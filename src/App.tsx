@@ -1,9 +1,19 @@
 import React from 'react';
 
-import './App.css';
+import { ThemeProvider } from 'styled-components';
 
-function App(): JSX.Element {
-    return <div className="App"></div>;
-}
+import { GlobalStyle } from './styles/globalStyles';
+import { light } from './styles/themes/light';
+
+const App: React.FC = (): JSX.Element => {
+    return (
+        <ThemeProvider theme={light}>
+            <GlobalStyle />
+            <div className="App"></div>
+        </ThemeProvider>
+    );
+};
+
+App.displayName = 'App';
 
 export default App;
