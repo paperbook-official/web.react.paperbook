@@ -6,7 +6,7 @@ export const Container = styled.div`
     height: 30px;
 
     background-color: #ffffff40;
-    border-radius: 10px;
+    border-radius: 5px;
     overflow: hidden;
 `;
 
