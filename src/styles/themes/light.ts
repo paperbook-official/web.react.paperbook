@@ -6,9 +6,12 @@ import { DefaultTheme } from 'styled-components';
 export const light: DefaultTheme = {
     title: 'light',
     colors: {
-        defaultBlue: '',
-        defaultGrey: '',
-        defaultGreyBlue: '',
-        defaultHighlightGreyBlue: ''
+        background: '#EFEFEF',
+        defaultBlue: '#2BABE1',
+        defaultGrey: '#AAAAAA',
+        defaultLightGrey: '#F5F5F5',
+        defaultDarkBlue: '#1A4152',
+        defaultHighlightGreyBlue: '#237BA0',
+        defaultYellow: '#FFE606'
     }
 };

@@ -12,7 +12,7 @@ export const GlobalStyle = createGlobalStyle`
         box-sizing: border-box;
 
         font-size: 16px;
-        font-family: sans-serif;
+        font-family: Poppins, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
