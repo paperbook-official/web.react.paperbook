@@ -1,5 +1,7 @@
 import React from 'react';
 
+import CookiesProvider from './contexts/cookiesContext';
+
 import { ThemeProvider } from 'styled-components';
 
 import Routes from './router';
@@ -10,7 +12,9 @@ const App: React.FC = (): JSX.Element => {
     return (
         <ThemeProvider theme={light}>
             <GlobalStyle />
-            <Routes />
+            <CookiesProvider>
+                <Routes />
+            </CookiesProvider>
         </ThemeProvider>
     );
 };
