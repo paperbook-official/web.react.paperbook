@@ -15,7 +15,7 @@ const Header: React.FC = (): JSX.Element => {
     const [cartAmount, setCartAmount] = useState(0);
 
     useEffect(() => {
-        setCartAmount(parseInt(getCookie('cartAmount')) || 0);
+        setCartAmount(parseInt(getCookie('paperbook-cartamount')) || 0);
     }, []);
 
     return (
