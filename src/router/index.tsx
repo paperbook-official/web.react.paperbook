@@ -3,6 +3,7 @@ import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
 
 import { isAuthenticated } from '../services/auth';
 
+import Login from '../pages/auth/Login';
 import Home from '../pages/Home';
 
 interface PrivateRouteProps {
@@ -29,7 +30,7 @@ const Routes = (): JSX.Element => (
         <Switch>
             <Route exact path="/" component={Home} />
             <Route exact path="/signup" component={() => <h1>Sign Up</h1>} />
-            <Route exact path="/login" component={() => <h1>Log In</h1>} />
+            <Route exact path="/login" component={Login} />
             <Route exact path="/cart" component={() => <h1>Cart</h1>} />
             <PrivateRoute path="/private" component={() => <h1>Private</h1>} />
             <Route path="*" component={() => <h1>Page Not Found</h1>} />

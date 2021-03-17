@@ -5,6 +5,8 @@ declare module 'styled-components' {
         title: string;
         colors: {
             background: string;
+            defaultDarkerGrey: string;
+            defaultDarkGrey: string;
             defaultGrey: string;
             defaultLightGrey: string;
             defaultDarkBlue: string;
