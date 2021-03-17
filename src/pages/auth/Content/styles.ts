@@ -15,12 +15,14 @@ export const Title = styled.span`
     color: ${(props) => props.theme.colors.defaultLightGrey};
     font-family: Quando;
     font-size: 4rem;
+    text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.4);
 `;
 
 export const Subtitle = styled.span`
     color: ${(props) => props.theme.colors.defaultLightGrey};
     font-family: Quando;
     font-size: 1.4rem;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 1);
 
     margin-top: 10px;
 `;
