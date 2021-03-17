@@ -14,6 +14,7 @@ export const dark: DefaultTheme = {
         defaultLightGrey: '',
         defaultDarkBlue: '',
         defaultHighlightGreyBlue: '',
-        defaultYellow: ''
+        defaultYellow: '',
+        defaultRed: ''
     }
 };

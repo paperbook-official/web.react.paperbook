@@ -14,6 +14,7 @@ export const light: DefaultTheme = {
         defaultLightGrey: '#F5F5F5',
         defaultDarkBlue: '#1A4152',
         defaultHighlightGreyBlue: '#237BA0',
-        defaultYellow: '#FFE606'
+        defaultYellow: '#FFE606',
+        defaultRed: '#EB5757'
     }
 };

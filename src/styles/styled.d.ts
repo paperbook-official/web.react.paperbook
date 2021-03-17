@@ -13,6 +13,7 @@ declare module 'styled-components' {
             defaultBlue: string;
             defaultHighlightGreyBlue: string;
             defaultYellow: string;
+            defaultRed: string;
         };
     }
 }
