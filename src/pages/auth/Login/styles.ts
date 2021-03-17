@@ -23,7 +23,7 @@ export const GradientOverlay = styled.div`
 
     background: linear-gradient(
         90deg,
-        rgba(32, 32, 32, 0.5) 0%,
+        rgba(32, 32, 32, 0.6) 0%,
         rgba(32, 32, 32, 0) 69.95%
     );
 `;
