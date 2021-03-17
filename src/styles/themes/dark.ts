@@ -8,6 +8,8 @@ export const dark: DefaultTheme = {
     colors: {
         background: '',
         defaultBlue: '',
+        defaultDarkerGrey: '',
+        defaultDarkGrey: '',
         defaultGrey: '',
         defaultLightGrey: '',
         defaultDarkBlue: '',
