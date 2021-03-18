@@ -1,7 +1,15 @@
-import styled from 'styled-components';
+import styled, { DefaultTheme } from 'styled-components';
+
+interface ButtonStyleProps {
+    theme: DefaultTheme;
+    disabled: boolean;
+}
 
 export const Label = styled.span`
-    color: ${(props) => props.theme.colors.defaultDarkBlue};
+    color: ${(props: ButtonStyleProps) =>
+        props.disabled
+            ? props.theme.colors.defaultGrey
+            : props.theme.colors.defaultDarkBlue};
     font-size: 1.3rem;
     font-weight: 500;
 
@@ -9,10 +17,14 @@ export const Label = styled.span`
 `;
 
 export const Container = styled.button`
-    cursor: pointer;
+    ${(props: ButtonStyleProps) => !props.disabled && 'cursor: pointer;'}
     outline: none;
     background-color: transparent;
-    border: 3px solid ${(props) => props.theme.colors.defaultDarkBlue};
+    border: 3px solid
+        ${(props) =>
+            props.disabled
+                ? props.theme.colors.defaultGrey
+                : props.theme.colors.defaultDarkBlue};
     border-radius: 150px;
 
     width: 210px;
@@ -21,12 +33,20 @@ export const Container = styled.button`
     transition: all 0.3s;
 
     &:hover {
-        border-color: transparent;
-        background-color: ${(props) => props.theme.colors.defaultDarkBlue};
-        transform: translateY(-5px);
+        ${(props: ButtonStyleProps) =>
+            !props.disabled && 'border-color: transparent;'}
+        background-color: ${(props) =>
+            props.disabled
+                ? 'transparent'
+                : props.theme.colors.defaultDarkBlue};
+        ${(props: ButtonStyleProps) =>
+            !props.disabled && 'transform: translateY(-5px);'}
     }
 
     &:hover ${Label} {
-        color: ${(props) => props.theme.colors.defaultLightGrey};
+        color: ${(props) =>
+            props.disabled
+                ? props.theme.colors.defaultGrey
+                : props.theme.colors.defaultLightGrey};
     }
 `;

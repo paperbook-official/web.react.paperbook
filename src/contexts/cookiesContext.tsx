@@ -1,6 +1,10 @@
 import React, { createContext, useState } from 'react';
 
+import { CookiesEnum } from '../models/enums/cookies';
+
 import { getCookie } from '../services/cookies';
+
+import CookieBar from '../components/organisms/CookieBar';
 
 export interface CookiesContextData {
     isCookiesAccepted: boolean;
@@ -21,7 +25,7 @@ export const CookiesProvider: React.FC<CookiesProviderProps> = ({
     children
 }: CookiesProviderProps) => {
     const [isCookiesAccepted, setCookiesAccepted] = useState(
-        getCookie('paperbook-access') === 'true'
+        getCookie(CookiesEnum.ACCESS_KEY) === 'true'
     );
 
     const [isCookiesBarConfirmed, setCookiesBarConfirmed] = useState(false);
@@ -38,6 +42,7 @@ export const CookiesProvider: React.FC<CookiesProviderProps> = ({
             }}
         >
             {children}
+            {!isCookiesAccepted && !isCookiesBarConfirmed && <CookieBar />}
         </CookiesContext.Provider>
 
         //#endregion

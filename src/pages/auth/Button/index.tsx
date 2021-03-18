@@ -6,16 +6,18 @@ interface ButtonProps {
     label: string;
     handleClick(): void;
     style?: React.CSSProperties;
+    disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
     label = 'Label',
     handleClick,
-    style
+    style,
+    disabled = false
 }: ButtonProps): JSX.Element => {
     return (
-        <Container style={style} onClick={handleClick}>
-            <Label>{label}</Label>
+        <Container disabled={disabled} style={style} onClick={handleClick}>
+            <Label disabled={disabled}>{label}</Label>
         </Container>
     );
 };

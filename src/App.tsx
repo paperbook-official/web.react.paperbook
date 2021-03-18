@@ -1,6 +1,9 @@
 import React from 'react';
 
+import AuthProvider from './contexts/authContext';
 import CookiesProvider from './contexts/cookiesContext';
+import LoadingProvider from './contexts/loadingContext';
+import UserProvider from './contexts/userContext';
 
 import { ThemeProvider } from 'styled-components';
 
@@ -12,9 +15,15 @@ const App: React.FC = (): JSX.Element => {
     return (
         <ThemeProvider theme={light}>
             <GlobalStyle />
-            <CookiesProvider>
-                <Routes />
-            </CookiesProvider>
+            <LoadingProvider>
+                <CookiesProvider>
+                    <AuthProvider>
+                        <UserProvider>
+                            <Routes />
+                        </UserProvider>
+                    </AuthProvider>
+                </CookiesProvider>
+            </LoadingProvider>
         </ThemeProvider>
     );
 };

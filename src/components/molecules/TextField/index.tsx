@@ -14,7 +14,7 @@ import {
 } from './styles';
 
 interface TextFieldProps {
-    value: string;
+    value?: string;
     label: string;
     name: string;
     type?: string;
@@ -22,6 +22,7 @@ interface TextFieldProps {
     validation?: (text: string) => boolean;
     onTextChange(text: string): void;
     onKeyDown?(event: React.KeyboardEvent<HTMLInputElement>): void;
+    isValid?(errorState: boolean): void;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -32,15 +33,23 @@ const TextField: React.FC<TextFieldProps> = ({
     errorMessage = '',
     validation,
     onTextChange,
-    onKeyDown
+    onKeyDown,
+    isValid
 }: TextFieldProps): JSX.Element => {
     const theme = useTheme();
 
     const [error, setError] = useState(false);
+    const [text, setText] = useState(value);
+
+    const onFieldChange = (text: string): void => {
+        setText(text);
+        onTextChange(text);
+    };
 
     const inputValidation = (text: string): void => {
         if (validation && !validation(text)) {
             setError(true);
+            if (isValid) isValid(false);
             const container = document.getElementsByClassName(
                 name + '-field-container'
             )[0];
@@ -56,6 +65,7 @@ const TextField: React.FC<TextFieldProps> = ({
     const clearError = (): void => {
         if (validation) {
             setError(false);
+            if (isValid) isValid(true);
             const icon = document.getElementsByClassName(
                 name + '-error-icon'
             )[0];
@@ -72,9 +82,9 @@ const TextField: React.FC<TextFieldProps> = ({
     return (
         <Container className={`${name}-field-container`}>
             <InputField
-                value={value}
+                value={text}
                 onKeyDown={onKeyDown}
-                onChange={(event) => onTextChange(event.target.value)}
+                onChange={(event) => onFieldChange(event.target.value)}
                 onBlur={(event) => inputValidation(event.target.value)}
                 onFocus={clearError}
                 name={name}
