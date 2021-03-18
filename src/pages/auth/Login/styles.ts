@@ -53,12 +53,30 @@ export const CardTitle = styled.div`
     margin-top: 70px;
 `;
 
+export const FormContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;
+
+export const FieldsContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 120px;
+
+    margin-top: 40px;
+`;
+
 export const FieldsFooterContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
 
     width: 80%;
+    margin-top: 30px;
 `;
 
 export const RememberContainer = styled.div`

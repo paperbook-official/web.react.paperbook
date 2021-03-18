@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 
+import { AuthPayload } from '../../../models/payloads/user';
+import { TokenProxy } from '../../../models/proxies/user';
+
+import api from '../../../services/api';
+
 import bookstore from '../../../assets/images/bookstore.jpg';
+
+import { useAuth } from '../../../hooks/useAuth';
+import { useCookies } from '../../../hooks/useCookies';
+import { useUser } from '../../../hooks/useUser';
 
 import BackButton from '../../../components/atoms/BackButton';
 import Checkbox from '../../../components/atoms/Checkbox';
 import SocialMedia from '../../../components/atoms/SocialMedia';
+import TextField from '../../../components/molecules/TextField';
 import { useTheme } from 'styled-components';
 
-import { ReactComponent as PaperBookIcon } from '../../../assets//icons/book-reader.svg';
+import { emailValidation } from '../../../utils/validations';
+
+import { ReactComponent as PaperBookIcon } from '../../../assets/icons/book-reader.svg';
 
 import AuthToggleScreen from '../AuthToggleScreen';
 import Button from '../Button';
@@ -18,8 +30,10 @@ import {
     Card,
     CardTitle,
     Container,
+    FieldsContainer,
     FieldsFooterContainer,
     ForgotPassword,
+    FormContainer,
     GradientOverlay,
     RememberContainer
 } from './styles';
@@ -27,17 +41,66 @@ import {
 const Login: React.FC = (): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
+    const { setMe } = useUser();
+    const { login, setToken, setTokenCookie } = useAuth();
+    const { isCookiesAccepted, setCookiesBarConfirmed } = useCookies();
 
     const [isRememberActive, setRememberActive] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isEmailValid, setEmailValid] = useState(false);
 
     const paperbookIconSize = 50;
 
     const handleButtonClick = (): void => {
-        history.push('/');
+        const payload: AuthPayload = {
+            email,
+            password
+        };
+
+        api.post<TokenProxy>('/auth/local', payload)
+            .then((response) => {
+                const data = response.data;
+                console.log(data);
+                if (data.token) {
+                    const expires =
+                        data.expiresIn[1] === 'a'
+                            ? parseInt(data.expiresIn[0]) * 365
+                            : parseInt(data.expiresIn[0]);
+
+                    setToken(data.token);
+                    if (isRememberActive) {
+                        setTokenCookie(data.token, expires);
+                    }
+                }
+                return data.token;
+            })
+            .then(async (token) => {
+                const userData = await login(token);
+                setMe(userData);
+                history.push('/');
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    };
+
+    const checkKeyboardKey = (
+        event: React.KeyboardEvent<HTMLInputElement>,
+        elementName: string
+    ): void => {
+        if (event.key === 'Enter') {
+            document.getElementsByName(elementName)[0].blur();
+
+            if (email.length > 0 && password.length > 0) {
+                handleButtonClick();
+            }
+        }
     };
 
     const handleCheckboxClick = (): void => {
-        setRememberActive(!isRememberActive);
+        if (isCookiesAccepted) setRememberActive(!isRememberActive);
+        else setCookiesBarConfirmed(false);
     };
 
     const handleBackButtonClick = (): void => {
@@ -50,18 +113,48 @@ const Login: React.FC = (): JSX.Element => {
             <GradientOverlay></GradientOverlay>
             <Card>
                 <CardTitle>Entrar</CardTitle>
-                <FieldsFooterContainer>
-                    <RememberContainer>
-                        <Checkbox
-                            isActive={isRememberActive}
-                            onClick={handleCheckboxClick}
+                <FormContainer>
+                    <FieldsContainer>
+                        <TextField
+                            label="E-mail"
+                            name="emailInput"
+                            onTextChange={setEmail}
+                            type="text"
+                            errorMessage="E-mail inválido!"
+                            validation={emailValidation}
+                            isValid={setEmailValid}
+                            onKeyDown={(
+                                event: React.KeyboardEvent<HTMLInputElement>
+                            ) => checkKeyboardKey(event, 'emailInput')}
                         />
-                        <span style={{ marginLeft: 5 }}>Lembrar</span>
-                    </RememberContainer>
-                    <ForgotPassword>Esqueceu a Senha?</ForgotPassword>
-                </FieldsFooterContainer>
+                        <TextField
+                            label="Senha"
+                            name="passwordInput"
+                            onTextChange={setPassword}
+                            type="password"
+                            onKeyDown={(
+                                event: React.KeyboardEvent<HTMLInputElement>
+                            ) => checkKeyboardKey(event, 'passwordInput')}
+                        />
+                    </FieldsContainer>
+                    <FieldsFooterContainer>
+                        <RememberContainer>
+                            <Checkbox
+                                isActive={isRememberActive}
+                                onClick={handleCheckboxClick}
+                            />
+                            <span
+                                style={{ pointerEvents: 'none', marginLeft: 5 }}
+                            >
+                                Lembrar
+                            </span>
+                        </RememberContainer>
+                        <ForgotPassword>Esqueceu a Senha?</ForgotPassword>
+                    </FieldsFooterContainer>
+                </FormContainer>
                 <Button
-                    style={{ marginTop: 100 }}
+                    style={{ marginBottom: 10 }}
+                    disabled={!isEmailValid || password.length <= 4}
                     label="Continuar"
                     handleClick={handleButtonClick}
                 />
