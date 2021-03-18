@@ -1,5 +1,6 @@
 import React from 'react';
 
+import ActionResultProvider from './contexts/actionResultContext';
 import AuthProvider from './contexts/authContext';
 import CookiesProvider from './contexts/cookiesContext';
 import LoadingProvider from './contexts/loadingContext';
@@ -15,15 +16,17 @@ const App: React.FC = (): JSX.Element => {
     return (
         <ThemeProvider theme={light}>
             <GlobalStyle />
-            <LoadingProvider>
-                <CookiesProvider>
-                    <AuthProvider>
-                        <UserProvider>
-                            <Routes />
-                        </UserProvider>
-                    </AuthProvider>
-                </CookiesProvider>
-            </LoadingProvider>
+            <ActionResultProvider>
+                <LoadingProvider>
+                    <CookiesProvider>
+                        <AuthProvider>
+                            <UserProvider>
+                                <Routes />
+                            </UserProvider>
+                        </AuthProvider>
+                    </CookiesProvider>
+                </LoadingProvider>
+            </ActionResultProvider>
         </ThemeProvider>
     );
 };
