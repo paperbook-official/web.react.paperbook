@@ -17,7 +17,47 @@ export const Container = styled.div`
     border-radius: 5px;
     padding: 20px;
 
+    transform: translateY(180px);
+
     background-color: ${(props) => props.theme.colors.defaultDarkBlue};
+
+    &.cookie-bar-move-in-animation {
+        animation-name: cookiebarentering;
+        animation-duration: 0.5s;
+        animation-delay: 0.2s;
+        animation-fill-mode: forwards;
+    }
+
+    &.cookie-bar-move-out-animation {
+        animation-name: cookiebarleaving;
+        animation-duration: 0.4s;
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+
+    @keyframes cookiebarentering {
+        0% {
+            transform: translateY(180px);
+        }
+        60% {
+            transform: translateY(-20px);
+        }
+        100% {
+            transform: translateY(0px);
+        }
+    }
+
+    @keyframes cookiebarleaving {
+        0% {
+            transform: translateY(0px);
+        }
+        60% {
+            transform: translateY(-20px);
+        }
+        100% {
+            transform: translateY(180px);
+        }
+    }
 `;
 
 export const CookieText = styled.span`
