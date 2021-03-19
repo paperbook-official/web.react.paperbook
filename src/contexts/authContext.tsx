@@ -1,7 +1,8 @@
 import React, { createContext, useState } from 'react';
 
 import { CookiesEnum } from '../models/enums/cookies';
-import { UserProxy } from '../models/proxies/user';
+import { AuthPayload, SignUpPayload } from '../models/payloads/user';
+import { TokenProxy, UserProxy } from '../models/proxies/user';
 
 import api from '../services/api';
 import { getCookie, setCookie, removeCookie } from '../services/cookies';
@@ -9,6 +10,8 @@ import { getCookie, setCookie, removeCookie } from '../services/cookies';
 export interface AuthContextData {
     token: string | undefined;
     setToken(token: string): void;
+    getToken(authPayload: AuthPayload): Promise<TokenProxy>;
+    signUp(payload: SignUpPayload): Promise<UserProxy>;
     login(token: string): Promise<UserProxy>;
     logout(): void;
     isAuthenticated(): boolean;
@@ -28,6 +31,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     children
 }: AuthProviderProps) => {
     const [token, setToken] = useState<string | undefined>(undefined);
+
     const login = async (token: string): Promise<UserProxy> => {
         const proxy = await api.get<UserProxy>('/users/me', {
             headers: {
@@ -35,6 +39,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
             }
         });
         return proxy.data;
+    };
+
+    const getToken = async (authPayload: AuthPayload): Promise<TokenProxy> => {
+        const response = await api.post<TokenProxy>('/auth/local', authPayload);
+        return response.data;
+    };
+
+    const signUp = async (payload: SignUpPayload): Promise<UserProxy> => {
+        const response = await api.post<UserProxy>('/users', payload);
+        return response.data;
     };
 
     const isAuthenticated = (): boolean => !!token;
@@ -59,6 +73,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
             value={{
                 token,
                 setToken,
+                getToken,
+                signUp,
                 login,
                 logout,
                 isAuthenticated,

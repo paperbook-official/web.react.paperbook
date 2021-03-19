@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 
+import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
 import { AuthPayload } from '../../../models/payloads/user';
-import { TokenProxy } from '../../../models/proxies/user';
-
-import api from '../../../services/api';
 
 import bookstore from '../../../assets/images/bookstore.jpg';
 
+import { useActionResult } from '../../../hooks/useActionResult';
 import { useAuth } from '../../../hooks/useAuth';
 import { useCookies } from '../../../hooks/useCookies';
 import { useUser } from '../../../hooks/useUser';
@@ -42,8 +41,9 @@ const Login: React.FC = (): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
     const { setMe } = useUser();
-    const { login, setToken, setTokenCookie } = useAuth();
+    const { login, getToken, setToken, setTokenCookie } = useAuth();
     const { isCookiesAccepted, setCookiesBarConfirmed } = useCookies();
+    const { show } = useActionResult();
 
     const [isRememberActive, setRememberActive] = useState(false);
     const [email, setEmail] = useState('');
@@ -52,37 +52,39 @@ const Login: React.FC = (): JSX.Element => {
 
     const paperbookIconSize = 50;
 
-    const handleButtonClick = (): void => {
+    const handleButtonClick = async (): Promise<void> => {
         const payload: AuthPayload = {
             email,
             password
         };
 
-        api.post<TokenProxy>('/auth/local', payload)
-            .then((response) => {
-                const data = response.data;
-                console.log(data);
-                if (data.token) {
-                    const expires =
-                        data.expiresIn[1] === 'a'
-                            ? parseInt(data.expiresIn[0]) * 365
-                            : parseInt(data.expiresIn[0]);
+        const data = await getToken(payload);
+        if (data.token) {
+            const expires =
+                data.expiresIn[1] === 'a'
+                    ? parseInt(data.expiresIn[0]) * 365
+                    : parseInt(data.expiresIn[0]);
 
-                    setToken(data.token);
-                    if (isRememberActive) {
-                        setTokenCookie(data.token, expires);
-                    }
-                }
-                return data.token;
-            })
-            .then(async (token) => {
-                const userData = await login(token);
+            setToken(data.token);
+            if (isRememberActive) {
+                setTokenCookie(data.token, expires);
+            }
+
+            try {
+                const userData = await login(data.token);
                 setMe(userData);
                 history.push('/');
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            } catch (error) {
+                const response = error.response.data;
+                if (response.statusCode === 401) {
+                    show(
+                        'Falha no Login',
+                        'E-mail ou senha incorreto(a)!',
+                        ActionResultEnum.ERROR
+                    );
+                }
+            }
+        }
     };
 
     const checkKeyboardKey = (
