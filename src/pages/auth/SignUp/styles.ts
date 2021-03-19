@@ -67,7 +67,7 @@ export const FieldsContainer = styled.div`
     justify-content: space-between;
     height: 240px;
 
-    margin-top: 40px;
+    margin-top: 30px;
 `;
 
 export const FullNameContainer = styled.div`
