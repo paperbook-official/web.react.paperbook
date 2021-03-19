@@ -1,3 +1,4 @@
+import { AddressProxy } from './address';
 export interface TokenProxy {
     token: string;
     expiresIn: string;
@@ -14,4 +15,5 @@ export interface UserProxy {
     cpf: string;
     permissions: string;
     phone: string;
+    addresses: AddressProxy[];
 }
