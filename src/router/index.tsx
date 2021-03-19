@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../hooks/useUser';
 
 import Login from '../pages/auth/Login';
+import SignUp from '../pages/auth/SignUp';
 import Home from '../pages/Home';
 
 interface PrivateRouteProps {
@@ -70,11 +71,7 @@ const Routes = (): JSX.Element => {
         <BrowserRouter>
             <Switch>
                 <Route exact path="/" component={Home} />
-                <AuthRoute
-                    exact
-                    path="/signup"
-                    component={() => <h1>Sign Up</h1>}
-                />
+                <AuthRoute exact path="/signup" component={SignUp} />
                 <AuthRoute exact path="/login" component={Login} />
                 <Route exact path="/cart" component={() => <h1>Cart</h1>} />
                 <PrivateRoute
