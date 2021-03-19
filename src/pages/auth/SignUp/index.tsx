@@ -69,7 +69,10 @@ const SignUp: React.FC = (): JSX.Element => {
             name,
             lastName,
             email,
-            password
+            password,
+            cpf: null,
+            roles: null,
+            phone: null
         };
 
         const authPayload: AuthPayload = {
@@ -80,8 +83,10 @@ const SignUp: React.FC = (): JSX.Element => {
         try {
             const userData = await signUp(payload);
             setMe(userData);
+            console.log(userData);
 
             const data = await getToken(authPayload);
+            console.log(data);
             if (data.token) {
                 const expires =
                     data.expiresIn[1] === 'a'
@@ -231,22 +236,23 @@ const SignUp: React.FC = (): JSX.Element => {
                             </span>
                         </CheckboxContainer>
                     </FieldsFooterContainer>
-                    <FieldsFooterContainer>
+                    <FieldsFooterContainer style={{ marginTop: 5 }}>
                         <CheckboxContainer>
                             <Checkbox
                                 isActive={isRememberActive}
                                 onClick={handleRememberClick}
                             />
-                            <span style={{ marginLeft: 5 }}>
+                            <span
+                                style={{ pointerEvents: 'none', marginLeft: 5 }}
+                            >
                                 Lembrar de mim
                             </span>
                         </CheckboxContainer>
                     </FieldsFooterContainer>
                 </FormContainer>
                 <Button
-                    style={{ marginBottom: 10 }}
                     disabled={!isFormValid()}
-                    label="Continuar"
+                    label="Vamos lá"
                     handleClick={handleButtonClick}
                 />
                 <AuthToggleScreen
