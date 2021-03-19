@@ -8,7 +8,7 @@ export interface SignUpPayload {
     lastName: string;
     email: string;
     password: string;
-    cpf: string;
-    roles: string;
-    phone: string;
+    cpf?: string;
+    roles?: string;
+    phone?: string;
 }
