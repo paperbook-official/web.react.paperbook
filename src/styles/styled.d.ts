@@ -5,6 +5,7 @@ declare module 'styled-components' {
         title: string;
         colors: {
             background: string;
+            white: string;
             defaultDarkerGrey: string;
             defaultDarkGrey: string;
             defaultGrey: string;
@@ -14,6 +15,7 @@ declare module 'styled-components' {
             defaultHighlightGreyBlue: string;
             defaultYellow: string;
             defaultRed: string;
+            defaultLightGreen: string;
         };
     }
 }
