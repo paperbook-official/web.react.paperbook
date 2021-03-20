@@ -7,6 +7,7 @@ export const dark: DefaultTheme = {
     title: 'dark',
     colors: {
         background: '',
+        white: '',
         defaultBlue: '',
         defaultDarkerGrey: '',
         defaultDarkGrey: '',
@@ -15,6 +16,7 @@ export const dark: DefaultTheme = {
         defaultDarkBlue: '',
         defaultHighlightGreyBlue: '',
         defaultYellow: '',
-        defaultRed: ''
+        defaultRed: '',
+        defaultLightGreen: ''
     }
 };

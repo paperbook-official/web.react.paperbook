@@ -4,6 +4,7 @@ import ActionResultProvider from './contexts/actionResultContext';
 import AuthProvider from './contexts/authContext';
 import CookiesProvider from './contexts/cookiesContext';
 import LoadingProvider from './contexts/loadingContext';
+import ShippingProvider from './contexts/shippingContext';
 import UserProvider from './contexts/userContext';
 
 import { ThemeProvider } from 'styled-components';
@@ -19,11 +20,13 @@ const App: React.FC = (): JSX.Element => {
             <ActionResultProvider>
                 <LoadingProvider>
                     <CookiesProvider>
-                        <AuthProvider>
-                            <UserProvider>
-                                <Routes />
-                            </UserProvider>
-                        </AuthProvider>
+                        <ShippingProvider>
+                            <AuthProvider>
+                                <UserProvider>
+                                    <Routes />
+                                </UserProvider>
+                            </AuthProvider>
+                        </ShippingProvider>
                     </CookiesProvider>
                 </LoadingProvider>
             </ActionResultProvider>

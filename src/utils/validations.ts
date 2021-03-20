@@ -12,3 +12,8 @@ export const nameValidation = (name: string): boolean => {
     const regex = /^([a-zA-Z]{1,}'?-?([a-zA-Z]{1,})?)/;
     return regex.test(name);
 };
+
+export const cepValidation = (cep: string): boolean => {
+    const regex = /[0-9]{8}/g;
+    return regex.test(cep);
+};

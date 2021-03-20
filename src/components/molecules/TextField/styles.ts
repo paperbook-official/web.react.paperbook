@@ -57,8 +57,6 @@ export const ErrorIconContainer = styled.div`
     right: 5px;
     bottom: 20%;
 
-    background-color: ${(props) => props.theme.colors.background};
-
     width: 30px;
     height: 20px;
 
