@@ -20,6 +20,7 @@ interface TextFieldProps {
     name: string;
     type?: string;
     errorMessage?: string;
+    length?: number;
     validation?: (text: string) => boolean;
     onTextChange(text: string): void;
     onKeyDown?(event: React.KeyboardEvent<HTMLInputElement>): void;
@@ -33,6 +34,7 @@ const TextField: React.FC<TextFieldProps> = ({
     name,
     type = 'text',
     errorMessage = '',
+    length,
     validation,
     onTextChange,
     onKeyDown,
@@ -93,6 +95,7 @@ const TextField: React.FC<TextFieldProps> = ({
                 type={type}
                 theme={theme}
                 error={error}
+                maxLength={length}
                 required
             />
             <InputLabel error={error}>{label}</InputLabel>
