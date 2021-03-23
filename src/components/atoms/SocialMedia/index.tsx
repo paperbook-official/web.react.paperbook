@@ -10,21 +10,23 @@ import { Container } from './styles';
 
 interface SocialMediaProps {
     style?: React.CSSProperties;
+    baseIconColor?: string;
 }
 
 const SocialMedia: React.FC<SocialMediaProps> = ({
-    style
+    style,
+    baseIconColor
 }: SocialMediaProps): JSX.Element => {
     const theme = useTheme();
 
     const [facebookColor, setFacebookColor] = useState(
-        theme.colors.defaultLightGrey
+        baseIconColor || theme.colors.defaultLightGrey
     );
     const [twitterColor, setTwitterColor] = useState(
-        theme.colors.defaultLightGrey
+        baseIconColor || theme.colors.defaultLightGrey
     );
     const [instagramColor, setInstagramColor] = useState(
-        theme.colors.defaultLightGrey
+        baseIconColor || theme.colors.defaultLightGrey
     );
 
     const iconSize = 30;
@@ -46,7 +48,9 @@ const SocialMedia: React.FC<SocialMediaProps> = ({
             <FacebookIcon
                 onMouseEnter={() => setFacebookColor('#4267B2')}
                 onMouseLeave={() =>
-                    setFacebookColor(theme.colors.defaultLightGrey)
+                    setFacebookColor(
+                        baseIconColor || theme.colors.defaultLightGrey
+                    )
                 }
                 onClick={handleFacebookClick}
                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -57,7 +61,9 @@ const SocialMedia: React.FC<SocialMediaProps> = ({
             <TwitterIcon
                 onMouseEnter={() => setTwitterColor('#1DA1F2')}
                 onMouseLeave={() =>
-                    setTwitterColor(theme.colors.defaultLightGrey)
+                    setTwitterColor(
+                        baseIconColor || theme.colors.defaultLightGrey
+                    )
                 }
                 onClick={handleTwitterClick}
                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}
@@ -68,7 +74,9 @@ const SocialMedia: React.FC<SocialMediaProps> = ({
             <InstagramIcon
                 onMouseEnter={() => setInstagramColor('#FFDC80')}
                 onMouseLeave={() =>
-                    setInstagramColor(theme.colors.defaultLightGrey)
+                    setInstagramColor(
+                        baseIconColor || theme.colors.defaultLightGrey
+                    )
                 }
                 onClick={handleInstagramClick}
                 style={{ cursor: 'pointer', transition: 'all 0.2s' }}

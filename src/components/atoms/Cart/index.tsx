@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { useTheme } from 'styled-components';
 
@@ -13,13 +13,24 @@ interface CartProps {
 const Cart: React.FC<CartProps> = ({
     cartAmount = 0
 }: CartProps): JSX.Element => {
-    const iconSize = 30;
-
     const theme = useTheme();
 
+    const [iconColor, setIconColor] = useState(theme.colors.background);
+
+    const iconSize = 30;
+
     return (
-        <Container theme={theme}>
-            <CartIcon width={`${iconSize}px`} height={`${iconSize}px`} />
+        <Container
+            theme={theme}
+            onMouseEnter={() => setIconColor(theme.colors.defaultGrey)}
+            onMouseLeave={() => setIconColor(theme.colors.background)}
+        >
+            <CartIcon
+                color={iconColor}
+                style={{ transition: 'all 0.2s' }}
+                width={`${iconSize}px`}
+                height={`${iconSize}px`}
+            />
             {cartAmount > 0 ? <CartCounter>{cartAmount}</CartCounter> : <></>}
         </Container>
     );

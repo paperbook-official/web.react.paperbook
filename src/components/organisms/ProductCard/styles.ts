@@ -4,8 +4,7 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
 
-    height: 480px;
-    max-height: 500px;
+    height: 500px;
     width: 300px;
 
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -13,16 +12,18 @@ export const Container = styled.div`
     background-color: white;
     cursor: pointer;
 
+    transform: scale(0.85);
+
     transition: all 0.3s;
 
     &:hover {
         background-color: ${(props) => props.theme.colors.defaultLightGrey};
-        transform: scale(1.03);
+        transform: scale(0.9);
     }
 
     &:active {
-        box-shadow: none;
-        transform: scale(1.02);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
+        transform: scale(0.87);
     }
 `;
 
