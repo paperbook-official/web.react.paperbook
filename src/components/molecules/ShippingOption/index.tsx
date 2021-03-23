@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useTheme } from 'styled-components';
+
 import {
     SelectedContainer,
     ArriveDate,
@@ -26,6 +28,8 @@ const ShippingOption: React.FC<ShippingOptionProps> = ({
     onClick,
     style
 }: ShippingOptionProps): JSX.Element => {
+    const theme = useTheme();
+
     const days = [
         'Domingo',
         'Segunda-Feira',
@@ -66,9 +70,17 @@ const ShippingOption: React.FC<ShippingOptionProps> = ({
                     Chegará{' '}
                     <span style={{ fontWeight: 500 }}>{getArriveDate()}</span>
                 </ArriveDate>
-                <Price>
-                    R$ <span>{price.toFixed(2).replace(/\./, ',')}</span>
-                </Price>
+                {price > 0 ? (
+                    <Price>
+                        R$ <span>{price.toFixed(2).replace(/\./, ',')}</span>
+                    </Price>
+                ) : (
+                    <Price>
+                        <span style={{ color: theme.colors.defaultLightGreen }}>
+                            Grátis
+                        </span>
+                    </Price>
+                )}
             </InfoContainer>
         </Container>
     );
