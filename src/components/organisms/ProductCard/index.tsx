@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
 import { ProductProxy } from '../../../models/proxies/product';
-import { UserProxy } from '../../../models/proxies/user';
 
 import Rating from '../../../components/atoms/Rating';
+
+import { formatPrice } from '../../../utils/formatters';
 
 import {
     Container,
@@ -19,79 +20,35 @@ import {
 
 interface ProductCardProps {
     image: string;
-    title: string;
-    seller: string;
-    fullPrice: number;
-    installmentPrice: number;
-    installmentAmount: number;
-    stockAmount: number;
-    discountAmount?: number;
+    product: ProductProxy;
     rating?: number;
     onClick(product: ProductProxy): void;
+    style?: React.CSSProperties;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
     image,
-    title,
-    seller,
-    fullPrice,
-    installmentPrice,
-    installmentAmount,
-    stockAmount,
-    discountAmount = 0,
+    product,
     rating = 0,
-    onClick
+    onClick,
+    style
 }: ProductCardProps): JSX.Element => {
-    const [currentPrice] = useState(fullPrice * (1 - discountAmount));
-    const [currentInstallmentPrice] = useState(
-        installmentPrice * (1 - discountAmount)
+    const [currentPrice] = useState(
+        product.fullPrice * (1 - product.discountAmount)
     );
-    const [hasDiscount] = useState(discountAmount > 0);
-    const [hasInstallment] = useState(installmentAmount > 1);
+    const [currentInstallmentPrice] = useState(
+        product.installmentPrice * (1 - product.discountAmount)
+    );
+    const [hasDiscount] = useState(product.discountAmount > 0);
+    const [hasInstallment] = useState(product.installmentAmount > 1);
     const [isInterestFree] = useState(currentPrice === currentInstallmentPrice);
 
     const getInstallment = (): number => {
-        return currentInstallmentPrice / installmentAmount;
-    };
-
-    const formatPrice = (price: number): string => {
-        return price.toFixed(2).replace(/\./, ',');
-    };
-
-    // TODO - remove hardcoded user
-    const user: UserProxy = {
-        id: 3,
-        createdAt: '2021-03-17T02:01:03.708Z',
-        updatedAt: '2021-03-17T02:01:03.708Z',
-        isActive: true,
-        name: 'usuario',
-        lastName: 'vendedor',
-        email: 'seller@email.com',
-        cpf: '12345678910',
-        permissions: 'seller',
-        phone: '15988776655',
-        addresses: []
-    };
-
-    // TODO - remove hardcoded product
-    const product = {
-        id: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isActive: true,
-        name: title,
-        description: 'Any Description',
-        fullPrice,
-        installmentPrice,
-        installmentAmount,
-        discountAmount,
-        stockAmount,
-        userId: user.id,
-        user
+        return currentInstallmentPrice / product.installmentAmount;
     };
 
     return (
-        <Container onClick={() => onClick(product)}>
+        <Container style={style} onClick={() => onClick(product)}>
             <ImageContainer>
                 <img src={image} alt="book cover" />
             </ImageContainer>
@@ -99,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <PriceContainer>
                     {hasDiscount && (
                         <Price className="full-price">
-                            R$ {formatPrice(fullPrice)}
+                            R$ {formatPrice(product.fullPrice)}
                         </Price>
                     )}
                     <span
@@ -111,14 +68,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                         <Price>R$ {formatPrice(currentPrice)}</Price>
                         {hasDiscount && (
-                            <Discount>%{discountAmount * 100} OFF</Discount>
+                            <Discount>
+                                %{product.discountAmount * 100} OFF
+                            </Discount>
                         )}
                     </span>
                     {hasInstallment && (
                         <span>
                             em{' '}
                             <Installment isInterestFree={isInterestFree}>
-                                {installmentAmount}x R${' '}
+                                {product.installmentAmount}x R${' '}
                                 {formatPrice(getInstallment())}{' '}
                                 {isInterestFree && 'sem juros'}
                             </Installment>
@@ -126,8 +85,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     )}
                 </PriceContainer>
                 <div>
-                    <Title>{title}</Title>
-                    <Seller>por {seller}</Seller>
+                    <Title>{product.name}</Title>
+                    <Seller>por {product.user.name}</Seller>
                 </div>
                 <div style={{ width: 80 }}>
                     <Rating size={15} rating={rating} />
