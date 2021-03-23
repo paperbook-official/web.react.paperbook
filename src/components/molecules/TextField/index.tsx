@@ -25,6 +25,7 @@ interface TextFieldProps {
     onTextChange(text: string): void;
     onKeyDown?(event: React.KeyboardEvent<HTMLInputElement>): void;
     isValid?(errorState: boolean): void;
+    inputStyle?: React.CSSProperties;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -38,7 +39,8 @@ const TextField: React.FC<TextFieldProps> = ({
     validation,
     onTextChange,
     onKeyDown,
-    isValid
+    isValid,
+    inputStyle
 }: TextFieldProps): JSX.Element => {
     const theme = useTheme();
 
@@ -97,6 +99,7 @@ const TextField: React.FC<TextFieldProps> = ({
                 error={error}
                 maxLength={length}
                 required
+                style={inputStyle}
             />
             <InputLabel error={error}>{label}</InputLabel>
             <InputBorder error={error}></InputBorder>
