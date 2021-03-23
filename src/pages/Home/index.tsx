@@ -300,7 +300,12 @@ const Home: React.FC = (): JSX.Element => {
         <Container theme={theme}>
             <FirstPageContainer>
                 <ImageContainer>
-                    <Image src={openBook} alt="home-background" />
+                    <Image
+                        src={openBook}
+                        alt="home-background"
+                        height={725}
+                        width={967}
+                    />
                 </ImageContainer>
                 <CustomHeader />
                 <CategoriesBar

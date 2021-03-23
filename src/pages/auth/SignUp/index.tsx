@@ -151,7 +151,12 @@ const SignUp: React.FC = (): JSX.Element => {
 
     return (
         <Container theme={theme}>
-            <BackgroundImage src={openbook} alt="bookstore" />
+            <BackgroundImage
+                src={openbook}
+                alt="bookstore"
+                height={2560}
+                width={1440}
+            />
             <GradientOverlay></GradientOverlay>
             <Card>
                 <CardTitle>Registrar</CardTitle>

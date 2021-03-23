@@ -111,7 +111,12 @@ const Login: React.FC = (): JSX.Element => {
 
     return (
         <Container theme={theme}>
-            <BackgroundImage src={bookstore} alt="bookstore" />
+            <BackgroundImage
+                src={bookstore}
+                alt="bookstore"
+                height={1332}
+                width={1441}
+            />
             <GradientOverlay></GradientOverlay>
             <Card>
                 <CardTitle>Entrar</CardTitle>
