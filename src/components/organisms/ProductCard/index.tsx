@@ -89,7 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </PriceContainer>
                 <div>
                     <Title>{product.name}</Title>
-                    <Seller>por {product.user?.name}</Seller>
+                    <Seller>por {product.user.name}</Seller>
                 </div>
                 <div style={{ width: 80 }}>
                     <Rating size={15} rating={rating} />

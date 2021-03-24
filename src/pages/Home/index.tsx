@@ -152,6 +152,7 @@ const Home: React.FC = (): JSX.Element => {
             page: number,
             offset: number,
             itemsPerPage: number,
+            join?: string,
             orderBy?: string[]
         ) => Promise<ManyProductProxy>
     ): Promise<ManyProductProxy> => {

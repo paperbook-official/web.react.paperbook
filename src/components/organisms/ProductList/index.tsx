@@ -44,7 +44,7 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
     const setInitialState = async (): Promise<void> => {
         const response = await request(productAmount * 2, page);
         setProductsList(response.data);
-        setCurrentProducts(response.data.slice(0, productAmount));
+        setCurrentProducts(response.data?.slice(0, productAmount));
         setTotalProducts(response.total);
     };
 
@@ -113,7 +113,7 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
                         color={theme.colors.defaultHighlightGreyBlue}
                     />
                 </ChangePageIconContainer>
-                {currentProducts.map((product) => (
+                {currentProducts?.map((product) => (
                     <ProductCard
                         key={product.id}
                         product={product}
