@@ -15,3 +15,11 @@ export interface ProductProxy {
     userId: number;
     user: UserProxy;
 }
+
+export interface ManyProductProxy {
+    count: number;
+    total: number;
+    page: number;
+    pageCount: number;
+    data: ProductProxy[];
+}

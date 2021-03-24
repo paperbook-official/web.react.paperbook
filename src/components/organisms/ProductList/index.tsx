@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { ProductProxy } from '../../../models/proxies/product';
+import {
+    ManyProductProxy,
+    ProductProxy
+} from '../../../models/proxies/product';
 
 import { useTheme } from 'styled-components';
 
@@ -17,7 +20,7 @@ import {
 interface ProductFlatListProps {
     topicTitle: string;
     onProductClick(product: ProductProxy): void;
-    request(itemsPerPage: number, page: number): ProductProxy[];
+    request(itemsPerPage: number, page: number): Promise<ManyProductProxy>;
     style?: React.CSSProperties;
 }
 
@@ -36,11 +39,18 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
     const [page, setPage] = useState(1);
     const [productsList, setProductsList] = useState<ProductProxy[]>([]);
     const [currentProducts, setCurrentProducts] = useState<ProductProxy[]>([]);
+    const [totalProducts, setTotalProducts] = useState<number | null>(null);
+
+    const setInitialState = async (): Promise<void> => {
+        const response = await request(productAmount * 2, page);
+        setProductsList(response.data);
+        setCurrentProducts(response.data.slice(0, productAmount));
+        setTotalProducts(response.total);
+    };
 
     useEffect(() => {
         setItemsPerPage(productAmount);
-        setProductsList(request(productAmount * 2, page));
-        setCurrentProducts(request(productAmount, page));
+        setInitialState();
     }, []);
 
     const getOffset = (nPage: number): number => {
@@ -61,9 +71,9 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
 
     const nextPage = async (): Promise<void> => {
         const nPage = page + 1;
-        if (!productsList[getOffset(nPage + 1)]) {
+        if (totalProducts && totalProducts > productsList.length) {
             const response = await request(itemsPerPage, nPage + 1);
-            setProductsList([...productsList, ...response]);
+            setProductsList([...productsList, ...response.data]);
         }
         setCurrentProducts(getPageContent(nPage));
         setPage(nPage);
@@ -75,8 +85,19 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
         setPage(nPage);
     };
 
+    const hasMorePages = (): boolean => {
+        return (
+            !!totalProducts &&
+            totalProducts > itemsPerPage &&
+            totalProducts > page * itemsPerPage
+        );
+    };
+
     return (
-        <Container style={style}>
+        <Container
+            style={style}
+            isVisible={!!totalProducts && totalProducts > 2}
+        >
             <TopicTitle>{topicTitle}</TopicTitle>
             <FlatListContainer>
                 <ChangePageIconContainer
@@ -105,10 +126,8 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
                     onClick={nextPage}
                     style={{
                         marginRight: 20,
-                        opacity: productsList[getOffset(page + 1)] ? 1 : 0,
-                        pointerEvents: productsList[getOffset(page + 1)]
-                            ? 'visible'
-                            : 'none'
+                        opacity: hasMorePages() ? 1 : 0,
+                        pointerEvents: hasMorePages() ? 'visible' : 'none'
                     }}
                 >
                     <ArrowIcon color={theme.colors.defaultHighlightGreyBlue} />

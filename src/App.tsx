@@ -4,6 +4,7 @@ import ActionResultProvider from './contexts/actionResultContext';
 import AuthProvider from './contexts/authContext';
 import CookiesProvider from './contexts/cookiesContext';
 import LoadingProvider from './contexts/loadingContext';
+import ProductProvider from './contexts/productContext';
 import ShippingProvider from './contexts/shippingContext';
 import UserProvider from './contexts/userContext';
 
@@ -23,7 +24,9 @@ const App: React.FC = (): JSX.Element => {
                         <ShippingProvider>
                             <AuthProvider>
                                 <UserProvider>
-                                    <Routes />
+                                    <ProductProvider>
+                                        <Routes />
+                                    </ProductProvider>
                                 </UserProvider>
                             </AuthProvider>
                         </ShippingProvider>

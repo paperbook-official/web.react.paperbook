@@ -37,11 +37,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
         product.fullPrice * (1 - product.discountAmount)
     );
     const [currentInstallmentPrice] = useState(
-        product.installmentPrice * (1 - product.discountAmount)
+        !product.installmentPrice ||
+            product.installmentPrice <= product.fullPrice
+            ? currentPrice
+            : product.installmentPrice * (1 - product.discountAmount)
     );
     const [hasDiscount] = useState(product.discountAmount > 0);
     const [hasInstallment] = useState(product.installmentAmount > 1);
-    const [isInterestFree] = useState(currentPrice === currentInstallmentPrice);
+    const [isInterestFree] = useState(currentPrice >= currentInstallmentPrice);
 
     const getInstallment = (): number => {
         return currentInstallmentPrice / product.installmentAmount;
@@ -86,7 +89,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </PriceContainer>
                 <div>
                     <Title>{product.name}</Title>
-                    <Seller>por {product.user.name}</Seller>
+                    <Seller>por {product.user?.name}</Seller>
                 </div>
                 <div style={{ width: 80 }}>
                     <Rating size={15} rating={rating} />

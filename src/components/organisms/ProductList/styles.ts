@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+    display: ${(props: { isVisible: boolean }) =>
+        props.isVisible ? 'block' : 'none'};
     width: 100%;
     height: auto;
     margin-top: 30px;

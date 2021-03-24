@@ -58,31 +58,37 @@ const Login: React.FC = (): JSX.Element => {
             password
         };
 
-        const data = await getToken(payload);
-        if (data.token) {
-            const expires =
-                data.expiresIn[1] === 'a'
-                    ? parseInt(data.expiresIn[0]) * 365
-                    : parseInt(data.expiresIn[0]);
+        try {
+            const data = await getToken(payload);
+            if (data.token) {
+                const expires =
+                    data.expiresIn[1] === 'a'
+                        ? parseInt(data.expiresIn[0]) * 365
+                        : parseInt(data.expiresIn[0]);
 
-            setToken(data.token);
-            if (isRememberActive) {
-                setTokenCookie(data.token, expires);
-            }
+                setToken(data.token);
+                if (isRememberActive) {
+                    setTokenCookie(data.token, expires);
+                }
 
-            try {
                 const userData = await login(data.token);
                 setMe(userData);
-                history.push('/');
-            } catch (error) {
-                const response = error.response.data;
-                if (response.statusCode === 401) {
-                    show(
-                        'Falha no Login',
-                        'E-mail ou senha incorreto(a)!',
-                        ActionResultEnum.ERROR
-                    );
-                }
+            }
+        } catch (error) {
+            const response = error.response.data;
+            if (response.statusCode === 401) {
+                show(
+                    'Falha no Login',
+                    'E-mail ou senha incorreto(a)!',
+                    ActionResultEnum.ERROR
+                );
+            }
+            if (response.statusCode === 500) {
+                show(
+                    'Falha no Login',
+                    'Falha ao conectar-se ao servidor!',
+                    ActionResultEnum.ERROR
+                );
             }
         }
     };
@@ -106,7 +112,7 @@ const Login: React.FC = (): JSX.Element => {
     };
 
     const handleBackButtonClick = (): void => {
-        history.push('/');
+        history.goBack();
     };
 
     return (
