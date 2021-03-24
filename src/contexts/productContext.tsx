@@ -13,6 +13,7 @@ export interface ProductContextData {
         page: number,
         offset: number,
         limit: number,
+        join?: string,
         orderBy?: string[]
     ): Promise<ManyProductProxy>;
     getProductsByPrice(
@@ -20,29 +21,34 @@ export interface ProductContextData {
         page: number,
         offset: number,
         limit: number,
+        join?: string,
         orderBy?: string[]
     ): Promise<ManyProductProxy>;
     getProductsOnSale(
         page: number,
         offset: number,
         limit: number,
+        join?: string,
         orderBy?: string[]
     ): Promise<ManyProductProxy>;
     getInterestFree(
         page: number,
         offset: number,
         limit: number,
+        join?: string,
         orderBy?: string[]
     ): Promise<ManyProductProxy>;
     getRecentProducts(
         page: number,
         offset: number,
-        limit: number
+        limit: number,
+        join?: string
     ): Promise<ManyProductProxy>;
     getMostBought(
         page: number,
         offset: number,
         limit: number,
+        join?: string,
         orderBy?: string[]
     ): Promise<ManyProductProxy>;
 }
@@ -87,9 +93,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
+        join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy('/products?', orderBy);
+        url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         console.log(url);
@@ -108,10 +116,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
+        join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy('/products?', orderBy);
         url += `filter=fullPrice||$lt||${price}`;
+        url += `&join=${join}`;
         url += `&limit=${limit}&offset=${offset}&page=${page}`;
 
         console.log('price\n', url);
@@ -127,9 +137,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
+        join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy('/products/on-sale?', orderBy);
+        url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         console.log('sale\n', url);
@@ -145,12 +157,14 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
+        join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy(
             '/products/free-of-interests?',
             orderBy
         );
+        url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         console.log('interestfree\n', url);
@@ -165,9 +179,10 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     const getRecentProducts = async (
         page: number,
         offset: number,
-        limit: number
+        limit: number,
+        join = 'user||name'
     ): Promise<ManyProductProxy> => {
-        const url = `/products/recents?limit=${limit}&offset=${offset}&page=${page}`;
+        const url = `/products/recents?join=${join}limit=${limit}&offset=${offset}&page=${page}`;
         console.log('recent\n', url);
 
         const response = await api.get<ManyProductProxy>(url, {
@@ -181,10 +196,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
+        join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy('/products?', orderBy);
-
+        url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         console.log('mostbought\n', url);
