@@ -31,10 +31,10 @@ const PrivateRoute: React.FC<PrivateRouteProps> = (
     props: PrivateRouteProps
 ): JSX.Element => {
     const history = useHistory();
-    const { getTokenCookie } = useAuth();
-    const token = getTokenCookie();
+    const { getTokenCookie, token } = useAuth();
+    const tokenCookie = getTokenCookie();
 
-    return token ? (
+    return token || tokenCookie ? (
         <Route
             path={props.path}
             exact={props.exact}
@@ -56,10 +56,10 @@ const AuthRoute: React.FC<AuthRouteProps> = (
     const history = useHistory();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const state: any = history.location.state;
-    const { getTokenCookie } = useAuth();
-    const token = getTokenCookie();
+    const { getTokenCookie, token } = useAuth();
+    const tokenCookie = getTokenCookie();
 
-    return token ? (
+    return token || tokenCookie ? (
         <Redirect to={{ pathname: state?.from || '/' }} />
     ) : (
         <Route
