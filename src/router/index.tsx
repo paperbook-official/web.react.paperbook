@@ -1,5 +1,11 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom';
+import {
+    BrowserRouter,
+    Redirect,
+    Route,
+    Switch,
+    useHistory
+} from 'react-router-dom';
 
 import { useAuth } from '../hooks/useAuth';
 import { useUser } from '../hooks/useUser';
@@ -7,6 +13,7 @@ import { useUser } from '../hooks/useUser';
 import Login from '../pages/auth/Login';
 import SignUp from '../pages/auth/SignUp';
 import Home from '../pages/Home';
+import Products from '../pages/Products';
 
 interface PrivateRouteProps {
     component: React.FC;
@@ -23,7 +30,10 @@ interface AuthRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = (
     props: PrivateRouteProps
 ): JSX.Element => {
-    const { token } = useAuth();
+    const history = useHistory();
+    const { getTokenCookie } = useAuth();
+    const token = getTokenCookie();
+
     return token ? (
         <Route
             path={props.path}
@@ -31,16 +41,26 @@ const PrivateRoute: React.FC<PrivateRouteProps> = (
             component={props.component}
         />
     ) : (
-        <Redirect to="/login" />
+        <Redirect
+            to={{
+                pathname: '/login',
+                state: { from: history.location.pathname }
+            }}
+        />
     );
 };
 
 const AuthRoute: React.FC<AuthRouteProps> = (
     props: AuthRouteProps
 ): JSX.Element => {
-    const { token } = useAuth();
+    const history = useHistory();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const state: any = history.location.state;
+    const { getTokenCookie } = useAuth();
+    const token = getTokenCookie();
+
     return token ? (
-        <Redirect to="/" />
+        <Redirect to={{ pathname: state?.from || '/' }} />
     ) : (
         <Route
             path={props.path}
@@ -52,13 +72,14 @@ const AuthRoute: React.FC<AuthRouteProps> = (
 
 const Routes = (): JSX.Element => {
     const { setMe } = useUser();
-    const { getTokenCookie, login } = useAuth();
+    const { getTokenCookie, login, setToken } = useAuth();
 
     const autoLogin = async (): Promise<void> => {
         const token = getTokenCookie();
 
         if (token) {
             const userData = await login(token);
+            setToken(token);
             setMe(userData);
         }
     };
@@ -74,10 +95,7 @@ const Routes = (): JSX.Element => {
                 <AuthRoute exact path="/signup" component={SignUp} />
                 <AuthRoute exact path="/login" component={Login} />
                 <Route exact path="/cart" component={() => <h1>Cart</h1>} />
-                <PrivateRoute
-                    path="/private"
-                    component={() => <h1>Private</h1>}
-                />
+                <PrivateRoute path="/products/new" component={Products} />
                 <Route path="*" component={() => <h1>Page Not Found</h1>} />
             </Switch>
         </BrowserRouter>
