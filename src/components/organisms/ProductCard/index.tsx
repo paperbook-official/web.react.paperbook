@@ -19,7 +19,6 @@ import {
 } from './styles';
 
 interface ProductCardProps {
-    image: string;
     product: ProductProxy;
     rating?: number;
     onClick(product: ProductProxy): void;
@@ -27,22 +26,18 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
-    image,
     product,
     rating = 0,
     onClick,
     style
 }: ProductCardProps): JSX.Element => {
-    const [currentPrice] = useState(
-        product.fullPrice * (1 - product.discountAmount)
-    );
+    const [currentPrice] = useState(product.price * (1 - product.discount));
     const [currentInstallmentPrice] = useState(
-        !product.installmentPrice ||
-            product.installmentPrice <= product.fullPrice
+        !product.installmentPrice || product.installmentPrice <= product.price
             ? currentPrice
-            : product.installmentPrice * (1 - product.discountAmount)
+            : product.installmentPrice * (1 - product.discount)
     );
-    const [hasDiscount] = useState(product.discountAmount > 0);
+    const [hasDiscount] = useState(product.discount > 0);
     const [hasInstallment] = useState(product.installmentAmount > 1);
     const [isInterestFree] = useState(currentPrice >= currentInstallmentPrice);
 
@@ -53,13 +48,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return (
         <Container style={style} onClick={() => onClick(product)}>
             <ImageContainer>
-                <img src={image} alt="book cover" />
+                <img src={product.imageUrl} alt="Product Image" />
             </ImageContainer>
             <InfoContainer>
                 <PriceContainer>
                     {hasDiscount && (
                         <Price className="full-price">
-                            R$ {formatPrice(product.fullPrice)}
+                            R$ {formatPrice(product.price)}
                         </Price>
                     )}
                     <span
@@ -71,9 +66,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                         <Price>R$ {formatPrice(currentPrice)}</Price>
                         {hasDiscount && (
-                            <Discount>
-                                %{product.discountAmount * 100} OFF
-                            </Discount>
+                            <Discount>%{product.discount * 100} OFF</Discount>
                         )}
                     </span>
                     {hasInstallment && (
