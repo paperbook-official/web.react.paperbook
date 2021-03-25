@@ -30,7 +30,7 @@ const Products: React.FC = () => {
             const product: ProductPayload = {
                 name: nameText,
                 description: descriptionText,
-                fullPrice: parseFloat(fullPriceText.replace(/,/, '.')),
+                price: parseFloat(fullPriceText.replace(/,/, '.')),
                 installmentPrice:
                     installmentPriceText.length > 0
                         ? parseFloat(installmentPriceText.replace(/,/, '.'))
@@ -39,7 +39,7 @@ const Products: React.FC = () => {
                     installmentAmountText.length > 0
                         ? parseFloat(installmentAmountText)
                         : undefined,
-                discountAmount:
+                discount:
                     discountAmountText.length > 0
                         ? parseFloat(discountAmountText.replace(/,/, '.'))
                         : undefined,
