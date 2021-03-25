@@ -100,14 +100,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        console.log(url);
-
         const response = await api.get<ManyProductProxy>(url, {
             headers: {
                 Authorization: 'Bearer ' + token
             }
         });
-
         return response.data;
     };
 
@@ -120,7 +117,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
         let url: string = concatOrderBy('/products?', orderBy);
-        url += `filter=fullPrice||$lt||${price}`;
+        url += `filter=price||$lt||${price}`;
         url += `&join=${join}`;
         url += `&limit=${limit}&offset=${offset}&page=${page}`;
 
@@ -129,7 +126,6 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
-
         return response.data;
     };
 
@@ -144,12 +140,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        console.log('sale\n', url);
-
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
-
         return response.data;
     };
 
@@ -167,12 +160,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        console.log('interestfree\n', url);
-
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
-
         return response.data;
     };
 
@@ -182,13 +172,10 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name'
     ): Promise<ManyProductProxy> => {
-        const url = `/products/recents?join=${join}limit=${limit}&offset=${offset}&page=${page}`;
-        console.log('recent\n', url);
-
+        const url = `/products/recents?join=${join}&limit=${limit}&offset=${offset}&page=${page}`;
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
-
         return response.data;
     };
 
@@ -203,12 +190,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        console.log('mostbought\n', url);
-
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
-
         return response.data;
     };
 

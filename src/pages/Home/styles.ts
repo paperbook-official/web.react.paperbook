@@ -62,7 +62,7 @@ export const TextContainer = styled.div`
 export const Title = styled.h1`
     color: ${(props) => props.theme.colors.defaultDarkBlue};
     font-size: 2.4rem;
-    text-shadow: 0px 0px 2px #aaa;
+    text-shadow: 0px 0px 2px #ccc;
 `;
 
 export const Description = styled.p`

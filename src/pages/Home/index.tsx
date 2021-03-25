@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { ManyProductProxy } from '../../models/proxies/product';
+import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
 
 import { useProduct } from '../../hooks/useProduct';
 
@@ -9,7 +9,7 @@ import CategoriesBar from '../../components/molecules/CategoriesBar';
 import CustomHeader from '../../components/organisms/CustomHeader';
 import CustomProductCard from '../../components/organisms/CustomProductCard';
 import Header from '../../components/organisms/Header';
-import ProductFlatList from '../../components/organisms/ProductList';
+import ProductList from '../../components/organisms/ProductList';
 import { useTheme } from 'styled-components';
 
 import { getRandom } from '../../utils/arrayManagement';
@@ -42,26 +42,29 @@ const Home: React.FC = (): JSX.Element => {
 
     const prices: number[] = [10, 20, 30, 40, 50];
 
+    const [isHeaderHidden, setHeaderHidden] = useState(true);
     const [headerPosition, setHeaderPosition] = useState(-100);
-    const [contentOpacity, setContentOpacity] = useState(1);
-    const [scrollDownOpacity, setScrollDownOpacity] = useState(1);
     const [randomPrice] = useState(getRandom(prices));
+    const [customCardProduct, setCustomCardProduct] = useState<ProductProxy>();
+    const [isLoadingCustomCard, setLoadingCustomCard] = useState(false);
 
     useEffect(() => {
-        if (window.pageYOffset >= 150) setHeaderPosition(0);
+        getCustomCardProduct();
+        if (window.pageYOffset >= 150 && isHeaderHidden) {
+            setHeaderPosition(0);
+        } else if (window.pageYOffset < 150 && !isHeaderHidden) {
+            setHeaderPosition(-100);
+        }
     }, []);
 
-    window.onscroll = () => {
-        if (window.pageYOffset >= 150) setHeaderPosition(0);
-        else setHeaderPosition(-100);
-
-        setContentOpacity(
-            1 - (window.pageYOffset - window.innerHeight / 2 + 200) / 200
-        );
-
-        setScrollDownOpacity(
-            1 - (window.pageYOffset - window.innerHeight / 2 + 300) / 300
-        );
+    window.onscroll = (): void => {
+        if (window.pageYOffset >= 150 && isHeaderHidden) {
+            setHeaderPosition(0);
+            setHeaderHidden(false);
+        } else if (window.pageYOffset < 150 && !isHeaderHidden) {
+            setHeaderPosition(-100);
+            setHeaderHidden(true);
+        }
     };
 
     const scrollDown = (): void => {
@@ -115,34 +118,21 @@ const Home: React.FC = (): JSX.Element => {
         }
     ];
 
-    const user = {
-        id: 3,
-        createdAt: '2021-03-17T02:01:03.708Z',
-        updatedAt: '2021-03-17T02:01:03.708Z',
-        isActive: true,
-        name: 'usuario',
-        lastName: 'vendedor',
-        email: 'seller@email.com',
-        cpf: '12345678910',
-        permissions: 'seller',
-        phone: '15988776655',
-        addresses: []
-    };
-
-    const product = {
-        id: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        isActive: true,
-        name: 'The Science of Selling',
-        description: 'bla bla bla',
-        fullPrice: 89.9,
-        installmentPrice: 89.9,
-        installmentAmount: 6,
-        discountAmount: 0.2,
-        stockAmount: 978,
-        userId: user.id,
-        user: user
+    const getCustomCardProduct = async (): Promise<void> => {
+        setLoadingCustomCard(true);
+        const responseSale = await getProductsOnSale(1, 0, 1);
+        if (responseSale.data[0]) {
+            setCustomCardProduct(responseSale.data[0]);
+        } else {
+            const responseIFree = await getInterestFree(1, 0, 1);
+            if (responseIFree.data[0]) {
+                setCustomCardProduct(responseIFree.data[0]);
+            } else {
+                const response = await getRecentProducts(1, 0, 1);
+                setCustomCardProduct(response.data[0]);
+            }
+        }
+        setLoadingCustomCard(false);
     };
 
     const getProductsByTopic = async (
@@ -192,7 +182,7 @@ const Home: React.FC = (): JSX.Element => {
                     onClick={console.log}
                     onMoreClick={console.log}
                 />
-                <TextContainer style={{ opacity: contentOpacity }}>
+                <TextContainer>
                     <Title>Leia um livro e mude uma vida!</Title>
                     <Description>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit,
@@ -207,53 +197,40 @@ const Home: React.FC = (): JSX.Element => {
                     />
                 </TextContainer>
                 <CustomProductCard
-                    style={{ opacity: contentOpacity }}
+                    isLoading={isLoadingCustomCard}
                     onClick={console.log}
-                    product={product}
-                    image="https://i1.wp.com/sellingsherpa.com/wp-content/uploads/2021/01/science-of-selling.png?fit=2380%2C700&ssl=1"
+                    product={customCardProduct}
                 />
-                <ScrollDown
-                    style={{
-                        opacity: scrollDownOpacity,
-                        display:
-                            window.pageYOffset > window.innerHeight / 2
-                                ? 'none'
-                                : 'inline-block'
-                    }}
-                    onClick={scrollDown}
-                >
-                    Role para baixo
-                </ScrollDown>
+                <ScrollDown onClick={scrollDown}>Role para baixo</ScrollDown>
             </FirstPageContainer>
             <SecondPageContainer>
-                <ProductFlatList
-                    style={{ marginTop: 120 }}
+                <ProductList
                     topicTitle={`Por menos de R$ ${formatPrice(randomPrice)}`}
                     request={getProductsByPriceLocal}
                     onProductClick={(product) => console.log(product)}
                 />
-                <ProductFlatList
+                <ProductList
                     topicTitle={`Ofertas`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getProductsOnSale)
                     }
                     onProductClick={(product) => console.log(product)}
                 />
-                <ProductFlatList
+                <ProductList
                     topicTitle={`Parcelamento sem juros`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getInterestFree)
                     }
                     onProductClick={(product) => console.log(product)}
                 />
-                <ProductFlatList
+                <ProductList
                     topicTitle={`Adicionados recentemente`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getRecentProducts)
                     }
                     onProductClick={(product) => console.log(product)}
                 />
-                <ProductFlatList
+                <ProductList
                     topicTitle={`Mais comprados`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getMostBought)

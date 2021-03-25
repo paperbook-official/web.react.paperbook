@@ -5,12 +5,13 @@ export interface ProductProxy {
     createdAt: string;
     updatedAt: string;
     isActive: boolean;
+    imageUrl: string;
     name: string;
     description: string;
-    fullPrice: number;
+    price: number;
     installmentPrice: number;
     installmentAmount: number;
-    discountAmount: number;
+    discount: number;
     stockAmount: number;
     userId: number;
     user: UserProxy;

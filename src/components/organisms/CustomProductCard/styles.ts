@@ -2,7 +2,8 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
     display: flex;
-    justify-content: space-between;
+    justify-content: ${(props: { isLoading: boolean }) =>
+        props.isLoading ? 'center' : 'space-between'};
     position: absolute;
     top: 50%;
     right: 25%;
