@@ -1,8 +1,10 @@
 import React, { createContext, useState } from 'react';
 
+import LoadingTopBar from '../components/atoms/LoadingTopBar';
+
 export interface LoadingContextData {
-    isLoading: boolean;
-    setLoading: (value: boolean) => void;
+    isLoadingContent: boolean;
+    setLoadingContent: (value: boolean) => void;
 }
 
 interface LoadingProviderProps {
@@ -16,18 +18,19 @@ export const LoadingContext = createContext<LoadingContextData>(
 export const LoadingProvider: React.FC<LoadingProviderProps> = ({
     children
 }: LoadingProviderProps) => {
-    const [isLoading, setLoading] = useState(false);
+    const [isLoadingContent, setLoadingContent] = useState(false);
 
     return (
         //#region JSX
 
         <LoadingContext.Provider
             value={{
-                isLoading,
-                setLoading
+                isLoadingContent,
+                setLoadingContent
             }}
         >
             {children}
+            {isLoadingContent && <LoadingTopBar />}
         </LoadingContext.Provider>
 
         //#endregion
