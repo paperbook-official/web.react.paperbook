@@ -1,11 +1,12 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-    display: ${(props: { isVisible: boolean }) =>
-        props.isVisible ? 'block' : 'none'};
+    display: ${(props: { isNotVisible: boolean }) =>
+        props.isNotVisible ? 'none' : 'block'};
     width: 100%;
     height: auto;
-    margin-top: 30px;
+    margin-top: 120px;
+    margin-bottom: -90px;
 `;
 
 export const TopicTitle = styled.h2`
@@ -44,7 +45,7 @@ export const ChangePageIconContainer = styled.div`
     }
 `;
 
-export const FlatListContainer = styled.div`
+export const ListContainer = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -52,6 +53,7 @@ export const FlatListContainer = styled.div`
     position: relative;
 
     padding: 10px 5px;
+    min-height: 100px;
     height: auto;
     width: 100%;
 

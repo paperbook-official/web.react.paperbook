@@ -9,15 +9,16 @@ import { useTheme } from 'styled-components';
 
 import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-right.svg';
 
+import LoadingDots from '../../atoms/LoadingDots';
 import ProductCard from '../ProductCard';
 import {
     ChangePageIconContainer,
     Container,
-    FlatListContainer,
+    ListContainer,
     TopicTitle
 } from './styles';
 
-interface ProductFlatListProps {
+interface ProductListProps {
     topicTitle: string;
     onProductClick(product: ProductProxy): void;
     request(itemsPerPage: number, page: number): Promise<ManyProductProxy>;
@@ -27,12 +28,12 @@ interface ProductFlatListProps {
 const productAmount =
     window.innerWidth > 1400 ? 5 : window.innerWidth > 1130 ? 4 : 3;
 
-const ProductFlatList: React.FC<ProductFlatListProps> = ({
+const ProductList: React.FC<ProductListProps> = ({
     topicTitle,
     request,
     onProductClick,
     style
-}: ProductFlatListProps) => {
+}: ProductListProps) => {
     const theme = useTheme();
 
     const [itemsPerPage, setItemsPerPage] = useState(0);
@@ -40,12 +41,15 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
     const [productsList, setProductsList] = useState<ProductProxy[]>([]);
     const [currentProducts, setCurrentProducts] = useState<ProductProxy[]>([]);
     const [totalProducts, setTotalProducts] = useState<number | null>(null);
+    const [isLoading, setLoading] = useState(false);
 
     const setInitialState = async (): Promise<void> => {
+        setLoading(true);
         const response = await request(productAmount * 2, page);
         setProductsList(response.data);
         setCurrentProducts(response.data?.slice(0, productAmount));
         setTotalProducts(response.total);
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -96,45 +100,55 @@ const ProductFlatList: React.FC<ProductFlatListProps> = ({
     return (
         <Container
             style={style}
-            isVisible={!!totalProducts && totalProducts > 2}
+            isNotVisible={totalProducts !== null && totalProducts < 3}
         >
             <TopicTitle>{topicTitle}</TopicTitle>
-            <FlatListContainer>
-                <ChangePageIconContainer
-                    onClick={previousPage}
-                    style={{
-                        marginLeft: 20,
-                        opacity: page > 1 ? 1 : 0,
-                        pointerEvents: page > 1 ? 'visible' : 'none'
-                    }}
-                >
-                    <ArrowIcon
-                        style={{ transform: 'rotate(180deg)' }}
-                        color={theme.colors.defaultHighlightGreyBlue}
-                    />
-                </ChangePageIconContainer>
-                {currentProducts?.map((product) => (
-                    <ProductCard
-                        key={product.id}
-                        product={product}
-                        image="https://images-na.ssl-images-amazon.com/images/I/81PHloIwKnL.jpg"
-                        onClick={onProductClick}
-                        rating={4}
-                    />
-                ))}
-                <ChangePageIconContainer
-                    onClick={nextPage}
-                    style={{
-                        marginRight: 20,
-                        opacity: hasMorePages() ? 1 : 0,
-                        pointerEvents: hasMorePages() ? 'visible' : 'none'
-                    }}
-                >
-                    <ArrowIcon color={theme.colors.defaultHighlightGreyBlue} />
-                </ChangePageIconContainer>
-            </FlatListContainer>
+            <ListContainer>
+                {isLoading ? (
+                    <LoadingDots />
+                ) : (
+                    <>
+                        {' '}
+                        <ChangePageIconContainer
+                            onClick={previousPage}
+                            style={{
+                                marginLeft: 20,
+                                opacity: page > 1 ? 1 : 0,
+                                pointerEvents: page > 1 ? 'visible' : 'none'
+                            }}
+                        >
+                            <ArrowIcon
+                                style={{ transform: 'rotate(180deg)' }}
+                                color={theme.colors.defaultHighlightGreyBlue}
+                            />
+                        </ChangePageIconContainer>
+                        {currentProducts?.map((product) => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onClick={onProductClick}
+                                rating={4}
+                            />
+                        ))}
+                        <ChangePageIconContainer
+                            onClick={nextPage}
+                            style={{
+                                marginRight: 20,
+                                opacity: hasMorePages() ? 1 : 0,
+                                pointerEvents: hasMorePages()
+                                    ? 'visible'
+                                    : 'none'
+                            }}
+                        >
+                            <ArrowIcon
+                                color={theme.colors.defaultHighlightGreyBlue}
+                            />
+                        </ChangePageIconContainer>{' '}
+                    </>
+                )}
+            </ListContainer>
         </Container>
     );
 };
 
-export default ProductFlatList;
+export default ProductList;
