@@ -174,7 +174,7 @@ const SignUp: React.FC = (): JSX.Element => {
                                 onKeyDown={(
                                     event: React.KeyboardEvent<HTMLInputElement>
                                 ) => checkKeyboardKey(event, 'nameInput')}
-                                width={140}
+                                style={{ width: 140 }}
                             />
                             <TextField
                                 label="Sobrenome"
@@ -187,7 +187,7 @@ const SignUp: React.FC = (): JSX.Element => {
                                 onKeyDown={(
                                     event: React.KeyboardEvent<HTMLInputElement>
                                 ) => checkKeyboardKey(event, 'lastNameInput')}
-                                width={140}
+                                style={{ width: 140 }}
                             />
                         </FullNameContainer>
                         <TextField

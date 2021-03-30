@@ -52,6 +52,7 @@ const CustomHeader: React.FC = () => {
                 type="text"
                 onKeyDown={(event) => checkKeyboardKey(event, 'searchInput')}
                 inputStyle={{ color: 'white' }}
+                style={{ flexGrow: 1, marginLeft: 60, marginRight: 60 }}
             />
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 {!isLogged ? (

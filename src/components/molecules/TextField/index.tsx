@@ -14,7 +14,7 @@ import {
 } from './styles';
 
 interface TextFieldProps {
-    width?: number;
+    style?: React.CSSProperties;
     value?: string;
     label: string;
     name: string;
@@ -29,7 +29,7 @@ interface TextFieldProps {
 }
 
 const TextField: React.FC<TextFieldProps> = ({
-    width = 310,
+    style,
     value = '',
     label,
     name,
@@ -86,7 +86,7 @@ const TextField: React.FC<TextFieldProps> = ({
     };
 
     return (
-        <Container className={`${name}-field-container`} style={{ width }}>
+        <Container className={`${name}-field-container`} style={style}>
             <InputField
                 value={text}
                 onKeyDown={onKeyDown}

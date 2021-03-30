@@ -28,7 +28,7 @@ const SearchBar: React.FC = (): JSX.Element => {
             <SearchIcon
                 width={`${iconSize}px`}
                 height={`${iconSize}px`}
-                style={{ position: 'absolute', top: '3px' }}
+                style={{ position: 'absolute', right: 10, top: '3px' }}
             />
         </Container>
     );
