@@ -2,10 +2,11 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
     position: relative;
-    width: 400px;
+    width: 32%;
+    min-width: 250px;
     height: 30px;
 
-    background-color: #ffffff40;
+    background-color: ${(props) => props.theme.colors.white}40;
     border-radius: 5px;
     overflow: hidden;
 `;
