@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
+import { CategoryProxy } from '../../models/proxies/category';
 import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
 
+import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
 
 import SocialMedia from '../../components/atoms/SocialMedia';
@@ -39,6 +41,7 @@ const Home: React.FC = (): JSX.Element => {
         getRecentProducts,
         getWellRated
     } = useProduct();
+    const { getCategories } = useCategory();
 
     const prices: number[] = [10, 20, 30, 40, 50];
 
@@ -47,8 +50,10 @@ const Home: React.FC = (): JSX.Element => {
     const [randomPrice] = useState(getRandom(prices));
     const [customCardProduct, setCustomCardProduct] = useState<ProductProxy>();
     const [isLoadingCustomCard, setLoadingCustomCard] = useState(false);
+    const [categories, setCategories] = useState<CategoryProxy[]>([]);
 
     useEffect(() => {
+        getCategoriesList();
         getCustomCardProduct();
         if (window.pageYOffset >= 150 && isHeaderHidden) {
             setHeaderPosition(0);
@@ -71,52 +76,12 @@ const Home: React.FC = (): JSX.Element => {
         window.scrollTo(0, window.innerHeight);
     };
 
-    const categories = [
-        {
-            id: 1,
-            name: 'Ficção'
-        },
-        {
-            id: 2,
-            name: 'Aventura'
-        },
-        {
-            id: 3,
-            name: 'Romance'
-        },
-        {
-            id: 4,
-            name: 'Ação'
-        },
-        {
-            id: 5,
-            name: 'Didáticos'
-        },
-        {
-            id: 6,
-            name: 'Autoconhecimento'
-        },
-        {
-            id: 7,
-            name: 'Conhecimentos Gerais'
-        },
-        {
-            id: 8,
-            name: 'Figuras em Quadrinho'
-        },
-        {
-            id: 9,
-            name: 'Animais'
-        },
-        {
-            id: 10,
-            name: 'Engenharia'
-        },
-        {
-            id: 11,
-            name: 'Medicina'
-        }
-    ];
+    const getCategoriesList = async (): Promise<void> => {
+        const categoriesRes = await getCategories(7);
+        console.log(categoriesRes);
+
+        setCategories(categoriesRes);
+    };
 
     const getCustomCardProduct = async (): Promise<void> => {
         setLoadingCustomCard(true);
@@ -177,11 +142,13 @@ const Home: React.FC = (): JSX.Element => {
                     />
                 </ImageContainer>
                 <CustomHeader />
-                <CategoriesBar
-                    categoriesList={categories}
-                    onClick={console.log}
-                    onMoreClick={console.log}
-                />
+                {categories && categories.length > 0 && (
+                    <CategoriesBar
+                        categoriesList={categories}
+                        onClick={console.log}
+                        onMoreClick={console.log}
+                    />
+                )}
                 <TextContainer>
                     <Title>Leia um livro e mude uma vida!</Title>
                     <Description>
