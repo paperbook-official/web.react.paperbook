@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { CategoryProxy } from '../../../models/proxies/category';
 
@@ -15,18 +15,28 @@ const CategoriesBar: React.FC<CategoriesBarProps> = ({
     onClick,
     onMoreClick
 }: CategoriesBarProps) => {
-    const [primaryCategories] = useState<CategoryProxy[]>(
-        categoriesList.slice(0, 6)
-    );
+    const [categories, setCategories] = useState<CategoryProxy[]>();
+    const [primaryCategories, setPrimaryCategories] = useState<
+        CategoryProxy[]
+    >();
+
+    useEffect(() => {
+        setCategories(categoriesList);
+        setPrimaryCategories(categoriesList.slice(0, 6));
+    }, []);
 
     return (
         <Container>
-            {primaryCategories.map((category) => (
-                <Category key={category.id} onClick={() => onClick(category)}>
-                    {category.name}
-                </Category>
-            ))}
-            {categoriesList.length > 6 && (
+            {primaryCategories &&
+                primaryCategories.map((category) => (
+                    <Category
+                        key={category.id}
+                        onClick={() => onClick(category)}
+                    >
+                        {category.name}
+                    </Category>
+                ))}
+            {categories && categories.length > 6 && (
                 <Category onClick={onMoreClick}>Mais</Category>
             )}
         </Container>
