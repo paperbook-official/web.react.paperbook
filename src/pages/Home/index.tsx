@@ -37,7 +37,7 @@ const Home: React.FC = (): JSX.Element => {
         getProductsOnSale,
         getInterestFree,
         getRecentProducts,
-        getMostBought
+        getWellRated
     } = useProduct();
 
     const prices: number[] = [10, 20, 30, 40, 50];
@@ -231,9 +231,9 @@ const Home: React.FC = (): JSX.Element => {
                     onProductClick={(product) => console.log(product)}
                 />
                 <ProductList
-                    topicTitle={`Mais comprados`}
+                    topicTitle={`Bem avaliados`}
                     request={(i: number, p: number) =>
-                        getProductsByTopic(i, p, getMostBought)
+                        getProductsByTopic(i, p, getWellRated)
                     }
                     onProductClick={(product) => console.log(product)}
                 />
