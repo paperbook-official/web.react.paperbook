@@ -44,7 +44,7 @@ export interface ProductContextData {
         limit: number,
         join?: string
     ): Promise<ManyProductProxy>;
-    getMostBought(
+    getWellRated(
         page: number,
         offset: number,
         limit: number,
@@ -116,12 +116,10 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy('/products?', orderBy);
-        url += `filter=price||$lt||${price}`;
+        let url: string = concatOrderBy('/products/less-than?', orderBy);
+        url += `&maxPrice=${price}`;
         url += `&join=${join}`;
         url += `&limit=${limit}&offset=${offset}&page=${page}`;
-
-        console.log('price\n', url);
 
         const response = await api.get<ManyProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -179,7 +177,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         return response.data;
     };
 
-    const getMostBought = async (
+    const getWellRated = async (
         page: number,
         offset: number,
         limit: number,
@@ -207,7 +205,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
                 getProductsOnSale,
                 getInterestFree,
                 getRecentProducts,
-                getMostBought
+                getWellRated
             }}
         >
             {children}
