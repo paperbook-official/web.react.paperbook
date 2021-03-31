@@ -2,6 +2,7 @@ import React from 'react';
 
 import ActionResultProvider from './contexts/actionResultContext';
 import AuthProvider from './contexts/authContext';
+import CategoryProvider from './contexts/categoryContext';
 import CookiesProvider from './contexts/cookiesContext';
 import LoadingProvider from './contexts/loadingContext';
 import ProductProvider from './contexts/productContext';
@@ -24,9 +25,11 @@ const App: React.FC = (): JSX.Element => {
                         <ShippingProvider>
                             <AuthProvider>
                                 <UserProvider>
-                                    <ProductProvider>
-                                        <Routes />
-                                    </ProductProvider>
+                                    <CategoryProvider>
+                                        <ProductProvider>
+                                            <Routes />
+                                        </ProductProvider>
+                                    </CategoryProvider>
                                 </UserProvider>
                             </AuthProvider>
                         </ShippingProvider>
