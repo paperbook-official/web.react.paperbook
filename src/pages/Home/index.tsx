@@ -6,6 +6,7 @@ import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
 import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
 
+import AddressCard from '../../components/atoms/AddressCard';
 import SocialMedia from '../../components/atoms/SocialMedia';
 import CategoriesBar from '../../components/molecules/CategoriesBar';
 import CustomHeader from '../../components/organisms/CustomHeader';
@@ -210,6 +211,7 @@ const Home: React.FC = (): JSX.Element => {
             >
                 <Header />
             </HeaderContainer>
+            <AddressCard />
         </Container>
     );
 };
