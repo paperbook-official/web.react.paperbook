@@ -14,6 +14,7 @@ import Login from '../pages/auth/Login';
 import SignUp from '../pages/auth/SignUp';
 import Home from '../pages/Home';
 import Products from '../pages/Products';
+import Search from '../pages/Search';
 
 interface PrivateRouteProps {
     component: React.FC;
@@ -94,6 +95,7 @@ const Routes = (): JSX.Element => {
                 <Route exact path="/" component={Home} />
                 <AuthRoute exact path="/signup" component={SignUp} />
                 <AuthRoute exact path="/login" component={Login} />
+                <Route exact path="/products" component={Search} />
                 <Route exact path="/cart" component={() => <h1>Cart</h1>} />
                 <PrivateRoute path="/products/new" component={Products} />
                 <Route path="*" component={() => <h1>Page Not Found</h1>} />
