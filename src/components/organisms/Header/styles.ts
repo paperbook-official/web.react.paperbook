@@ -14,7 +14,6 @@ export const Container = styled.div`
 export const AuthOptionsContainer = styled.div``;
 
 export const AuthOption = styled.span`
-    margin-right: 30px;
     color: ${(props) => props.theme.colors.defaultLightGrey};
     transition: all 0.2s;
     cursor: pointer;
