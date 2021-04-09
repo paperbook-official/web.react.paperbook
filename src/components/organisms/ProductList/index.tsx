@@ -103,7 +103,9 @@ const ProductList: React.FC<ProductListProps> = ({
             isNotVisible={totalProducts !== null && totalProducts < 3}
         >
             <TopicTitle>{topicTitle}</TopicTitle>
-            <ListContainer>
+            <ListContainer
+                hasLess={totalProducts !== null && totalProducts < itemsPerPage}
+            >
                 {isLoading ? (
                     <LoadingDots />
                 ) : (
