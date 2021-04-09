@@ -70,7 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                         )}
                     </span>
                     {hasInstallment && (
-                        <span>
+                        <span style={{ fontSize: '0.9rem' }}>
                             em{' '}
                             <Installment isInterestFree={isInterestFree}>
                                 {product.installmentAmount}x R${' '}
@@ -84,8 +84,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     <Title>{product.name}</Title>
                     <Seller>por {product.user.name}</Seller>
                 </div>
-                <div style={{ width: 80 }}>
-                    <Rating size={15} rating={rating} />
+                <div style={{ width: 70 }}>
+                    <Rating size={13} rating={rating} />
                 </div>
             </InfoContainer>
         </Container>
