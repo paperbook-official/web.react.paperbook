@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router';
 
 import { CategoryProxy } from '../../models/proxies/category';
 import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
@@ -15,7 +16,7 @@ import ProductList from '../../components/organisms/ProductList';
 import { useTheme } from 'styled-components';
 
 import { getRandom } from '../../utils/arrayManagement';
-import { formatPrice } from '../../utils/formatters';
+import { formatPrice, formatQueryParam } from '../../utils/formatters';
 
 import openBook from '../../assets/images/open-book.jpg';
 
@@ -34,6 +35,7 @@ import {
 
 const Home: React.FC = (): JSX.Element => {
     const theme = useTheme();
+    const history = useHistory();
     const {
         getProductsByPrice,
         getProductsOnSale,
@@ -76,10 +78,12 @@ const Home: React.FC = (): JSX.Element => {
         window.scrollTo(0, window.innerHeight);
     };
 
+    const onCategoryClick = (category: CategoryProxy): void => {
+        history.push(`/products?category=${formatQueryParam(category.name)}`);
+    };
+
     const getCategoriesList = async (): Promise<void> => {
         const categoriesRes = await getCategories(7);
-        console.log(categoriesRes);
-
         setCategories(categoriesRes);
     };
 
@@ -145,7 +149,7 @@ const Home: React.FC = (): JSX.Element => {
                 {categories && categories.length > 0 && (
                     <CategoriesBar
                         categoriesList={categories}
-                        onClick={console.log}
+                        onClick={onCategoryClick}
                         onMoreClick={console.log}
                     />
                 )}

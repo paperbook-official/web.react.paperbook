@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { CookiesEnum } from '../../../models/enums/cookies';
 
@@ -10,6 +10,8 @@ import { useCookies } from '../../../hooks/useCookies';
 
 import { useTheme } from 'styled-components';
 
+import { formatQueryParam } from '../../../utils/formatters';
+
 import Cart from '../../atoms/Cart';
 import Logo from '../../atoms/Logo';
 import TextField from '../../molecules/TextField';
@@ -19,6 +21,7 @@ const CustomHeader: React.FC = () => {
     const theme = useTheme();
     const { isCookiesAccepted } = useCookies();
     const { isAuthenticated, getTokenCookie, logout } = useAuth();
+    const history = useHistory();
 
     const [cartAmount, setCartAmount] = useState(0);
     const [searchText, setSearchText] = useState('');
@@ -37,14 +40,18 @@ const CustomHeader: React.FC = () => {
         event: React.KeyboardEvent<HTMLInputElement>,
         elementName: string
     ): void => {
-        if (event.key === 'Enter') {
+        if (
+            event.key === 'Enter' &&
+            searchText.replace(/-/g, '').trim().length > 0
+        ) {
             document.getElementsByName(elementName)[0].blur();
+            history.push('/products?search=' + formatQueryParam(searchText));
         }
     };
 
     return (
         <Container theme={theme}>
-            <Logo />
+            <Logo showTitle={window.innerWidth > 1000} />
             <TextField
                 label="Pesquisar"
                 name="searchInput"
@@ -57,19 +64,33 @@ const CustomHeader: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 {!isLogged ? (
                     <AuthOptionsContainer>
-                        <Link to="/signup" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/signup"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Crie sua conta</AuthOption>
                         </Link>
-                        <Link to="/login" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/login"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Entrar</AuthOption>
                         </Link>
                     </AuthOptionsContainer>
                 ) : (
                     <AuthOptionsContainer>
-                        <Link to="/orders" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/orders"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Meus pedidos</AuthOption>
                         </Link>
-                        <AuthOption onClick={logout}>Sair</AuthOption>
+                        <AuthOption
+                            style={{ marginRight: 30 }}
+                            onClick={logout}
+                        >
+                            Sair
+                        </AuthOption>
                     </AuthOptionsContainer>
                 )}
                 <Link to="/cart" style={{ textDecoration: 'none' }}>

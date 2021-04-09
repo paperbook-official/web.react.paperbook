@@ -6,14 +6,20 @@ import { ReactComponent as LogoIcon } from '../../../assets/icons/book-reader.sv
 
 import { Container, Title } from './styles';
 
-const Logo: React.FC = (): JSX.Element => {
+interface LogoProps {
+    showTitle?: boolean;
+}
+
+const Logo: React.FC<LogoProps> = ({
+    showTitle = true
+}: LogoProps): JSX.Element => {
     const theme = useTheme();
     const iconSize = 40;
 
     return (
         <Container theme={theme}>
             <LogoIcon width={`${iconSize}px`} height={`${iconSize}px`} />
-            <Title>PaperBook</Title>
+            {showTitle && <Title>PaperBook</Title>}
         </Container>
     );
 };

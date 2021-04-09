@@ -41,19 +41,33 @@ const Header: React.FC = (): JSX.Element => {
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 {!isLogged ? (
                     <AuthOptionsContainer>
-                        <Link to="/signup" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/signup"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Crie sua conta</AuthOption>
                         </Link>
-                        <Link to="/login" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/login"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Entrar</AuthOption>
                         </Link>
                     </AuthOptionsContainer>
                 ) : (
                     <AuthOptionsContainer>
-                        <Link to="/orders" style={{ textDecoration: 'none' }}>
+                        <Link
+                            to="/orders"
+                            style={{ textDecoration: 'none', marginRight: 30 }}
+                        >
                             <AuthOption>Meus pedidos</AuthOption>
                         </Link>
-                        <AuthOption onClick={logout}>Sair</AuthOption>
+                        <AuthOption
+                            style={{ marginRight: 30 }}
+                            onClick={logout}
+                        >
+                            Sair
+                        </AuthOption>
                     </AuthOptionsContainer>
                 )}
                 <Link to="/cart" style={{ textDecoration: 'none' }}>

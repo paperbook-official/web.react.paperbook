@@ -48,11 +48,13 @@ export const ChangePageIconContainer = styled.div`
 export const ListContainer = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: ${(props: { hasLess: boolean }) =>
+        props.hasLess ? 'flex-start' : 'center'};
     align-items: center;
     position: relative;
 
-    padding: 10px 5px;
+    gap: 40px;
+    padding: 30px 5px;
     min-height: 100px;
     height: auto;
     width: 100%;

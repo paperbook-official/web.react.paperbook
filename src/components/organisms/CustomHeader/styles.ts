@@ -13,12 +13,16 @@ export const Container = styled.div`
     padding: 0 35px;
 
     transform: translateX(-50%);
+
+    @media (max-width: 1000px) {
+        width: 90%;
+        padding: 0 10px;
+    }
 `;
 
 export const AuthOptionsContainer = styled.div``;
 
 export const AuthOption = styled.span`
-    margin-right: 30px;
     color: ${(props) => props.theme.colors.defaultLightGrey};
     transition: all 0.2s;
     cursor: pointer;
