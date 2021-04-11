@@ -90,6 +90,7 @@ const ShippingCard: React.FC<ShippingCardProps> = ({
 
     const handleChangeCepClick = (): void => {
         setCep('');
+        if (isCookiesAccepted) setCookie(CookiesEnum.CEP, '', '/', 0);
         removeCookie(CookiesEnum.CEP);
         setAddress(undefined);
     };

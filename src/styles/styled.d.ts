@@ -8,6 +8,7 @@ declare module 'styled-components' {
             white: string;
             defaultDarkerGrey: string;
             defaultDarkGrey: string;
+            defaultMidGrey: string;
             defaultGrey: string;
             defaultLightGrey: string;
             defaultDarkBlue: string;
