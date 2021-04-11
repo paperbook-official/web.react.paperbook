@@ -169,7 +169,9 @@ const Home: React.FC = (): JSX.Element => {
                 </TextContainer>
                 <CustomProductCard
                     isLoading={isLoadingCustomCard}
-                    onClick={console.log}
+                    onClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                     product={customCardProduct}
                 />
                 <ScrollDown onClick={scrollDown}>Role para baixo</ScrollDown>
@@ -178,35 +180,45 @@ const Home: React.FC = (): JSX.Element => {
                 <ProductList
                     topicTitle={`Por menos de R$ ${formatPrice(randomPrice)}`}
                     request={getProductsByPriceLocal}
-                    onProductClick={(product) => console.log(product)}
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                 />
                 <ProductList
                     topicTitle={`Ofertas`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getProductsOnSale)
                     }
-                    onProductClick={(product) => console.log(product)}
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                 />
                 <ProductList
                     topicTitle={`Parcelamento sem juros`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getInterestFree)
                     }
-                    onProductClick={(product) => console.log(product)}
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                 />
                 <ProductList
                     topicTitle={`Adicionados recentemente`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getRecentProducts)
                     }
-                    onProductClick={(product) => console.log(product)}
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                 />
                 <ProductList
                     topicTitle={`Bem avaliados`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getWellRated)
                     }
-                    onProductClick={(product) => console.log(product)}
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
                 />
             </SecondPageContainer>
             <HeaderContainer
