@@ -23,6 +23,7 @@ export interface ShippingContextData {
     getAddress(cep: string): Promise<CEPProxy>;
     address?: CEPProxy;
     setAddress(address?: CEPProxy): void;
+    getArriveDate(daysToArrive: number, price: number): string;
 }
 
 interface ShippingProviderProps {
@@ -32,6 +33,16 @@ interface ShippingProviderProps {
 export const ShippingContext = createContext<ShippingContextData>(
     {} as ShippingContextData
 );
+
+const days = [
+    'Domingo',
+    'Segunda-Feira',
+    'Terça-Feira',
+    'Quarta-Feira',
+    'Quinta-Feira',
+    'Sexta-Feira',
+    'Sábado'
+];
 
 export const ShippingProvider: React.FC<ShippingProviderProps> = ({
     children
@@ -51,6 +62,30 @@ export const ShippingProvider: React.FC<ShippingProviderProps> = ({
         return data;
     };
 
+    const getArriveDate = (daysToArrive: number, price: number): string => {
+        const date = new Date();
+        date.setDate(date.getDate() + daysToArrive);
+
+        const localDate = date.toLocaleDateString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+
+        const prefix = price === 0 ? 'grátis ' : '';
+
+        const arriveDay = date.getDay();
+
+        if (daysToArrive === 0) return prefix + 'hoje';
+        if (daysToArrive === 1) return prefix + 'amanhã';
+        if (daysToArrive <= 7)
+            return (
+                (price === 0 ? prefix : `${days[arriveDay]}, `) +
+                `${localDate.split('/')[0]}/${localDate.split('/')[1]}`
+            );
+        return `${prefix}${localDate.split('/')[0]}/${localDate.split('/')[1]}`;
+    };
+
     useEffect(() => {
         if (cep) {
             getAddress(cep).then(setAddress);
@@ -68,7 +103,8 @@ export const ShippingProvider: React.FC<ShippingProviderProps> = ({
                 setOption,
                 getAddress,
                 address,
-                setAddress
+                setAddress,
+                getArriveDate
             }}
         >
             {children}
