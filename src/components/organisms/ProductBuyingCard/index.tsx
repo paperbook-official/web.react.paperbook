@@ -3,33 +3,41 @@ import React, { useState } from 'react';
 import { CEPProxy } from '../../../models/proxies/address';
 import { ProductProxy } from '../../../models/proxies/product';
 
+import { useShipping } from '../../../hooks/useShipping';
+
+import { ShippingOptionData } from '../../../contexts/shippingContext';
+
+import { useTheme } from 'styled-components';
+
 import { formatPrice } from '../../../utils/formatters';
 
+import { ReactComponent as MapMarkerIcon } from '../../../assets/icons/map-marker.svg';
+import { ReactComponent as TruckIcon } from '../../../assets/icons/truck.svg';
+
+import AmountPicker from '../../atoms/AmountPicker';
 import Rating from '../../atoms/Rating';
 import {
+    ActionButton,
+    ActionButtonContainer,
     Container,
-    StyledContainer,
-    DescontoContainer,
-    Title,
-    Price,
-    CurrentPrice,
     Discount,
-    CaminhaozinhoIcon,
-    InterestFree,
+    DiscountContainer,
+    HeaderContainer,
+    InstallmentPrice,
+    Price,
+    PriceContainer,
+    RatingAmount,
     ShippingArriveDate,
+    ShippingContainer,
     ShippingOption,
-    Seller,
-    Amount,
-    Text,
-    StockAmount,
-    CreateButton,
-    AddToCartButton
+    SellerContainer,
+    Title
 } from './styles';
 
 interface ProductBuyingCardProps {
     product: ProductProxy;
-    cep: CEPProxy;
-    shippingOption: number;
+    cep?: CEPProxy;
+    shippingOption?: ShippingOptionData;
     onShippingOptionsClick(): void;
     onBuyClick(product: ProductProxy): void;
     onAddCartClick(product: ProductProxy): void;
@@ -43,69 +51,138 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
     onBuyClick,
     onAddCartClick
 }: ProductBuyingCardProps): JSX.Element => {
+    const theme = useTheme();
+    const { getArriveDate } = useShipping();
+
     const [buyAmount, setBuyAmount] = useState(1);
 
-    const [hasDiscount] = useState(product.discount > 0);
+    const hasDiscount = product.discount > 0;
     const currentPrice = product.price * (1 - product.discount);
+    const isShippingFree = shippingOption?.price === 0;
+    const isInterestFree =
+        product.installmentPrice === null ||
+        product.installmentPrice * (1 - product.discount) <= currentPrice;
 
-    const changeBuyAmount = (amount: number): void => {
+    const handleAmountChange = (amount: number): void => {
         setBuyAmount(amount);
     };
 
     return (
         <Container>
-            <StyledContainer>
+            <HeaderContainer>
                 <Title>{product.name}</Title>
-                <Rating rating={5} />
-            </StyledContainer>
+                <span className="rating">
+                    <Rating rating={5} size={16} />
+                    <RatingAmount>26</RatingAmount>
+                </span>
+            </HeaderContainer>
 
-            <StyledContainer>
-                {!hasDiscount && <Price>{formatPrice(product.price)}</Price>}
-                <DescontoContainer>
-                    <CurrentPrice>{formatPrice(currentPrice)}</CurrentPrice>
-                    {!hasDiscount && (
+            <PriceContainer>
+                {hasDiscount && (
+                    <Price className="full-price">
+                        R$ {formatPrice(product.price)}
+                    </Price>
+                )}
+                <DiscountContainer>
+                    <Price>R$ {formatPrice(currentPrice)}</Price>
+                    {hasDiscount && (
                         <Discount>{`${product.discount * 100}% OFF`}</Discount>
                     )}
-                </DescontoContainer>
-                {!(product.installmentAmount > 1) && (
-                    <InterestFree>{`em ${product.installmentAmount}x R$ ${
-                        product.installmentPrice
-                    } ${
-                        product.installmentPrice < currentPrice
-                            ? 'sem juros'
-                            : ''
-                    }`}</InterestFree>
+                </DiscountContainer>
+                {product.installmentAmount > 1 && (
+                    <span
+                        style={{
+                            fontSize: '0.9rem',
+                            marginTop: -5,
+                            color: theme.colors.defaultMidGrey
+                        }}
+                    >
+                        em{' '}
+                        <InstallmentPrice
+                            className={isInterestFree ? 'interest-free' : ''}
+                        >
+                            {`${product.installmentAmount}x R$ ${formatPrice(
+                                currentPrice / product.installmentAmount
+                            )} ${isInterestFree ? 'sem juros' : ''}`}
+                        </InstallmentPrice>
+                    </span>
                 )}
-            </StyledContainer>
+            </PriceContainer>
 
-            <StyledContainer>
-                <CaminhaozinhoIcon>CAMINHAO</CaminhaozinhoIcon>
-                <ShippingArriveDate>{`Chegará gratis 15/03`}</ShippingArriveDate>
-                <ShippingOption onClick={onShippingOptionsClick} />
-            </StyledContainer>
+            <ShippingContainer>
+                {!cep || !shippingOption ? (
+                    <>
+                        <MapMarkerIcon
+                            height="18"
+                            width="18"
+                            style={{ transform: 'scaleX(-1)' }}
+                            color={theme.colors.defaultHighlightGreyBlue}
+                        />
+                        <ShippingOption onClick={onShippingOptionsClick}>
+                            Calcular prazo de entrega
+                        </ShippingOption>
+                    </>
+                ) : (
+                    <>
+                        <TruckIcon
+                            height="22"
+                            width="22"
+                            style={{ transform: 'scaleX(-1)' }}
+                            color={
+                                isShippingFree
+                                    ? theme.colors.defaultLightGreen
+                                    : theme.colors.defaultMidGrey
+                            }
+                        />
+                        <div
+                            style={{
+                                display: 'flex',
+                                flexDirection: 'column'
+                            }}
+                        >
+                            <ShippingArriveDate
+                                className={
+                                    isShippingFree ? 'shipping-free' : ''
+                                }
+                            >
+                                Chegará{' '}
+                                {getArriveDate(
+                                    shippingOption.daysToArrive,
+                                    shippingOption.price
+                                )}
+                            </ShippingArriveDate>
+                            <ShippingOption
+                                className="more-options"
+                                onClick={onShippingOptionsClick}
+                            >
+                                Ver mais opções de entrega
+                            </ShippingOption>
+                        </div>
+                    </>
+                )}
+            </ShippingContainer>
 
-            <Seller>{`Vendedor ${product.user}`}</Seller>
+            <SellerContainer>
+                Vendedor <span className="seller">{product.user.name}</span>
+            </SellerContainer>
 
-            <StyledContainer>
-                <Text>Quantidade </Text>
-                <Amount
-                    type={'number'}
-                    min={buyAmount}
-                    max={product.stockAmount}
-                    value={buyAmount}
-                    onChange={(event) =>
-                        changeBuyAmount(parseInt(event.target.value, 10))
-                    }
-                />
-                <StockAmount>{product.stockAmount} disponível</StockAmount>
-            </StyledContainer>
+            <AmountPicker
+                initialAmount={buyAmount}
+                onAmountChange={handleAmountChange}
+                stockAmount={product.stockAmount}
+            />
 
-            <StyledContainer>
-                <CreateButton onClick={() => product && onBuyClick(product)} />
-                <AddToCartButton
+            <ActionButtonContainer>
+                <ActionButton onClick={() => product && onBuyClick(product)}>
+                    Comprar
+                </ActionButton>
+                <ActionButton
+                    className="secondary"
                     onClick={() => product && onAddCartClick(product)}
-                />
-            </StyledContainer>
+                >
+                    Adicionar ao Carrinho
+                </ActionButton>
+            </ActionButtonContainer>
         </Container>
     );
 };
