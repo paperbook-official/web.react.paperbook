@@ -388,7 +388,9 @@ const Search: React.FC = (): JSX.Element => {
                             <ProductCard
                                 key={product.id}
                                 product={product}
-                                onClick={console.log}
+                                onClick={(product) =>
+                                    history.push(`/products/${product.id}`)
+                                }
                                 rating={4}
                             />
                         ))
