@@ -66,7 +66,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     >
                         <Price>R$ {formatPrice(currentPrice)}</Price>
                         {hasDiscount && (
-                            <Discount>%{product.discount * 100} OFF</Discount>
+                            <Discount>{product.discount * 100}% OFF</Discount>
                         )}
                     </span>
                     {hasInstallment && (
