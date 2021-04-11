@@ -11,6 +11,7 @@ export const dark: DefaultTheme = {
         defaultBlue: '',
         defaultDarkerGrey: '',
         defaultDarkGrey: '',
+        defaultMidGrey: '',
         defaultGrey: '',
         defaultLightGrey: '',
         defaultDarkBlue: '',
