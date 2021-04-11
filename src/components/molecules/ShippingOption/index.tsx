@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useShipping } from '../../../hooks/useShipping';
+
 import { useTheme } from 'styled-components';
 
 import {
@@ -29,37 +31,7 @@ const ShippingOption: React.FC<ShippingOptionProps> = ({
     style
 }: ShippingOptionProps): JSX.Element => {
     const theme = useTheme();
-
-    const days = [
-        'Domingo',
-        'Segunda-Feira',
-        'Terça-Feira',
-        'Quarta-Feira',
-        'Quinta-Feira',
-        'Sexta-Feira',
-        'Sábado'
-    ];
-
-    const getArriveDate = (): string => {
-        const date = new Date();
-        date.setDate(date.getDate() + daysToArrive);
-
-        const localDate = date.toLocaleDateString('pt-BR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        });
-
-        const arriveDay = date.getDay();
-
-        if (daysToArrive === 0) return 'hoje';
-        if (daysToArrive === 1) return 'amanhã';
-        if (daysToArrive <= 7)
-            return `${days[arriveDay]}, ${localDate.split('/')[0]}/${
-                localDate.split('/')[1]
-            }`;
-        return `${localDate.split('/')[0]}/${localDate.split('/')[1]}`;
-    };
+    const { getArriveDate } = useShipping();
 
     return (
         <Container style={style} onClick={onClick}>
@@ -68,7 +40,9 @@ const ShippingOption: React.FC<ShippingOptionProps> = ({
                 <ServiceName>{name}</ServiceName>
                 <ArriveDate>
                     Chegará{' '}
-                    <span style={{ fontWeight: 500 }}>{getArriveDate()}</span>
+                    <span style={{ fontWeight: 500 }}>
+                        {getArriveDate(daysToArrive, price)}
+                    </span>
                 </ArriveDate>
                 {price > 0 ? (
                     <Price>
