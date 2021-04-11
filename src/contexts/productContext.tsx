@@ -7,8 +7,24 @@ import api from '../services/api';
 
 import { useAuth } from '../hooks/useAuth';
 
+import { insertParamInQuery } from '../utils/formatters';
+
 export interface ProductContextData {
     createProduct(product: ProductPayload): Promise<ProductProxy>;
+    getProductById(id: string, join?: string): Promise<ProductProxy>;
+    searchProducts(
+        page: number,
+        offset: number,
+        limit: number,
+        join?: string[],
+        orderBy?: string[],
+        name?: string,
+        categoryId?: number,
+        minPrice?: number,
+        maxPrice?: number,
+        state?: string,
+        freeOfInterest?: boolean
+    ): Promise<ManyProductProxy>;
     getProducts(
         page: number,
         offset: number,
@@ -66,16 +82,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 }: ProductProviderProps) => {
     const { token } = useAuth();
 
-    const concatOrderBy = (url: string, orderBy: string[]) => {
+    const concatParam = (url: string, param: string, value: string[]) => {
         let fullUrl: string = url;
-        orderBy.forEach((value, index) => {
+        value.forEach((val, index) => {
             if (index !== 0) {
                 fullUrl += '&';
             }
-            fullUrl += 'sort=' + value;
+            fullUrl += param + '=' + val;
         });
 
-        if (orderBy.length > 0) {
+        if (value.length > 0) {
             fullUrl += '&';
         }
 
@@ -89,6 +105,50 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         return response.data;
     };
 
+    const getProductById = async (
+        id: string,
+        join = 'user||name'
+    ): Promise<ProductProxy> => {
+        let url = `/products/${id}?`;
+        url += `join=${join}`;
+
+        const response = await api.get<ProductProxy>(url, {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        return response.data;
+    };
+
+    const searchProducts = async (
+        page: number,
+        offset: number,
+        limit: number,
+        join = ['user||name'],
+        orderBy: string[] = [],
+        name?: string,
+        categoryId?: number,
+        minPrice?: number,
+        maxPrice?: number,
+        state?: string,
+        freeOfInterest?: boolean
+    ): Promise<ManyProductProxy> => {
+        let url: string = concatParam('/search?', 'sort', orderBy);
+        url = concatParam(url, 'join', join);
+        url = insertParamInQuery(url, 'name', name || '');
+        url = insertParamInQuery(url, 'categoryId', categoryId || '');
+        url = insertParamInQuery(url, 'minPrice', minPrice || '');
+        url = insertParamInQuery(url, 'maxPrice', maxPrice || '');
+        url = insertParamInQuery(url, 'state', state || '');
+        url = insertParamInQuery(
+            url,
+            'freeOfInterest',
+            freeOfInterest?.toString() || ''
+        );
+        url += `&limit=${limit}&offset=${offset}&page=${page}`;
+
+        const response = await api.get<ManyProductProxy>(url);
+        return response.data;
+    };
+
     const getProducts = async (
         page: number,
         offset: number,
@@ -96,14 +156,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy('/products?', orderBy);
+        let url: string = concatParam('/products?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         const response = await api.get<ManyProductProxy>(url, {
-            headers: {
-                Authorization: 'Bearer ' + token
-            }
+            headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
     };
@@ -116,7 +174,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy('/products/less-than?', orderBy);
+        let url: string = concatParam('/products/less-than?', 'sort', orderBy);
         url += `&maxPrice=${price}`;
         url += `&join=${join}`;
         url += `&limit=${limit}&offset=${offset}&page=${page}`;
@@ -134,7 +192,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy('/products/on-sale?', orderBy);
+        let url: string = concatParam('/products/on-sale?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
@@ -151,8 +209,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy(
+        let url: string = concatParam(
             '/products/free-of-interests?',
+            'sort',
             orderBy
         );
         url += `join=${join}&`;
@@ -184,7 +243,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = 'user||name',
         orderBy: string[] = []
     ): Promise<ManyProductProxy> => {
-        let url: string = concatOrderBy('/products?', orderBy);
+        let url: string = concatParam('/products?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
@@ -200,6 +259,8 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         <ProductContext.Provider
             value={{
                 createProduct,
+                getProductById,
+                searchProducts,
                 getProducts,
                 getProductsByPrice,
                 getProductsOnSale,
