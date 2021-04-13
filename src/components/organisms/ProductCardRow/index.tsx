@@ -6,8 +6,6 @@ import { useTheme } from 'styled-components';
 
 import { formatPrice } from '../../../utils/formatters';
 
-import { ReactComponent as LogoIcon } from '../../../assets/icons/book-reader.svg';
-
 import Logo from '../../atoms/Logo';
 import Rating from '../../atoms/Rating';
 import {
