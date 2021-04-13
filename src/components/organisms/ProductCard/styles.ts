@@ -32,6 +32,15 @@ export const ImageContainer = styled.div`
     border-bottom: 1px solid
         ${(props) => (props.theme.title === 'light' ? '#DDDDDD' : '#777777')};
 
+    & div.logo-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+    }
+
     & img {
         width: 100%;
         height: 100%;

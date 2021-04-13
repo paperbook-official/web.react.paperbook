@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import { ProductProxy } from '../../../models/proxies/product';
 
 import Rating from '../../../components/atoms/Rating';
+import { useTheme } from 'styled-components';
 
 import { formatPrice } from '../../../utils/formatters';
 
+import Logo from '../../atoms/Logo';
 import {
     Container,
     Discount,
@@ -31,6 +33,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     onClick,
     style
 }: ProductCardProps): JSX.Element => {
+    const theme = useTheme();
+
     const [currentPrice] = useState(product.price * (1 - product.discount));
     const [currentInstallmentPrice] = useState(
         !product.installmentPrice || product.installmentPrice <= product.price
@@ -48,7 +52,17 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return (
         <Container style={style} onClick={() => onClick(product)}>
             <ImageContainer>
-                <img src={product.imageUrl} alt="Product Image" />
+                {product.imageUrl && product.imageUrl !== '' ? (
+                    <img src={product.imageUrl} alt="Product Image" />
+                ) : (
+                    <div className="logo-icon">
+                        <Logo
+                            showTitle={false}
+                            color={theme.colors.defaultGrey + '88'}
+                            size={100}
+                        />
+                    </div>
+                )}
             </ImageContainer>
             <InfoContainer>
                 <PriceContainer>
