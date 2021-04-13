@@ -10,10 +10,13 @@ import { useLoading } from '../../hooks/useLoading';
 import { useProduct } from '../../hooks/useProduct';
 import useQuery from '../../hooks/useQuery';
 
+import LoadingDots from '../../components/atoms/LoadingDots';
+import Modal from '../../components/atoms/Modal';
 import Paginator from '../../components/atoms/Paginator';
 import SortByDropdown from '../../components/atoms/SortByDropdown';
 import Header from '../../components/organisms/Header';
 import ProductCard from '../../components/organisms/ProductCard';
+import ProductCardRow from '../../components/organisms/ProductCardRow';
 import { useTheme } from 'styled-components';
 
 import {
@@ -21,6 +24,9 @@ import {
     insertParamInQuery,
     removeQueryParam
 } from '../../utils/formatters';
+
+import { ReactComponent as GridIcon } from '../../assets/icons/grid.svg';
+import { ReactComponent as ListIcon } from '../../assets/icons/list.svg';
 
 import {
     Container,
@@ -38,17 +44,24 @@ import {
     TitleContainer,
     Topic,
     TopicsContainer,
-    TotalMatches
+    TotalMatches,
+    SwitchIcon,
+    ModalCard
 } from './styles';
 
+interface GenericObject {
+    id: string | number;
+    name: string;
+}
+
 const sortOptions = ['Mais Relevantes', 'Menor Preço', 'Maior Preço'];
-const itemsPerPage = 3;
+const itemsPerPage = 5;
 
 const Search: React.FC = (): JSX.Element => {
     const query = useQuery();
     const history = useHistory();
     const theme = useTheme();
-    const { getProducts } = useProduct();
+    const { searchProducts } = useProduct();
     const { isLoadingContent, setLoadingContent } = useLoading();
     const { getCategories } = useCategory();
 
@@ -56,13 +69,23 @@ const Search: React.FC = (): JSX.Element => {
     const [totalMatches, setTotalMatches] = useState(0);
     const [products, setProducts] = useState<ProductProxy[]>([]);
     const [categories, setCategories] = useState<CategoryProxy[]>([]);
+    const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
     const [brStates, setBrStates] = useState<string[][]>();
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [sortBy, setSortBy] = useState<number>();
 
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState<GenericObject[]>([]);
+    const [isLoadingModal, setLoadingModal] = useState(false);
+
     const [page, setPage] = useState(1);
     const [pageAmount, setPageAmount] = useState(0);
+    const [displayType, setDisplayType] = useState('G');
+
+    const getCurrentUrl = (): string => {
+        return history.location.pathname + history.location.search;
+    };
 
     const isState = (state: string): state is keyof typeof BrStatesEnum => {
         return Object.keys(BrStatesEnum).indexOf(state) !== -1;
@@ -94,44 +117,80 @@ const Search: React.FC = (): JSX.Element => {
         setBrStates(states);
     };
 
-    const setQueryPage = (): number => {
-        const queryPage = query.get('page');
-        if (queryPage) {
-            setPage(parseInt(queryPage));
+    const setQueryParam = (
+        param: string,
+        defaultValue: string | number
+    ): string | number => {
+        const queryParam = query.get(param);
+        if (queryParam) {
+            if (param === 'page') setPage(parseInt(queryParam));
+            else setDisplayType(queryParam);
         } else {
-            const location = history.location;
-            const origUrl = location.pathname + location.search;
-            const url = insertParamInQuery(origUrl, 'page', 1);
+            const origUrl = getCurrentUrl();
+            const url = insertParamInQuery(origUrl, param, defaultValue);
             history.push(url);
         }
-        return parseInt(queryPage || '1');
+        if (typeof defaultValue === 'number') {
+            return parseInt(queryParam || `${defaultValue}`);
+        } else {
+            return queryParam || defaultValue;
+        }
     };
 
     const initialState = async (): Promise<void> => {
         setLoadingContent(true);
 
-        const currentPage = setQueryPage();
+        const location = history.location.search;
 
-        const queryToCommon = formatQueryToCommon(
-            query.get('search') || query.get('category') || ''
-        );
-        setTitle(queryToCommon);
-
-        const responseCat = await getCategories(9);
-        setCategories(responseCat);
-        getBrStates();
-
-        const response = await getProducts(currentPage, 0, itemsPerPage);
-
-        setTotalMatches(response.total);
-        setPageAmount(Math.ceil(response.total / itemsPerPage));
-        setProducts(response.data);
-
-        const querySort = query.get('orderBy');
-        if (querySort) {
-            setSortBy(querySort.includes('DESC') ? 3 : 2);
+        if (
+            !location ||
+            location === '' ||
+            !(location.includes('search') || location.includes('category'))
+        ) {
+            history.push('/');
         } else {
-            setSortBy(1);
+            setQueryParam('displayType', 'G');
+            const currentPage = setQueryParam('page', 1);
+
+            const search = formatQueryToCommon(query.get('search') || ''),
+                category = formatQueryToCommon(query.get('category') || ''),
+                categoryId = query.get('catId'),
+                state = query.get('state'),
+                minPrice = query.get('minPrice'),
+                maxPrice = query.get('maxPrice'),
+                freeOfInterests = query.get('interestFree');
+
+            const queryToCommon = search || category || '';
+            setTitle(queryToCommon);
+
+            const responseCat = await getCategories(9);
+            setCategories(responseCat);
+            getBrStates();
+
+            const response = await searchProducts(
+                currentPage as number,
+                0,
+                itemsPerPage,
+                [],
+                [],
+                search.toLowerCase(),
+                categoryId || '',
+                minPrice || '',
+                maxPrice || '',
+                state || '',
+                freeOfInterests === 'true'
+            );
+
+            setTotalMatches(response.total);
+            setPageAmount(Math.ceil(response.total / itemsPerPage));
+            setProducts(response.data);
+
+            const querySort = query.get('orderBy');
+            if (querySort) {
+                setSortBy(querySort.includes('DESC') ? 3 : 2);
+            } else {
+                setSortBy(1);
+            }
         }
 
         setLoadingContent(false);
@@ -142,20 +201,19 @@ const Search: React.FC = (): JSX.Element => {
     }, []);
 
     const handleCategoryClick = (category: CategoryProxy) => {
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'category', category.name);
+        const newUrl = insertParamInQuery(url, 'catId', category.id);
 
-        if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
-            const to = removeQueryParam(url, 'page');
+        if (decodeURIComponent(newUrl) !== decodeURIComponent(origUrl)) {
+            const to = removeQueryParam(newUrl, 'page');
             history.push(to);
             window.location.reload();
         }
     };
 
     const handleLocalClick = (state: string) => {
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'state', state);
 
         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
@@ -176,8 +234,7 @@ const Search: React.FC = (): JSX.Element => {
     };
 
     const handleInterestFree = (): void => {
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'interestFree', 'true');
 
         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
@@ -188,8 +245,7 @@ const Search: React.FC = (): JSX.Element => {
     };
 
     const handlePriceFilterClick = (min: string, max: string): void => {
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
 
         let url = origUrl;
 
@@ -213,8 +269,7 @@ const Search: React.FC = (): JSX.Element => {
     };
 
     const handleSortClick = (option: number): void => {
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
 
         if (option !== 0) {
             const url = insertParamInQuery(
@@ -241,17 +296,33 @@ const Search: React.FC = (): JSX.Element => {
     const handlePageChange = async (pageNumber: number): Promise<void> => {
         setLoadingContent(true);
 
-        const location = history.location;
-        const origUrl = location.pathname + location.search;
+        const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'page', pageNumber);
 
         if (page !== pageNumber) {
             history.push(url);
             setPage(pageNumber);
-            const response: ManyProductProxy = await getProducts(
+            window.scrollTo(0, 0);
+
+            const search = formatQueryToCommon(query.get('search') || ''),
+                categoryId = query.get('catId'),
+                state = query.get('state'),
+                minPrice = query.get('minPrice'),
+                maxPrice = query.get('maxPrice'),
+                freeOfInterests = query.get('interestFree');
+
+            const response: ManyProductProxy = await searchProducts(
                 pageNumber,
                 0,
-                itemsPerPage
+                itemsPerPage,
+                [],
+                [],
+                search.toLowerCase(),
+                categoryId || '',
+                minPrice || '',
+                maxPrice || '',
+                state || '',
+                freeOfInterests === 'true'
             );
             setProducts(response.data);
         }
@@ -259,8 +330,57 @@ const Search: React.FC = (): JSX.Element => {
         setLoadingContent(false);
     };
 
+    const handleDisplayChange = (type: string): void => {
+        setDisplayType(type);
+        const origUrl = getCurrentUrl();
+        const url = insertParamInQuery(origUrl, 'displayType', type);
+
+        if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
+            history.push(url);
+        }
+    };
+
+    const handleModalClose = (): void => {
+        const modal = document.getElementsByClassName('modal-container')[0];
+        modal.classList.add('modal-container-move-out');
+        setTimeout(() => {
+            setModalVisible(false);
+        }, 200);
+    };
+
+    const handleSeeAllCategories = async (): Promise<void> => {
+        setModalVisible(true);
+        setLoadingModal(true);
+
+        if (allCategories && allCategories.length > 0) {
+            setModalContent(allCategories);
+        } else {
+            const categories = await getCategories();
+            setAllCategories(categories);
+            setModalContent(categories);
+        }
+
+        setLoadingModal(false);
+    };
+
+    const handleSeeAllStates = (): void => {
+        setModalVisible(true);
+        setLoadingModal(true);
+
+        const states = [];
+
+        for (const state in BrStatesEnum) {
+            if (state && isState(state)) {
+                states.push({ id: state, name: BrStatesEnum[state] });
+            }
+        }
+
+        setModalContent(states);
+        setLoadingModal(false);
+    };
+
     return (
-        <Container>
+        <Container style={{ overflow: isModalVisible ? 'hidden' : 'visible' }}>
             <Header />
             <Content>
                 <InfoContainer>
@@ -282,7 +402,7 @@ const Search: React.FC = (): JSX.Element => {
                                 </Topic>
                             ))}
                             <Topic
-                                onClick={console.log}
+                                onClick={handleSeeAllCategories}
                                 style={{
                                     color:
                                         theme.colors.defaultHighlightGreyBlue,
@@ -306,7 +426,7 @@ const Search: React.FC = (): JSX.Element => {
                                 </Topic>
                             ))}
                             <Topic
-                                onClick={console.log}
+                                onClick={handleSeeAllStates}
                                 style={{
                                     color:
                                         theme.colors.defaultHighlightGreyBlue,
@@ -374,32 +494,110 @@ const Search: React.FC = (): JSX.Element => {
                         </PriceRangeContainer>
                     </TopicsContainer>
                 </InfoContainer>
-                <ListContainer>
+                <ListContainer
+                    style={{
+                        display:
+                            (!isLoadingContent && totalMatches === 0) ||
+                            displayType === 'L'
+                                ? 'flex'
+                                : 'grid'
+                    }}
+                    isListDisplay={displayType === 'L'}
+                >
                     {sortBy && (
                         <SortByDropdown
-                            style={{ position: 'absolute', right: 0, top: -60 }}
+                            style={{
+                                position: 'absolute',
+                                right: 100,
+                                top: -60
+                            }}
                             options={sortOptions}
                             defaultOption={sortBy}
                             onChange={handleSortClick}
                         />
                     )}
-                    {!isLoadingContent && products.length > 0 ? (
-                        products.map((product) => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onClick={(product) =>
-                                    history.push(`/products/${product.id}`)
-                                }
-                                rating={4}
-                            />
-                        ))
-                    ) : (
-                        <ResultNotFound>
-                            Nenhum resultado encontrado!
-                        </ResultNotFound>
-                    )}
-                    {pageAmount > 1 && (
+                    <SwitchIcon
+                        className={`list ${
+                            displayType === 'L' ? 'selected' : ''
+                        }`}
+                        onClick={() => handleDisplayChange('L')}
+                    >
+                        <ListIcon
+                            height={20}
+                            width={20}
+                            color={
+                                displayType === 'L'
+                                    ? theme.colors.defaultBlue
+                                    : theme.colors.defaultGrey
+                            }
+                        />
+                    </SwitchIcon>
+                    <SwitchIcon
+                        className={`grid ${
+                            displayType === 'G' ? 'selected' : ''
+                        }`}
+                        onClick={() => handleDisplayChange('G')}
+                    >
+                        <GridIcon
+                            height={18}
+                            width={18}
+                            color={
+                                displayType === 'G'
+                                    ? theme.colors.defaultBlue
+                                    : theme.colors.defaultGrey
+                            }
+                        />
+                    </SwitchIcon>
+                    {!isLoadingContent && products.length > 0
+                        ? products.map((product, index) =>
+                              displayType === 'G' ? (
+                                  <ProductCard
+                                      style={{
+                                          width:
+                                              window.innerWidth <= 1366
+                                                  ? 255
+                                                  : 300
+                                      }}
+                                      key={product.id}
+                                      product={product}
+                                      onClick={(product) =>
+                                          history.push(
+                                              `/products/${product.id}`
+                                          )
+                                      }
+                                      rating={4}
+                                  />
+                              ) : (
+                                  <ProductCardRow
+                                      style={{
+                                          borderRadius:
+                                              index === 0 &&
+                                              products.length === 1
+                                                  ? '5px 5px 5px 5px'
+                                                  : index === 0
+                                                  ? '5px 5px 0 0'
+                                                  : index ===
+                                                    products.length - 1
+                                                  ? '0 0 5px 5px'
+                                                  : ''
+                                      }}
+                                      key={product.id}
+                                      product={product}
+                                      onClick={(product) =>
+                                          history.push(
+                                              `/products/${product.id}`
+                                          )
+                                      }
+                                      rating={4}
+                                  />
+                              )
+                          )
+                        : !isLoadingContent && (
+                              <ResultNotFound>
+                                  Nenhum resultado encontrado!
+                              </ResultNotFound>
+                          )}
+                    {!isLoadingContent && pageAmount > 1 && (
                         <Paginator
                             page={page}
                             pageAmount={pageAmount}
@@ -414,6 +612,56 @@ const Search: React.FC = (): JSX.Element => {
                     )}
                 </ListContainer>
             </Content>
+            {isModalVisible && (
+                <Modal onClickOutside={handleModalClose}>
+                    <ModalCard
+                        className="modal-container modal-container-move-in"
+                        style={{ display: isLoadingModal ? 'flex' : 'block' }}
+                    >
+                        {isLoadingModal ? (
+                            <LoadingDots />
+                        ) : (
+                            <>
+                                <h1>
+                                    {typeof modalContent[0].id === 'number'
+                                        ? 'Categorias'
+                                        : 'Localização'}
+                                </h1>
+                                <div
+                                    className="modal-content"
+                                    style={{
+                                        overflowY:
+                                            modalContent.length === 12
+                                                ? 'hidden'
+                                                : 'scroll'
+                                    }}
+                                >
+                                    {modalContent.map((content, index) => (
+                                        <Topic
+                                            key={
+                                                typeof content.id === 'number'
+                                                    ? content.id
+                                                    : index
+                                            }
+                                            onClick={() =>
+                                                typeof content.id === 'number'
+                                                    ? handleCategoryClick(
+                                                          content as CategoryProxy
+                                                      )
+                                                    : handleLocalClick(
+                                                          content.id
+                                                      )
+                                            }
+                                        >
+                                            {content.name}
+                                        </Topic>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </ModalCard>
+                </Modal>
+            )}
         </Container>
     );
 };

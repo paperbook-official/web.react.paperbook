@@ -5,7 +5,7 @@ export const Container = styled.div`
     justify-content: center;
     align-items: center;
 
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
 

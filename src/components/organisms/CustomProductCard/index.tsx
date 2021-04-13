@@ -7,6 +7,7 @@ import { useTheme } from 'styled-components';
 import { formatPrice } from '../../../utils/formatters';
 
 import LoadingDots from '../../atoms/LoadingDots';
+import Logo from '../../atoms/Logo';
 import {
     Container,
     ImageContainer,
@@ -63,7 +64,17 @@ const CustomProductCard: React.FC<CustomProductCardProps> = ({
                         </div>
                     </InfoContainer>
                     <ImageContainer>
-                        <img src={product.imageUrl} alt="Product Image" />
+                        {product.imageUrl && product.imageUrl !== '' ? (
+                            <img src={product.imageUrl} alt="Product Image" />
+                        ) : (
+                            <div className="logo-icon">
+                                <Logo
+                                    showTitle={false}
+                                    color={theme.colors.defaultLightGrey + '88'}
+                                    size={100}
+                                />
+                            </div>
+                        )}
                     </ImageContainer>{' '}
                 </>
             )}

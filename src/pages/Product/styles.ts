@@ -109,10 +109,15 @@ export const ImagePreviewContainer = styled.div`
     height: 500px;
     width: auto;
     margin-left: 30px;
+    margin-right: 140px;
     padding: 20px 30px;
 
     border-radius: 5px;
     overflow: hidden;
+
+    @media (max-width: 1200px) {
+        margin-right: 0;
+    }
 
     &.mini {
         min-height: 70px;
@@ -126,6 +131,15 @@ export const ImagePreviewContainer = styled.div`
         cursor: pointer;
         border: 2px solid
             ${(props) => props.theme.colors.defaultHighlightGreyBlue}77;
+    }
+
+    & div.logo-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
     }
 
     & > img {

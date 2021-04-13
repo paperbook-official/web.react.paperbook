@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 
 import { ProductProxy } from '../../../models/proxies/product';
 
-import Rating from '../../../components/atoms/Rating';
 import { useTheme } from 'styled-components';
 
 import { formatPrice } from '../../../utils/formatters';
 
+import { ReactComponent as LogoIcon } from '../../../assets/icons/book-reader.svg';
+
 import Logo from '../../atoms/Logo';
+import Rating from '../../atoms/Rating';
 import {
     Container,
     Discount,
@@ -20,19 +22,19 @@ import {
     Title
 } from './styles';
 
-interface ProductCardProps {
+interface ProductCardRowProps {
     product: ProductProxy;
     rating?: number;
     onClick(product: ProductProxy): void;
     style?: React.CSSProperties;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCardRow: React.FC<ProductCardRowProps> = ({
     product,
     rating = 0,
     onClick,
     style
-}: ProductCardProps): JSX.Element => {
+}: ProductCardRowProps): JSX.Element => {
     const theme = useTheme();
 
     const [currentPrice] = useState(product.price * (1 - product.discount));
@@ -53,7 +55,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <Container style={style} onClick={() => onClick(product)}>
             <ImageContainer>
                 {product.imageUrl && product.imageUrl !== '' ? (
-                    <img src={product.imageUrl} alt="Product Image" />
+                    <img
+                        src={
+                            product.imageUrl ||
+                            'https://images-na.ssl-images-amazon.com/images/I/61hH5E8xHZL.jpg'
+                        }
+                        alt="Product Image"
+                    />
                 ) : (
                     <div className="logo-icon">
                         <Logo
@@ -65,6 +73,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 )}
             </ImageContainer>
             <InfoContainer>
+                <div>
+                    <Title>{product.name}</Title>
+                    <Seller>Vendido por {product.user.name}</Seller>
+                </div>
                 <PriceContainer>
                     {hasDiscount && (
                         <Price className="full-price">
@@ -94,11 +106,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                         </span>
                     )}
                 </PriceContainer>
-                <div>
-                    <Title>{product.name}</Title>
-                    <Seller>por {product.user.name}</Seller>
-                </div>
-                <div style={{ width: 70 }}>
+                <div style={{ width: 70, position: 'absolute', bottom: 20 }}>
                     <Rating size={13} rating={rating} />
                 </div>
             </InfoContainer>
@@ -106,4 +114,4 @@ const ProductCard: React.FC<ProductCardProps> = ({
     );
 };
 
-export default ProductCard;
+export default ProductCardRow;

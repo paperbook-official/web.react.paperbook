@@ -23,7 +23,7 @@ export const insertParamInQuery = (
     value: string | number
 ): string => {
     let newQuery = url;
-    if (value && value !== '') {
+    if ((value && value !== '') || value === 0) {
         if (url.includes('?')) {
             if (url.includes(param)) {
                 const queryParts = newQuery.split(`${param}=`);
@@ -32,13 +32,16 @@ export const insertParamInQuery = (
                         (queryParts[1].split('&')[1] ? '&' : ''),
                     ''
                 );
+
                 if (otherParams) {
                     newQuery = `${queryParts[0]}${param}=${value}&${otherParams}`;
                 } else {
                     newQuery = `${queryParts[0]}${param}=${value}`;
                 }
             } else {
-                newQuery += `&${param}=${value}`;
+                newQuery += `${
+                    newQuery[newQuery.length - 1] === '&' ? '' : '&'
+                }${param}=${value}`;
             }
         } else {
             newQuery += `?${param}=${value}`;

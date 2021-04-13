@@ -8,11 +8,13 @@ import { useLoading } from '../../hooks/useLoading';
 import { useProduct } from '../../hooks/useProduct';
 import { useShipping } from '../../hooks/useShipping';
 
+import Logo from '../../components/atoms/Logo';
 import Modal from '../../components/atoms/Modal';
 import Rating from '../../components/atoms/Rating';
 import Header from '../../components/organisms/Header';
 import ProductBuyingCard from '../../components/organisms/ProductBuyingCard';
 import ShippingCard from '../../components/organisms/ShippingCard';
+import { useTheme } from 'styled-components';
 
 import {
     CategoryPath,
@@ -34,6 +36,7 @@ import {
 const Product: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { id }: any = useParams();
+    const theme = useTheme();
     const history = useHistory();
     const { getProductById } = useProduct();
     const { address, option } = useShipping();
@@ -165,26 +168,47 @@ const Product: React.FC = () => {
                 <ProductContainer>
                     <ProductInfoContainer>
                         <ImageContainer>
-                            <ImagePreviewContainer className="mini">
-                                {product && (
+                            <ImagePreviewContainer
+                                className="mini"
+                                style={{ borderWidth: product ? 2 : 0 }}
+                            >
+                                {product &&
+                                product.imageUrl &&
+                                product.imageUrl !== '' ? (
                                     <img
-                                        src={
-                                            product.imageUrl ||
-                                            'https://images-na.ssl-images-amazon.com/images/I/61hH5E8xHZL.jpg'
-                                        }
+                                        src={product.imageUrl}
                                         alt="Product Image"
                                     />
+                                ) : (
+                                    <div className="logo-icon">
+                                        <Logo
+                                            showTitle={false}
+                                            color={
+                                                theme.colors.defaultGrey + '88'
+                                            }
+                                            size={40}
+                                        />
+                                    </div>
                                 )}
                             </ImagePreviewContainer>
                             <ImagePreviewContainer>
-                                {product && (
+                                {product &&
+                                product.imageUrl &&
+                                product.imageUrl !== '' ? (
                                     <img
-                                        src={
-                                            product.imageUrl ||
-                                            'https://images-na.ssl-images-amazon.com/images/I/61hH5E8xHZL.jpg'
-                                        }
+                                        src={product.imageUrl}
                                         alt="Product Image"
                                     />
+                                ) : (
+                                    <div className="logo-icon">
+                                        <Logo
+                                            showTitle={false}
+                                            color={
+                                                theme.colors.defaultGrey + '88'
+                                            }
+                                            size={400}
+                                        />
+                                    </div>
                                 )}
                             </ImagePreviewContainer>
                         </ImageContainer>

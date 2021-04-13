@@ -275,6 +275,7 @@ const SignUp: React.FC = (): JSX.Element => {
                 style={{ position: 'absolute', right: 400 + 20, bottom: 20 }}
                 height={`${paperbookIconSize}px`}
                 width={`${paperbookIconSize}px`}
+                color={theme.colors.background}
             />
             <SocialMedia style={{ left: 20, bottom: 20 }} />
             <Content
