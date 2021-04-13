@@ -34,7 +34,20 @@ const SearchBar: React.FC = (): JSX.Element => {
                     .trim()
             );
             document.getElementsByName('searchInput')[0].blur();
-            history.push('/products?search=' + formatQueryParam(searchText));
+
+            const queryDisplay = query.get('displayType');
+
+            if (queryDisplay)
+                history.push(
+                    `/products?search=${formatQueryParam(
+                        searchText
+                    )}&displayType=${queryDisplay}`
+                );
+            else
+                history.push(
+                    '/products?search=' + formatQueryParam(searchText)
+                );
+
             window.location.reload();
         }
     };
