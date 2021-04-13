@@ -59,6 +59,15 @@ export const ImageContainer = styled.div`
     width: 48%;
     padding: 10px 15px;
 
+    & div.logo-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 100%;
+    }
+
     & img {
         height: 100%;
         width: 100%;
