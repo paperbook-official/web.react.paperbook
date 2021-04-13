@@ -79,7 +79,11 @@ const Home: React.FC = (): JSX.Element => {
     };
 
     const onCategoryClick = (category: CategoryProxy): void => {
-        history.push(`/products?category=${formatQueryParam(category.name)}`);
+        history.push(
+            `/products?category=${formatQueryParam(category.name)}&catId=${
+                category.id
+            }`
+        );
     };
 
     const getCategoriesList = async (): Promise<void> => {
