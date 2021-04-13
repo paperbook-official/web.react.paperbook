@@ -123,7 +123,9 @@ const Product: React.FC = () => {
     };
 
     const handleCategoryClick = (category: CategoryProxy): void => {
-        history.push('/products?category=' + category.name);
+        history.push(
+            `/products?category=${category.name}&catId=${category.id}`
+        );
     };
 
     return (
