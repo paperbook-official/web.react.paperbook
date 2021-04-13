@@ -19,11 +19,11 @@ export interface ProductContextData {
         join?: string[],
         orderBy?: string[],
         name?: string,
-        categoryId?: number,
-        minPrice?: number,
-        maxPrice?: number,
+        categoryId?: string,
+        minPrice?: string,
+        maxPrice?: string,
         state?: string,
-        freeOfInterest?: boolean
+        freeOfInterests?: boolean
     ): Promise<ManyProductProxy>;
     getProducts(
         page: number,
@@ -122,17 +122,18 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join: string[] = [],
         orderBy: string[] = [],
         name?: string,
-        categoryId?: number,
-        minPrice?: number,
-        maxPrice?: number,
+        categoryId?: string,
+        minPrice?: string,
+        maxPrice?: string,
         state?: string,
-        freeOfInterest?: boolean
+        freeOfInterests?: boolean
     ): Promise<ManyProductProxy> => {
         let url: string = concatParam('/search?', 'sort', orderBy);
         url = concatParam(url, 'join', join);
+
         url = insertParamInQuery(url, 'name', name || '');
         url = insertParamInQuery(url, 'categoryId', categoryId || '');
         url = insertParamInQuery(url, 'minPrice', minPrice || '');
@@ -140,10 +141,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url = insertParamInQuery(url, 'state', state || '');
         url = insertParamInQuery(
             url,
-            'freeOfInterest',
-            freeOfInterest?.toString() || ''
+            'freeOfInterests',
+            freeOfInterests ? 'true' : ''
         );
-        url += `&limit=${limit}&offset=${offset}&page=${page}`;
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
 
         const response = await api.get<ManyProductProxy>(url);
         return response.data;
