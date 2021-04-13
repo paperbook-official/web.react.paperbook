@@ -26,7 +26,7 @@ export const SortOption = styled.span`
 `;
 
 export const DropdownContainer = styled.div`
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     position: absolute;
@@ -104,6 +104,7 @@ export const DropdownToggle = styled.div`
     }
 
     &.active ~ ${DropdownContainer} {
+        display: flex;
         opacity: 1;
     }
 `;
