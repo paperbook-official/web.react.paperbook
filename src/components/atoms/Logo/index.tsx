@@ -8,17 +8,20 @@ import { Container, Title } from './styles';
 
 interface LogoProps {
     showTitle?: boolean;
+    color?: string;
+    size?: number;
 }
 
 const Logo: React.FC<LogoProps> = ({
-    showTitle = true
+    showTitle = true,
+    color = '#f5f5f5',
+    size = 40
 }: LogoProps): JSX.Element => {
     const theme = useTheme();
-    const iconSize = 40;
 
     return (
         <Container theme={theme}>
-            <LogoIcon width={`${iconSize}px`} height={`${iconSize}px`} />
+            <LogoIcon width={`${size}px`} height={`${size}px`} color={color} />
             {showTitle && <Title>PaperBook</Title>}
         </Container>
     );
