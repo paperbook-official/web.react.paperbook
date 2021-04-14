@@ -1,3 +1,5 @@
+import { OrderProxy } from './order';
+import { ProductCategoryProxy } from './productCategory';
 import { UserProxy } from './user';
 
 export interface ProductProxy {
@@ -14,13 +16,11 @@ export interface ProductProxy {
     discount: number;
     stockAmount: number;
     userId: number;
-    user: UserProxy;
-}
 
-export interface ManyProductProxy {
-    count: number;
-    total: number;
-    page: number;
-    pageCount: number;
-    data: ProductProxy[];
+    // relations
+    user?: UserProxy;
+    orders?: OrderProxy[];
+    productsCategories?: ProductCategoryProxy[];
+    // ratings?: RatingProxy[];
+    // shoppingCarts: ShoppingCartProxy[];
 }

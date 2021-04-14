@@ -1,19 +1,15 @@
+import { ProductProxy } from './product';
 import { UserProxy } from './user';
 
-export interface AddressProxy {
+export interface ShoppingCartProxy {
     id: number;
     createdAt: string;
     updatedAt: string;
     isActive: boolean;
-    cep: string;
-    street: string;
-    houseNumber: number;
-    complement: string;
-    district: string;
-    city: string;
-    state: string;
+    productId: number;
     userId: number;
 
     // relations
+    product?: ProductProxy;
     user?: UserProxy;
 }

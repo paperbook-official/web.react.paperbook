@@ -1,3 +1,4 @@
+import { RolesEnum } from '../enums/user';
 import { AddressProxy } from './address';
 import { OrderProxy } from './order';
 import { ProductProxy } from './product';
@@ -16,9 +17,13 @@ export interface UserProxy {
     lastName: string;
     email: string;
     cpf?: string;
-    permissions: string;
+    permissions: RolesEnum;
     phone?: string;
+
+    // relations
     addresses?: AddressProxy[];
     products?: ProductProxy[];
     orders?: OrderProxy[];
+    // shoppingCarts?: ShoppingCartProxy[];
+    // ratings?: RatingProxy[];
 }

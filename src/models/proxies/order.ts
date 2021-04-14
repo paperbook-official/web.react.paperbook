@@ -1,3 +1,4 @@
+import { OrderStatus } from '../enums/order';
 import { ProductProxy } from './product';
 import { UserProxy } from './user';
 
@@ -6,10 +7,12 @@ export interface OrderProxy {
     createdAt: string;
     updatedAt: string;
     isActive: boolean;
-    status: number;
+    status: OrderStatus;
     trackingCode: string;
     userId: number;
     productId: number;
-    user: UserProxy;
-    product: ProductProxy;
+
+    // relations
+    user?: UserProxy;
+    product?: ProductProxy;
 }
