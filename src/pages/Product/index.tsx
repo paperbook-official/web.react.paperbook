@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
+import { ActionResultEnum } from '../../models/enums/actionResultTypes';
 import { CategoryProxy } from '../../models/proxies/category/category';
 import { ProductProxy } from '../../models/proxies/product/product';
+import { ProductReviewProxy } from '../../models/proxies/product/productReview';
+import { RatingProxy } from '../../models/proxies/rating/rating';
 
+import { useActionResult } from '../../hooks/useActionResult';
+import { useCart } from '../../hooks/useCart';
 import { useLoading } from '../../hooks/useLoading';
 import { useProduct } from '../../hooks/useProduct';
 import { useShipping } from '../../hooks/useShipping';
@@ -38,22 +43,45 @@ const Product: React.FC = () => {
     const { id }: any = useParams();
     const theme = useTheme();
     const history = useHistory();
-    const { getProductById } = useProduct();
+    const {
+        getProductById,
+        getProductCategories,
+        getProductRaitings,
+        getProductReview
+    } = useProduct();
     const { address, option, options, setOption } = useShipping();
+    const { insertInLocalCart } = useCart();
     const { setLoadingContent } = useLoading();
+    const { show } = useActionResult();
 
     const [product, setProduct] = useState<ProductProxy>();
+    const [categories, setCategories] = useState<CategoryProxy[]>([]);
+    const [ratings, setRatings] = useState<RatingProxy[]>([]);
+    const [review, setReview] = useState<ProductReviewProxy>();
+    const [amount, setAmount] = useState(1);
+
     const [isShippingCardVisible, setShippingCardVisible] = useState(false);
 
     const initialState = async (): Promise<void> => {
         setLoadingContent(true);
 
-        const productsResponse = await getProductById(id);
+        const productsResponse = await getProductById(parseInt(id));
         setProduct(productsResponse);
 
         if (!option) {
             setOption(options[0]);
         }
+
+        const categoriesResponse = await getProductCategories(
+            productsResponse.id
+        );
+        setCategories(categoriesResponse);
+
+        const ratingsResponse = await getProductRaitings(productsResponse.id);
+        setRatings(ratingsResponse);
+
+        const reviewResponse = await getProductReview(productsResponse.id);
+        setReview(reviewResponse);
 
         setLoadingContent(false);
     };
@@ -66,47 +94,6 @@ const Product: React.FC = () => {
         setShippingCardVisible(true);
     };
 
-    const categories: CategoryProxy[] = [
-        {
-            id: 1,
-            name: 'Ação',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        },
-        {
-            id: 2,
-            name: 'Aventura',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        },
-        {
-            id: 3,
-            name: 'Ficção',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        }
-    ];
-
-    const comments = [
-        {
-            id: 1,
-            stars: 5,
-            text:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.'
-        },
-        {
-            id: 2,
-            stars: 4,
-            text:
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-        },
-        {
-            id: 3,
-            stars: 3,
-            text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
-        }
-    ];
-
     const handleBackButtonClick = (): void => {
         history.goBack();
     };
@@ -115,6 +102,20 @@ const Product: React.FC = () => {
         history.push(
             `/products?category=${category.name}&catId=${category.id}`
         );
+    };
+
+    const handleBuyClick = (product: ProductProxy): void => {
+        insertInLocalCart({ product, amount });
+        history.push('/cart');
+    };
+
+    const handleAddCartClick = (product: ProductProxy): void => {
+        insertInLocalCart({ product, amount });
+        show('Adicionado ao carrinho!', product.name, ActionResultEnum.SUCCESS);
+    };
+
+    const handleAmountChange = (amount: number): void => {
+        setAmount(amount);
     };
 
     return (
@@ -209,21 +210,21 @@ const Product: React.FC = () => {
                                 <p>{product.description}</p>
                             </Description>
                         )}
-                        {product && comments && (
+                        {product && ratings && ratings.length > 0 && (
                             <CommentsContainer>
                                 <h1>Comentários</h1>
-                                {comments.map((comment, index) => (
+                                {ratings.map((rating, index) => (
                                     <Comment
-                                        key={comment.id}
+                                        key={rating.id}
                                         style={{
                                             marginTop: index === 0 ? 20 : 40
                                         }}
                                     >
                                         <Rating
-                                            rating={comment.stars}
+                                            rating={rating.stars}
                                             size={20}
                                         />
-                                        <p>{comment.text}</p>
+                                        <p>{rating.text}</p>
                                     </Comment>
                                 ))}
                             </CommentsContainer>
@@ -233,13 +234,15 @@ const Product: React.FC = () => {
                         {product && (
                             <ProductBuyingCard
                                 product={product}
+                                review={review}
                                 cep={address}
                                 shippingOption={option}
                                 onShippingOptionsClick={
                                     handleShippingOptionsClick
                                 }
-                                onBuyClick={console.log}
-                                onAddCartClick={console.log}
+                                onBuyClick={handleBuyClick}
+                                onAddCartClick={handleAddCartClick}
+                                onAmountChange={handleAmountChange}
                             />
                         )}
                     </ProductCardContainer>
