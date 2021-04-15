@@ -1,4 +1,5 @@
-export interface ProductPayload {
+export class UpdateProductPayload {
+    imageUrl: string;
     name: string;
     description: string;
     price: number;
@@ -6,5 +7,4 @@ export interface ProductPayload {
     installmentAmount?: number;
     discount?: number;
     stockAmount: number;
-    userId: number;
 }

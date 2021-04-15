@@ -1,5 +1,5 @@
-import { CategoryProxy } from './category';
-import { ProductProxy } from './product';
+import { CategoryProxy } from '../category/category';
+import { ProductProxy } from '../product/product';
 
 export interface ProductCategoryProxy {
     id: number;

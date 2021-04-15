@@ -1,6 +1,8 @@
-import { OrderProxy } from './order';
-import { ProductCategoryProxy } from './productCategory';
-import { UserProxy } from './user';
+import { OrderProxy } from '../order/order';
+import { ProductCategoryProxy } from '../productCategory/productCategory';
+import { RatingProxy } from '../rating/rating';
+import { ShoppingCartProxy } from '../shoppingCart/shoppingCart';
+import { UserProxy } from '../user/user';
 
 export interface ProductProxy {
     id: number;
@@ -21,6 +23,6 @@ export interface ProductProxy {
     user?: UserProxy;
     orders?: OrderProxy[];
     productsCategories?: ProductCategoryProxy[];
-    // ratings?: RatingProxy[];
-    // shoppingCarts: ShoppingCartProxy[];
+    ratings?: RatingProxy[];
+    shoppingCarts: ShoppingCartProxy[];
 }

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
-import { AuthPayload, SignUpPayload } from '../../../models/payloads/user';
+import {
+    AuthPayload,
+    CreateUserPayload
+} from '../../../models/payloads/user/createUser';
 
 import { useActionResult } from '../../../hooks/useActionResult';
 import { useAuth } from '../../../hooks/useAuth';
@@ -65,7 +68,7 @@ const SignUp: React.FC = (): JSX.Element => {
     const paperbookIconSize = 50;
 
     const handleButtonClick = async (): Promise<void> => {
-        const payload: SignUpPayload = {
+        const payload: CreateUserPayload = {
             name,
             lastName,
             email,

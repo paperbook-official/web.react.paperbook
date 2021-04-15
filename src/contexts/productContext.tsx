@@ -1,6 +1,6 @@
 import React, { createContext } from 'react';
 
-import { ProductPayload } from '../models/payloads/product';
+import { CreateProductPayload } from '../models/payloads/category/createProduct';
 import { ProductProxy, ManyProductProxy } from '../models/proxies/product';
 
 import api from '../services/api';
@@ -10,7 +10,7 @@ import { useAuth } from '../hooks/useAuth';
 import { insertParamInQuery } from '../utils/formatters';
 
 export interface ProductContextData {
-    createProduct(product: ProductPayload): Promise<ProductProxy>;
+    createProduct(product: CreateProductPayload): Promise<ProductProxy>;
     getProductById(id: string, join?: string): Promise<ProductProxy>;
     searchProducts(
         page: number,
@@ -99,7 +99,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const createProduct = async (
-        product: ProductPayload
+        product: CreateProductPayload
     ): Promise<ProductProxy> => {
         const response = await api.post<ProductProxy>('/products', product);
         return response.data;

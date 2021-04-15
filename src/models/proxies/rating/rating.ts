@@ -1,5 +1,5 @@
-import { ProductProxy } from './product';
-import { UserProxy } from './user';
+import { ProductProxy } from '../product/product';
+import { UserProxy } from '../user/user';
 
 export interface RatingProxy {
     id: number;

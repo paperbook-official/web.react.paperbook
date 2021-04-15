@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
-import { AuthPayload } from '../../../models/payloads/user';
+import { AuthPayload } from '../../../models/payloads/user/createUser';
 
 import bookstore from '../../../assets/images/bookstore.jpg';
 

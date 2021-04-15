@@ -1,6 +1,6 @@
-import { OrderStatus } from '../enums/order';
-import { ProductProxy } from './product';
-import { UserProxy } from './user';
+import { OrderStatus } from '../../enums/order';
+import { ProductProxy } from '../product/product';
+import { UserProxy } from '../user/user';
 
 export interface OrderProxy {
     id: number;

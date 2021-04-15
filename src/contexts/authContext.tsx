@@ -1,7 +1,10 @@
 import React, { createContext, useState } from 'react';
 
 import { CookiesEnum } from '../models/enums/cookies';
-import { AuthPayload, SignUpPayload } from '../models/payloads/user';
+import {
+    AuthPayload,
+    CreateUserPayload
+} from '../models/payloads/user/createUser';
 import { TokenProxy, UserProxy } from '../models/proxies/user';
 
 import api from '../services/api';
@@ -11,7 +14,7 @@ export interface AuthContextData {
     token: string | undefined;
     setToken(token: string): void;
     getToken(authPayload: AuthPayload): Promise<TokenProxy>;
-    signUp(payload: SignUpPayload): Promise<UserProxy>;
+    signUp(payload: CreateUserPayload): Promise<UserProxy>;
     login(token: string): Promise<UserProxy>;
     logout(): void;
     isAuthenticated(): boolean;
@@ -46,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         return response.data;
     };
 
-    const signUp = async (payload: SignUpPayload): Promise<UserProxy> => {
+    const signUp = async (payload: CreateUserPayload): Promise<UserProxy> => {
         const response = await api.post<UserProxy>('/users', payload);
         return response.data;
     };

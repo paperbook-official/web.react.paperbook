@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ProductPayload } from '../../models/payloads/product';
+import { CreateProductPayload } from '../../models/payloads/category/createProduct';
 import { ProductProxy } from '../../models/proxies/product';
 
 import api from '../../services/api';
@@ -27,7 +27,7 @@ const Products: React.FC = () => {
 
     const createProduct = async (): Promise<void> => {
         if (me) {
-            const product: ProductPayload = {
+            const product: CreateProductPayload = {
                 name: nameText,
                 description: descriptionText,
                 price: parseFloat(fullPriceText.replace(/,/, '.')),

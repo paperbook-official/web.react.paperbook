@@ -1,4 +1,4 @@
-import { ProductCategoryProxy } from './productCategory';
+import { ProductCategoryProxy } from '../productCategory/productCategory';
 
 export interface CategoryProxy {
     id: number;

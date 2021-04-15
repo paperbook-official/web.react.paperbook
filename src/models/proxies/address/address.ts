@@ -1,4 +1,4 @@
-import { UserProxy } from './user';
+import { UserProxy } from '../user/user';
 
 export interface AddressProxy {
     id: number;
