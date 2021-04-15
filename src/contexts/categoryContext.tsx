@@ -5,6 +5,7 @@ import { CategoryProxy } from '../models/proxies/category/category';
 import api from '../services/api';
 
 export interface CategoryContextData {
+    getCategoryById(id: number): Promise<CategoryProxy>;
     getCategories(
         limit?: number,
         join?: string,
@@ -39,6 +40,11 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({
         return fullUrl;
     };
 
+    const getCategoryById = async (id: number): Promise<CategoryProxy> => {
+        const response = await api.get<CategoryProxy>('/categories/' + id);
+        return response.data;
+    };
+
     const getCategories = async (
         limit = 0,
         join = '',
@@ -58,7 +64,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({
     return (
         //#region JSX
 
-        <CategoryContext.Provider value={{ getCategories }}>
+        <CategoryContext.Provider value={{ getCategoryById, getCategories }}>
             {children}
         </CategoryContext.Provider>
 
