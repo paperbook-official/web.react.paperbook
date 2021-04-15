@@ -2,7 +2,10 @@ import React, { createContext } from 'react';
 
 import { GetMany } from '../models/getMany';
 import { CreateProductPayload } from '../models/payloads/products/createProduct';
+import { CategoryProxy } from '../models/proxies/category/category';
 import { ProductProxy } from '../models/proxies/product/product';
+import { ProductReviewProxy } from '../models/proxies/product/productReview';
+import { RatingProxy } from '../models/proxies/rating/rating';
 
 import api from '../services/api';
 
@@ -12,7 +15,10 @@ import { insertParamInQuery } from '../utils/formatters';
 
 export interface ProductContextData {
     createProduct(product: CreateProductPayload): Promise<ProductProxy>;
-    getProductById(id: string, join?: string): Promise<ProductProxy>;
+    getProductById(id: number, join?: string): Promise<ProductProxy>;
+    getProductCategories(id: number): Promise<CategoryProxy[]>;
+    getProductRaitings(id: number): Promise<RatingProxy[]>;
+    getProductReview(id: number): Promise<ProductReviewProxy>;
     searchProducts(
         page: number,
         offset: number,
@@ -107,7 +113,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getProductById = async (
-        id: string,
+        id: number,
         join = 'user||name'
     ): Promise<ProductProxy> => {
         let url = `/products/${id}?`;
@@ -116,6 +122,31 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         const response = await api.get<ProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
+        return response.data;
+    };
+
+    const getProductCategories = async (
+        id: number
+    ): Promise<CategoryProxy[]> => {
+        const response = await api.get<CategoryProxy[]>(
+            `/products/${id}/categories?sort=name,ASC`
+        );
+        return response.data;
+    };
+
+    const getProductRaitings = async (id: number): Promise<RatingProxy[]> => {
+        const response = await api.get<RatingProxy[]>(
+            `/products/${id}/ratings`
+        );
+        return response.data;
+    };
+
+    const getProductReview = async (
+        id: number
+    ): Promise<ProductReviewProxy> => {
+        const response = await api.get<ProductReviewProxy>(
+            `/products/${id}/review`
+        );
         return response.data;
     };
 
@@ -264,6 +295,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
             value={{
                 createProduct,
                 getProductById,
+                getProductCategories,
+                getProductRaitings,
+                getProductReview,
                 searchProducts,
                 getProducts,
                 getProductsByPrice,
