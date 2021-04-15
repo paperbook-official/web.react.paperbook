@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
-import { CategoryProxy } from '../../models/proxies/category';
-import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
+import { GetMany } from '../../models/getMany';
+import { CategoryProxy } from '../../models/proxies/category/category';
+import { ProductProxy } from '../../models/proxies/product/product';
 
 import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
@@ -117,8 +118,8 @@ const Home: React.FC = (): JSX.Element => {
             itemsPerPage: number,
             join?: string,
             orderBy?: string[]
-        ) => Promise<ManyProductProxy>
-    ): Promise<ManyProductProxy> => {
+        ) => Promise<GetMany<ProductProxy>>
+    ): Promise<GetMany<ProductProxy>> => {
         const offset = 0;
         const data = await request(page, offset, itemsPerPage);
         return data;
@@ -127,7 +128,7 @@ const Home: React.FC = (): JSX.Element => {
     const getProductsByPriceLocal = async (
         itemsPerPage: number,
         page: number
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         const offset = 0;
         const data = await getProductsByPrice(
             randomPrice,

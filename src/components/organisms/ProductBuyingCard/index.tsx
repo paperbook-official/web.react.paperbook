@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { CEPProxy } from '../../../models/proxies/address';
-import { ProductProxy } from '../../../models/proxies/product';
+import { CEPProxy } from '../../../models/proxies/cep/cep';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import { useShipping } from '../../../hooks/useShipping';
 
@@ -163,7 +163,7 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
             </ShippingContainer>
 
             <SellerContainer>
-                Vendedor <span className="seller">{product.user.name}</span>
+                Vendedor <span className="seller">{product.user?.name}</span>
             </SellerContainer>
 
             <AmountPicker

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { CreateProductPayload } from '../../models/payloads/category/createProduct';
-import { ProductProxy } from '../../models/proxies/product';
+import { ProductProxy } from '../../models/proxies/product/product';
 
 import api from '../../services/api';
 

@@ -1,4 +1,4 @@
-export class CreateRating {
+export interface CreateRating {
     stars?: number;
     text?: string;
     userId?: number;

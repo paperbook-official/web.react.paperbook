@@ -1,4 +1,4 @@
-export class CreateProductPayload {
+export interface CreateProductPayload {
     imageUrl: string;
     name: string;
     description: string;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ProductProxy } from '../../../models/proxies/product';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import { useTheme } from 'styled-components';
 
@@ -73,7 +73,7 @@ const ProductCardRow: React.FC<ProductCardRowProps> = ({
             <InfoContainer>
                 <div>
                     <Title>{product.name}</Title>
-                    <Seller>Vendido por {product.user.name}</Seller>
+                    <Seller>Vendido por {product.user?.name}</Seller>
                 </div>
                 <PriceContainer>
                     {hasDiscount && (

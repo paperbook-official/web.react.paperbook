@@ -1,4 +1,4 @@
-export class UpdateShoppingCart {
+export interface UpdateShoppingCart {
     productId: number;
     userId: number;
 }

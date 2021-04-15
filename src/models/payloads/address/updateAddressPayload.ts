@@ -1,4 +1,4 @@
-export class UpdateAddressPayload {
+export interface UpdateAddressPayload {
     cep?: string;
     street?: string;
     houseNumber?: number;

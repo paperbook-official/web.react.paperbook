@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { ProductProxy } from '../../../models/proxies/product';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import { useTheme } from 'styled-components';
 

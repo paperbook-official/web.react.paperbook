@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 
-import { UserProxy } from '../models/proxies/user';
+import { UserProxy } from '../models/proxies/user/user';
 
 export interface UserContextData {
     me: UserProxy | undefined;

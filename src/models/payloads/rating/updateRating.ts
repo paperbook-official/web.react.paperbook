@@ -1,4 +1,4 @@
-export class UpdateRating {
+export interface UpdateRating {
     stars?: number;
     text?: string;
     userId?: number;

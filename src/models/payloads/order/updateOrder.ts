@@ -1,6 +1,6 @@
 import { OrderStatus } from '../../enums/order';
 
-export class UpdateOrderPayload {
+export interface UpdateOrderPayload {
     status: OrderStatus;
     trackingCode: string;
 }

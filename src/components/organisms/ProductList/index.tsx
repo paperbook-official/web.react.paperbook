@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-    ManyProductProxy,
-    ProductProxy
-} from '../../../models/proxies/product';
+import { GetMany } from '../../../models/getMany';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import { useTheme } from 'styled-components';
 
@@ -21,7 +19,7 @@ import {
 interface ProductListProps {
     topicTitle: string;
     onProductClick(product: ProductProxy): void;
-    request(itemsPerPage: number, page: number): Promise<ManyProductProxy>;
+    request(itemsPerPage: number, page: number): Promise<GetMany<ProductProxy>>;
     style?: React.CSSProperties;
 }
 

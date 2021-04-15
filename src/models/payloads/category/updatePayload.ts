@@ -1,4 +1,4 @@
-export class UpdateProductPayload {
+export interface UpdateProductPayload {
     imageUrl: string;
     name: string;
     description: string;

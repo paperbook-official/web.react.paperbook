@@ -1,4 +1,4 @@
-export class CreateShoppingCart {
+export interface CreateShoppingCart {
     stars?: number;
     text?: string;
     userId?: number;

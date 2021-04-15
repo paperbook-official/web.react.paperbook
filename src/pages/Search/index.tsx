@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { BrStatesEnum } from '../../models/enums/brStates';
-import { CategoryProxy } from '../../models/proxies/category';
-import { ManyProductProxy, ProductProxy } from '../../models/proxies/product';
+import { GetMany } from '../../models/getMany';
+import { CategoryProxy } from '../../models/proxies/category/category';
+import { ProductProxy } from '../../models/proxies/product/product';
 
 import { useCategory } from '../../hooks/useCategory';
 import { useLoading } from '../../hooks/useLoading';
@@ -311,7 +312,7 @@ const Search: React.FC = (): JSX.Element => {
                 maxPrice = query.get('maxPrice'),
                 freeOfInterests = query.get('interestFree');
 
-            const response: ManyProductProxy = await searchProducts(
+            const response: GetMany<ProductProxy> = await searchProducts(
                 pageNumber,
                 0,
                 itemsPerPage,

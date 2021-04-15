@@ -1,4 +1,4 @@
-export class CreateAddressPayload {
+export interface CreateAddressPayload {
     cep: string;
     street: string;
     houseNumber: number;

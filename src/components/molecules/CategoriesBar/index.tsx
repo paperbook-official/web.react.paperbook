@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
-import { CategoryProxy } from '../../../models/proxies/category';
+import { CategoryProxy } from '../../../models/proxies/category/category';
+
 
 import { Category, Container } from './styles';
 

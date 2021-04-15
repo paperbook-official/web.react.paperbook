@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
-import { AuthPayload } from '../../../models/payloads/user/createUser';
+import { LoginPayload } from '../../../models/payloads/auth/loginPayload';
 
 import bookstore from '../../../assets/images/bookstore.jpg';
 
@@ -53,7 +53,7 @@ const Login: React.FC = (): JSX.Element => {
     const paperbookIconSize = 50;
 
     const handleButtonClick = async (): Promise<void> => {
-        const payload: AuthPayload = {
+        const payload: LoginPayload = {
             email,
             password
         };
