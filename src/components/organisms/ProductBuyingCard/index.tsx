@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { CEPProxy } from '../../../models/proxies/cep/cep';
 import { ProductProxy } from '../../../models/proxies/product/product';
+import { ProductReviewProxy } from '../../../models/proxies/product/productReview';
 
 import { ShippingOptionData } from '../../../contexts/shippingContext';
 
@@ -29,11 +30,13 @@ import {
 
 interface ProductBuyingCardProps {
     product: ProductProxy;
+    review?: ProductReviewProxy;
     cep?: CEPProxy;
     shippingOption?: ShippingOptionData;
     onShippingOptionsClick(): void;
     onBuyClick(product: ProductProxy): void;
     onAddCartClick(product: ProductProxy): void;
+    onAmountChange(amount: number): void;
 }
 
 const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
@@ -42,7 +45,9 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
     shippingOption,
     onShippingOptionsClick,
     onBuyClick,
-    onAddCartClick
+    onAddCartClick,
+    onAmountChange,
+    review
 }: ProductBuyingCardProps): JSX.Element => {
     const theme = useTheme();
 
@@ -56,6 +61,7 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
 
     const handleAmountChange = (amount: number): void => {
         setBuyAmount(amount);
+        onAmountChange(amount);
     };
 
     return (
@@ -63,8 +69,13 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
             <HeaderContainer>
                 <Title>{product.name}</Title>
                 <span className="rating">
-                    <Rating rating={5} size={16} />
-                    <RatingAmount>26</RatingAmount>
+                    <Rating
+                        rating={Math.round(review?.average || 0)}
+                        size={16}
+                    />
+                    {review && review.total > 0 && (
+                        <RatingAmount>{review.total}</RatingAmount>
+                    )}
                 </span>
             </HeaderContainer>
 
