@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 
 import { CookiesEnum } from '../models/enums/cookies';
-import { CEPProxy } from '../models/proxies/address';
+import { CEPProxy } from '../models/proxies/cep/cep';
 
 import api from '../services/api';
 import { getCookie } from '../services/cookies';

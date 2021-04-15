@@ -1,7 +1,8 @@
 import React, { createContext } from 'react';
 
-import { ProductPayload } from '../models/payloads/product';
-import { ProductProxy, ManyProductProxy } from '../models/proxies/product';
+import { GetMany } from '../models/getMany';
+import { CreateProductPayload } from '../models/payloads/category/createProduct';
+import { ProductProxy } from '../models/proxies/product/product';
 
 import api from '../services/api';
 
@@ -10,7 +11,7 @@ import { useAuth } from '../hooks/useAuth';
 import { insertParamInQuery } from '../utils/formatters';
 
 export interface ProductContextData {
-    createProduct(product: ProductPayload): Promise<ProductProxy>;
+    createProduct(product: CreateProductPayload): Promise<ProductProxy>;
     getProductById(id: string, join?: string): Promise<ProductProxy>;
     searchProducts(
         page: number,
@@ -24,14 +25,14 @@ export interface ProductContextData {
         maxPrice?: string,
         state?: string,
         freeOfInterests?: boolean
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getProducts(
         page: number,
         offset: number,
         limit: number,
         join?: string,
         orderBy?: string[]
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getProductsByPrice(
         price: number,
         page: number,
@@ -39,34 +40,34 @@ export interface ProductContextData {
         limit: number,
         join?: string,
         orderBy?: string[]
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getProductsOnSale(
         page: number,
         offset: number,
         limit: number,
         join?: string,
         orderBy?: string[]
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getInterestFree(
         page: number,
         offset: number,
         limit: number,
         join?: string,
         orderBy?: string[]
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getRecentProducts(
         page: number,
         offset: number,
         limit: number,
         join?: string
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
     getWellRated(
         page: number,
         offset: number,
         limit: number,
         join?: string,
         orderBy?: string[]
-    ): Promise<ManyProductProxy>;
+    ): Promise<GetMany<ProductProxy>>;
 }
 
 interface ProductProviderProps {
@@ -99,7 +100,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const createProduct = async (
-        product: ProductPayload
+        product: CreateProductPayload
     ): Promise<ProductProxy> => {
         const response = await api.post<ProductProxy>('/products', product);
         return response.data;
@@ -130,7 +131,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         maxPrice?: string,
         state?: string,
         freeOfInterests?: boolean
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/search?', 'sort', orderBy);
         url = concatParam(url, 'join', join);
 
@@ -148,7 +149,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url = insertParamInQuery(url, 'offset', offset);
         url = insertParamInQuery(url, 'page', page);
 
-        const response = await api.get<ManyProductProxy>(url);
+        const response = await api.get<GetMany<ProductProxy>>(url);
         return response.data;
     };
 
@@ -158,12 +159,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name',
         orderBy: string[] = []
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
@@ -176,13 +177,13 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name',
         orderBy: string[] = []
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/less-than?', 'sort', orderBy);
         url += `&maxPrice=${price}`;
         url += `&join=${join}`;
         url += `&limit=${limit}&offset=${offset}&page=${page}`;
 
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
@@ -194,12 +195,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name',
         orderBy: string[] = []
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/on-sale?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
@@ -211,7 +212,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name',
         orderBy: string[] = []
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam(
             '/products/free-of-interests?',
             'sort',
@@ -220,7 +221,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
@@ -231,9 +232,9 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         offset: number,
         limit: number,
         join = 'user||name'
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         const url = `/products/recents?join=${join}&limit=${limit}&offset=${offset}&page=${page}`;
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
@@ -245,12 +246,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         limit: number,
         join = 'user||name',
         orderBy: string[] = []
-    ): Promise<ManyProductProxy> => {
+    ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
         url += `join=${join}&`;
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
-        const response = await api.get<ManyProductProxy>(url, {
+        const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;

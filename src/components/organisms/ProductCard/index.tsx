@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ProductProxy } from '../../../models/proxies/product';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import Rating from '../../../components/atoms/Rating';
 import { useTheme } from 'styled-components';
@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 </PriceContainer>
                 <div>
                     <Title>{product.name}</Title>
-                    <Seller>por {product.user.name}</Seller>
+                    <Seller>por {product.user?.name}</Seller>
                 </div>
                 <div style={{ width: 70 }}>
                     <Rating size={13} rating={rating} />

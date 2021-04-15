@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
-import { CategoryProxy } from '../../models/proxies/category';
-import { ProductProxy } from '../../models/proxies/product';
+import { CategoryProxy } from '../../models/proxies/category/category';
+import { ProductProxy } from '../../models/proxies/product/product';
 
 import { useLoading } from '../../hooks/useLoading';
 import { useProduct } from '../../hooks/useProduct';

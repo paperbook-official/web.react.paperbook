@@ -1,12 +1,10 @@
 import React, { createContext } from 'react';
 
-import { CategoryPayload } from '../models/payloads/category';
-import { CategoryProxy } from '../models/proxies/category';
+import { CategoryProxy } from '../models/proxies/category/category';
 
 import api from '../services/api';
 
 export interface CategoryContextData {
-    createCategory(category: CategoryPayload): Promise<CategoryProxy>;
     getCategories(
         limit?: number,
         join?: string,
@@ -41,13 +39,6 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({
         return fullUrl;
     };
 
-    const createCategory = async (
-        category: CategoryPayload
-    ): Promise<CategoryProxy> => {
-        const response = await api.post<CategoryProxy>('/categories', category);
-        return response.data;
-    };
-
     const getCategories = async (
         limit = 0,
         join = '',
@@ -67,12 +58,7 @@ export const CategoryProvider: React.FC<CategoryProviderProps> = ({
     return (
         //#region JSX
 
-        <CategoryContext.Provider
-            value={{
-                createCategory,
-                getCategories
-            }}
-        >
+        <CategoryContext.Provider value={{ getCategories }}>
             {children}
         </CategoryContext.Provider>
 
