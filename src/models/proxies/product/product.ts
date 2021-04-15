@@ -24,5 +24,5 @@ export interface ProductProxy {
     orders?: OrderProxy[];
     productsCategories?: ProductCategoryProxy[];
     ratings?: RatingProxy[];
-    shoppingCarts: ShoppingCartProxy[];
+    shoppingCarts?: ShoppingCartProxy[];
 }
