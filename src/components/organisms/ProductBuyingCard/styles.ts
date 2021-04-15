@@ -76,33 +76,6 @@ export const InstallmentPrice = styled.span`
     }
 `;
 
-export const ShippingArriveDate = styled.span`
-    font-size: 0.9rem;
-    color: ${(props) => props.theme.colors.defaultDarkGrey};
-    margin-left: 6px;
-
-    &.shipping-free {
-        color: ${(props) => props.theme.colors.defaultLightGreen};
-    }
-`;
-
-export const ShippingOption = styled.span`
-    font-size: 0.9rem;
-    color: ${(props) => props.theme.colors.defaultHighlightGreyBlue};
-    cursor: pointer;
-
-    margin-left: 6px;
-
-    &:hover {
-        color: ${(props) => props.theme.colors.defaultBlue};
-    }
-
-    &.more-options {
-        font-size: 0.8rem;
-        margin-left: 8px;
-    }
-`;
-
 export const SellerContainer = styled.span`
     font-size: 0.85rem;
     color: ${(props) => props.theme.colors.defaultMidGrey};
@@ -116,10 +89,6 @@ export const SellerContainer = styled.span`
     & > span.seller:hover {
         color: ${(props) => props.theme.colors.defaultBlue};
     }
-`;
-
-export const ShippingContainer = styled.div`
-    display: flex;
 `;
 
 export const ActionButtonContainer = styled.div`

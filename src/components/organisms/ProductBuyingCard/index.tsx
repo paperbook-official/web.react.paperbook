@@ -3,19 +3,15 @@ import React, { useState } from 'react';
 import { CEPProxy } from '../../../models/proxies/address';
 import { ProductProxy } from '../../../models/proxies/product';
 
-import { useShipping } from '../../../hooks/useShipping';
-
 import { ShippingOptionData } from '../../../contexts/shippingContext';
 
 import { useTheme } from 'styled-components';
 
 import { formatPrice } from '../../../utils/formatters';
 
-import { ReactComponent as MapMarkerIcon } from '../../../assets/icons/map-marker.svg';
-import { ReactComponent as TruckIcon } from '../../../assets/icons/truck.svg';
-
 import AmountPicker from '../../atoms/AmountPicker';
 import Rating from '../../atoms/Rating';
+import ShippingInfo from '../../atoms/ShippingInfo';
 import {
     ActionButton,
     ActionButtonContainer,
@@ -27,9 +23,6 @@ import {
     Price,
     PriceContainer,
     RatingAmount,
-    ShippingArriveDate,
-    ShippingContainer,
-    ShippingOption,
     SellerContainer,
     Title
 } from './styles';
@@ -52,13 +45,11 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
     onAddCartClick
 }: ProductBuyingCardProps): JSX.Element => {
     const theme = useTheme();
-    const { getArriveDate } = useShipping();
 
     const [buyAmount, setBuyAmount] = useState(1);
 
     const hasDiscount = product.discount > 0;
     const currentPrice = product.price * (1 - product.discount);
-    const isShippingFree = shippingOption?.price === 0;
     const isInterestFree =
         product.installmentPrice === null ||
         product.installmentPrice * (1 - product.discount) <= currentPrice;
@@ -109,58 +100,11 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
                 )}
             </PriceContainer>
 
-            <ShippingContainer>
-                {!cep || !shippingOption ? (
-                    <>
-                        <MapMarkerIcon
-                            height="18"
-                            width="18"
-                            style={{ transform: 'scaleX(-1)' }}
-                            color={theme.colors.defaultHighlightGreyBlue}
-                        />
-                        <ShippingOption onClick={onShippingOptionsClick}>
-                            Calcular prazo de entrega
-                        </ShippingOption>
-                    </>
-                ) : (
-                    <>
-                        <TruckIcon
-                            height="22"
-                            width="22"
-                            style={{ transform: 'scaleX(-1)' }}
-                            color={
-                                isShippingFree
-                                    ? theme.colors.defaultLightGreen
-                                    : theme.colors.defaultMidGrey
-                            }
-                        />
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}
-                        >
-                            <ShippingArriveDate
-                                className={
-                                    isShippingFree ? 'shipping-free' : ''
-                                }
-                            >
-                                Chegará{' '}
-                                {getArriveDate(
-                                    shippingOption.daysToArrive,
-                                    shippingOption.price
-                                )}
-                            </ShippingArriveDate>
-                            <ShippingOption
-                                className="more-options"
-                                onClick={onShippingOptionsClick}
-                            >
-                                Ver mais opções de entrega
-                            </ShippingOption>
-                        </div>
-                    </>
-                )}
-            </ShippingContainer>
+            <ShippingInfo
+                onShippingOptionsClick={onShippingOptionsClick}
+                cep={cep}
+                option={shippingOption}
+            />
 
             <SellerContainer>
                 Vendedor <span className="seller">{product.user.name}</span>

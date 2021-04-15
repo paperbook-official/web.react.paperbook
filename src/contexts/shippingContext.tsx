@@ -19,7 +19,8 @@ export interface ShippingContextData {
     cep?: string;
     setCep(value: string): void;
     option?: ShippingOptionData;
-    setOption(option: ShippingOptionData): void;
+    setOption(option?: ShippingOptionData): void;
+    options: ShippingOptionData[];
     getAddress(cep: string): Promise<CEPProxy>;
     address?: CEPProxy;
     setAddress(address?: CEPProxy): void;
@@ -92,6 +93,21 @@ export const ShippingProvider: React.FC<ShippingProviderProps> = ({
         }
     }, []);
 
+    const options = [
+        {
+            id: 1,
+            name: 'Sedex',
+            daysToArrive: 4,
+            price: 0
+        },
+        {
+            id: 2,
+            name: 'PBex',
+            daysToArrive: 3,
+            price: 7.9
+        }
+    ];
+
     return (
         //#region JSX
 
@@ -101,6 +117,7 @@ export const ShippingProvider: React.FC<ShippingProviderProps> = ({
                 setCep,
                 option,
                 setOption,
+                options,
                 getAddress,
                 address,
                 setAddress,
