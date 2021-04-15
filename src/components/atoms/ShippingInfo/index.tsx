@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CEPProxy } from '../../../models/proxies/address';
+import { CEPProxy } from '../../../models/proxies/cep/cep';
 
 import { useShipping } from '../../../hooks/useShipping';
 

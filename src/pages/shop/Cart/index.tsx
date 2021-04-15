@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
-import { ProductProxy } from '../../../models/proxies/product';
+import { ProductProxy } from '../../../models/proxies/product/product';
 
 import { useLoading } from '../../../hooks/useLoading';
 import { useProduct } from '../../../hooks/useProduct';
@@ -166,7 +166,7 @@ const Cart: React.FC = (): JSX.Element => {
                                         <ProductTitle>
                                             {product.name}
                                         </ProductTitle>
-                                        <span>{product.user.name}</span>
+                                        <span>{product.user?.name}</span>
                                     </InfoContainer>
                                     <AmountPicker
                                         onAmountChange={(amount: number) =>
