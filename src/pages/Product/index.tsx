@@ -39,7 +39,7 @@ const Product: React.FC = () => {
     const theme = useTheme();
     const history = useHistory();
     const { getProductById } = useProduct();
-    const { address, option } = useShipping();
+    const { address, option, options, setOption } = useShipping();
     const { setLoadingContent } = useLoading();
 
     const [product, setProduct] = useState<ProductProxy>();
@@ -51,6 +51,10 @@ const Product: React.FC = () => {
         const productsResponse = await getProductById(id);
         setProduct(productsResponse);
 
+        if (!option) {
+            setOption(options[0]);
+        }
+
         setLoadingContent(false);
     };
 
@@ -61,21 +65,6 @@ const Product: React.FC = () => {
     const handleShippingOptionsClick = (): void => {
         setShippingCardVisible(true);
     };
-
-    const options = [
-        {
-            id: 1,
-            name: 'Sedex',
-            daysToArrive: 4,
-            price: 0
-        },
-        {
-            id: 2,
-            name: 'PBex',
-            daysToArrive: 3,
-            price: 7.9
-        }
-    ];
 
     const categories: CategoryProxy[] = [
         {
@@ -245,7 +234,7 @@ const Product: React.FC = () => {
                             <ProductBuyingCard
                                 product={product}
                                 cep={address}
-                                shippingOption={option || options[0]}
+                                shippingOption={option}
                                 onShippingOptionsClick={
                                     handleShippingOptionsClick
                                 }
