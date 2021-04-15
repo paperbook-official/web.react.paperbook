@@ -1,5 +1,5 @@
 export interface CreateProductPayload {
-    imageUrl: string;
+    imageUrl?: string;
     name: string;
     description: string;
     price: number;

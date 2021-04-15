@@ -1,4 +1,4 @@
 export interface UpdateProductCategory {
-    productId: number;
-    categoryId: number;
+    productId?: number;
+    categoryId?: number;
 }

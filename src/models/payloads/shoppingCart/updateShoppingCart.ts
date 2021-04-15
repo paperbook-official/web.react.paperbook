@@ -1,4 +1,4 @@
 export interface UpdateShoppingCart {
-    productId: number;
-    userId: number;
+    userId?: number;
+    productId?: number;
 }
