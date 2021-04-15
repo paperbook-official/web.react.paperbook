@@ -16,12 +16,14 @@ interface AmountPickerProps {
     initialAmount?: number;
     onAmountChange(amount: number): void;
     stockAmount: number;
+    showOnlyPicker?: boolean;
 }
 
 const AmountPicker: React.FC<AmountPickerProps> = ({
     initialAmount = 1,
     onAmountChange,
-    stockAmount
+    stockAmount,
+    showOnlyPicker
 }: AmountPickerProps) => {
     const theme = useTheme();
 
@@ -66,7 +68,7 @@ const AmountPicker: React.FC<AmountPickerProps> = ({
 
     return (
         <Container>
-            Quantidade{' '}
+            {showOnlyPicker ? '' : 'Quantidade '}
             <InputContainer>
                 <AmountInput
                     value={amount}
@@ -116,10 +118,12 @@ const AmountPicker: React.FC<AmountPickerProps> = ({
                     />
                 </AmountModsContainer>
             </InputContainer>
-            <StockAmount>
-                <span>{stockAmount}</span>
-                {stockAmount > 1 ? ' disponíveis' : 'disponível'}
-            </StockAmount>
+            {!showOnlyPicker && (
+                <StockAmount>
+                    <span>{stockAmount}</span>
+                    {stockAmount > 1 ? ' disponíveis' : 'disponível'}
+                </StockAmount>
+            )}
         </Container>
     );
 };
