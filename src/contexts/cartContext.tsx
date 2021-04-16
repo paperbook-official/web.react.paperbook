@@ -15,8 +15,13 @@ export interface CartContextData {
     setCart(cart?: ShoppingCartProxy): void;
     localCart?: CartStorage[] | null;
     setLocalCart(cart?: CartStorage[] | null): void;
+    loadCart(): Promise<CartStorage[]>;
+    getLocalCart(): string | null;
     insertInLocalCart(cart: CartStorage): void;
-    removeProductFromCart(product: ProductProxy): void;
+    updateLocalCart(newCartStorage: CartStorage[]): void;
+    removeProductFromCart(
+        product: ProductProxy
+    ): CartStorage[] | null | undefined;
     deleteLocalCart(): void;
 }
 
@@ -39,13 +44,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({
     >();
 
     useEffect(() => {
-        if (token) {
-            console.log(token);
-        } else {
-            const localCart = getLocalCart();
-            if (localCart && localCart !== '')
-                setLocalCart(JSON.parse(localCart));
-        }
+        if (!cart && !localCart) loadCart();
     }, []);
 
     const getLocalCart = (): string | null => {
@@ -55,6 +54,18 @@ export const CartProvider: React.FC<CartProviderProps> = ({
     const deleteLocalCart = (): void => {
         window.localStorage.removeItem('paperbook-cart');
         setLocalCart(null);
+    };
+
+    const loadCart = async (): Promise<CartStorage[]> => {
+        if (token) {
+            const tCart = getLocalCart();
+            if (tCart && tCart !== '') setLocalCart(JSON.parse(tCart));
+            return JSON.parse(tCart || 'null');
+        } else {
+            const tCart = getLocalCart();
+            if (tCart && tCart !== '') setLocalCart(JSON.parse(tCart));
+            return JSON.parse(tCart || 'null');
+        }
     };
 
     const insertInLocalCart = (cart: CartStorage): void => {
@@ -78,7 +89,17 @@ export const CartProvider: React.FC<CartProviderProps> = ({
         setLocalCart(newCart);
     };
 
-    const removeProductFromCart = (product: ProductProxy): void => {
+    const updateLocalCart = (newCartStorage: CartStorage[]): void => {
+        window.localStorage.setItem(
+            'paperbook-cart',
+            JSON.stringify(newCartStorage)
+        );
+        setLocalCart(newCartStorage);
+    };
+
+    const removeProductFromCart = (
+        product: ProductProxy
+    ): CartStorage[] | null | undefined => {
         const newCart: CartStorage[] = [];
 
         if (localCart) {
@@ -91,7 +112,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({
                 const productIndex = productIds.indexOf(product.id);
 
                 if (productIndex !== -1) {
-                    newCart.push(...localCart.splice(productIndex, 1));
+                    localCart.splice(productIndex, 1);
+                    newCart.push(...localCart);
                 }
 
                 window.localStorage.setItem(
@@ -101,6 +123,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({
                 setLocalCart(localCart);
             }
         }
+
+        return localCart;
     };
 
     return (
@@ -112,7 +136,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({
                 setCart,
                 localCart,
                 setLocalCart,
+                loadCart,
+                getLocalCart,
                 insertInLocalCart,
+                updateLocalCart,
                 removeProductFromCart,
                 deleteLocalCart
             }}
