@@ -6,7 +6,7 @@ export const Container = styled.div`
     width: 100%;
     height: auto;
     margin-top: 120px;
-    /* margin-bottom: -90px; */
+    margin-bottom: -90px;
 `;
 
 export const TopicTitle = styled.h2`
