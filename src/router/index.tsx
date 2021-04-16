@@ -12,13 +12,13 @@ import { useUser } from '../hooks/useUser';
 
 import Login from '../pages/auth/Login';
 import SignUp from '../pages/auth/SignUp';
+import Cart from '../pages/checkout/Cart';
+import Identification from '../pages/checkout/Identification';
+import Payment from '../pages/checkout/Payment';
 import Home from '../pages/Home';
 import Product from '../pages/Product';
 import Products from '../pages/Products';
 import Search from '../pages/Search';
-import Cart from '../pages/shop/Cart';
-import Identification from '../pages/shop/Identification';
-import Payment from '../pages/shop/Payment';
 
 interface PrivateRouteProps {
     component: React.FC;
