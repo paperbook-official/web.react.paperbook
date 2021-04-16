@@ -1,47 +1,49 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-import { AddressProxy } from '../../../models/proxies/address';
+import { AddressProxy } from '../../../models/proxies/address/address';
+import { UserProxy } from '../../../models/proxies/user/user';
 
-import icon from '../../../assets/icons/close.svg';
+import { useTheme } from 'styled-components';
 
-import ShippingCard from '../../organisms/ShippingCard';
-import Modal from '../Modal';
-import { CardContainer } from './styles';
+import { ReactComponent as CloseIcon } from '../../../assets/icons/close.svg';
 
-// interface AddressCardProps {
-//     address: AddressProxy;
-//     onAddressChangeClick(address: AddressProxy): void;
-// }
+import { Container, ChangeAddressButton } from './styles';
 
-const AddressCard: React.FC = (): JSX.Element => {
-    const [modalActive, setModalActive] = useState(false);
+interface AddressCardProps {
+    user: UserProxy;
+    address: AddressProxy;
+    onAddressChangeClick(user: UserProxy, address: AddressProxy): void;
+}
 
-    function handleAddressChange() {
-        setModalActive(true);
-        console.log('helloasdaf');
-    }
+const AddressCard: React.FC<AddressCardProps> = ({
+    user,
+    address,
+    onAddressChangeClick
+}: AddressCardProps): JSX.Element => {
+    const theme = useTheme();
 
     return (
-        <CardContainer>
-            <p className="username">
-                Erick
-                <button className="delete_button">
-                    <img src={icon} />
-                </button>
-            </p>
-            <p>Rua do Erick, 100</p>
-            <p>Bairro do Erick</p>
-            <p>SP - Tiete</p>
-            <p>CEP 190000</p>
-            <a onClick={() => handleAddressChange()}>
-                Alterar endereco de entrega
-            </a>
-            {modalActive && (
-                <Modal>
-                    <p>aqui vai o shipping card</p>
-                </Modal>
-            )}
-        </CardContainer>
+        <Container>
+            <div className="delete-button">
+                <CloseIcon
+                    height="22"
+                    width="22"
+                    color={theme.colors.defaultDarkGrey}
+                />
+            </div>
+            <span className="username">{user.name}</span>
+            <span>{`${address.street}, ${address.houseNumber}`}</span>
+            <span>{address.district}</span>
+            <span>{`${address.city} - ${address.state}`}</span>
+            <span>CEP {address.cep}</span>
+            <div className="change-address-container">
+                <ChangeAddressButton
+                    onClick={() => onAddressChangeClick(user, address)}
+                >
+                    Alterar endereco de entrega
+                </ChangeAddressButton>
+            </div>
+        </Container>
     );
 };
 
