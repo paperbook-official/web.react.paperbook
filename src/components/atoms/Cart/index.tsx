@@ -10,9 +10,7 @@ interface CartProps {
     cartAmount: number;
 }
 
-const Cart: React.FC<CartProps> = ({
-    cartAmount = 0
-}: CartProps): JSX.Element => {
+const Cart: React.FC<CartProps> = ({ cartAmount }: CartProps): JSX.Element => {
     const theme = useTheme();
 
     const [iconColor, setIconColor] = useState(theme.colors.background);
@@ -31,7 +29,7 @@ const Cart: React.FC<CartProps> = ({
                 width={`${iconSize}px`}
                 height={`${iconSize}px`}
             />
-            {cartAmount > 0 ? <CartCounter>{cartAmount}</CartCounter> : <></>}
+            {cartAmount > 0 && <CartCounter>{cartAmount}</CartCounter>}
         </Container>
     );
 };

@@ -37,10 +37,25 @@ const AmountPicker: React.FC<AmountPickerProps> = ({
 
     useEffect(() => {
         setAmount(initialAmount);
+        setColors(initialAmount);
     }, []);
 
     const validateAmount = (value: number): boolean => {
         return !isNaN(value) && value >= 1 && value <= stockAmount;
+    };
+
+    const setColors = (value: number): void => {
+        if (value === 1) {
+            setArrowDownColor(theme.colors.defaultDarkBlue + '77');
+        } else {
+            setArrowDownColor(theme.colors.defaultDarkBlue);
+        }
+
+        if (value === stockAmount) {
+            setArrowUpColor(theme.colors.defaultDarkBlue + '77');
+        } else {
+            setArrowUpColor(theme.colors.defaultDarkBlue);
+        }
     };
 
     const handleAmountChange = (value: string): void => {
@@ -49,18 +64,7 @@ const AmountPicker: React.FC<AmountPickerProps> = ({
         if (validateAmount(numberValue)) {
             setAmount(numberValue);
             onAmountChange(numberValue);
-
-            if (numberValue === 1) {
-                setArrowDownColor(theme.colors.defaultDarkBlue + '77');
-            } else {
-                setArrowDownColor(theme.colors.defaultDarkBlue);
-            }
-
-            if (numberValue === stockAmount) {
-                setArrowUpColor(theme.colors.defaultDarkBlue + '77');
-            } else {
-                setArrowUpColor(theme.colors.defaultDarkBlue);
-            }
+            setColors(numberValue);
         }
     };
 

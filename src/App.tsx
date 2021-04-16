@@ -26,13 +26,13 @@ const App: React.FC = (): JSX.Element => {
                         <ShippingProvider>
                             <AuthProvider>
                                 <UserProvider>
-                                    <CategoryProvider>
-                                        <ProductProvider>
-                                            <CartProvider>
+                                    <CartProvider>
+                                        <CategoryProvider>
+                                            <ProductProvider>
                                                 <Routes />
-                                            </CartProvider>
-                                        </ProductProvider>
-                                    </CategoryProvider>
+                                            </ProductProvider>
+                                        </CategoryProvider>
+                                    </CartProvider>
                                 </UserProvider>
                             </AuthProvider>
                         </ShippingProvider>

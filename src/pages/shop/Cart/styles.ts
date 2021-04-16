@@ -60,6 +60,7 @@ export const ListContainer = styled.div`
 
     & > .empty-cart {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         flex-grow: 1;
@@ -75,6 +76,7 @@ export const ListContainer = styled.div`
 
 export const ProductListItem = styled.div`
     display: flex;
+    justify-content: space-between;
     align-items: center;
 
     height: 120px;
@@ -88,7 +90,10 @@ export const ImageContainer = styled.div`
     align-items: center;
     position: relative;
 
-    padding: 20px;
+    width: 120px;
+    height: 100px;
+
+    padding: 10px;
 
     & > img {
         width: 100%;
