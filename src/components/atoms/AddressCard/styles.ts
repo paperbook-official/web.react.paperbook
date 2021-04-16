@@ -1,49 +1,70 @@
-import styled, { DefaultTheme } from 'styled-components';
+import styled from 'styled-components';
 
-export const CardContainer = styled.div`
-    width: 309px;
-    height: 182px;
-    font-family: Poppins;
-    font-style: normal;
-    font-weight: normal;
+export const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    position: relative;
 
-    background-color: #f5f5f5;
+    width: 270px;
+
+    cursor: pointer;
+    background-color: ${(props) => props.theme.colors.background};
     border-radius: 10px;
-    padding: 18px 15px;
+    padding: 14px;
 
-    & .username {
+    transition: all 0.3s;
+
+    & > span {
+        font-size: 0.9rem;
+        line-height: 1.1rem;
+    }
+
+    & span.username {
+        font-size: 1.1rem;
+        line-height: 1.7rem;
+        font-weight: 500;
+    }
+
+    & div.delete-button {
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
+        align-items: center;
 
-        font-weight: 600;
-        font-size: 20px;
-        line-height: 30px;
-    }
-    & .username .delete_button {
-        font-weight: 600;
-        font-size: 20px;
-        line-height: 30px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+
+        height: 30px;
+        width: 30px;
 
         cursor: pointer;
 
-        border: none;
-        background-image: none;
+        border-radius: 60px;
         background-color: transparent;
-        -webkit-box-shadow: none;
-        -moz-box-shadow: none;
-        box-shadow: none;
+
+        transition: all 0.3s;
+
+        :hover {
+            background-color: ${(props) => props.theme.colors.defaultGrey}55;
+        }
     }
 
-    & p {
-        font-size: 20px;
-        line-height: 30px;
+    & > div.change-address-container {
+        margin-top: 5px;
     }
 
-    & a {
-        margin-top: 15px;
-        font-size: 15px;
-        color: #1f5eff;
+    &:hover {
+        background-color: ${(props) => props.theme.colors.defaultLightGrey};
+    }
+`;
 
-        cursor: pointer;
+export const ChangeAddressButton = styled.span`
+    font-size: 0.85rem;
+    color: ${(props) => props.theme.colors.defaultHighlightGreyBlue};
+
+    cursor: pointer;
+
+    &:hover {
+        color: ${(props) => props.theme.colors.defaultBlue};
     }
 `;
