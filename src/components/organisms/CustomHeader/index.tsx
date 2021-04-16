@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
-import { CookiesEnum } from '../../../models/enums/cookies';
-
-import { getCookie } from '../../../services/cookies';
-
 import { useAuth } from '../../../hooks/useAuth';
-import { useCookies } from '../../../hooks/useCookies';
+import { useCart } from '../../../hooks/useCart';
 
 import { useTheme } from 'styled-components';
 
@@ -19,7 +15,7 @@ import { Container, AuthOptionsContainer, AuthOption } from './styles';
 
 const CustomHeader: React.FC = () => {
     const theme = useTheme();
-    const { isCookiesAccepted } = useCookies();
+    const { localCart } = useCart();
     const { isAuthenticated, getTokenCookie, logout } = useAuth();
     const history = useHistory();
 
@@ -29,12 +25,10 @@ const CustomHeader: React.FC = () => {
     const [isLogged] = useState(isAuthenticated() || !!getTokenCookie());
 
     useEffect(() => {
-        if (isCookiesAccepted) {
-            setCartAmount(
-                parseInt(getCookie(CookiesEnum.CART_AMOUNT_KEY)) || 0
-            );
+        if (localCart) {
+            setCartAmount(localCart.length);
         }
-    }, []);
+    }, [localCart]);
 
     const checkKeyboardKey = (
         event: React.KeyboardEvent<HTMLInputElement>,

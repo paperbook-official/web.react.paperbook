@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 
-import { CookiesEnum } from '../../../models/enums/cookies';
-
-import { getCookie } from '../../../services/cookies';
-
 import { useAuth } from '../../../hooks/useAuth';
-import { useCookies } from '../../../hooks/useCookies';
+import { useCart } from '../../../hooks/useCart';
 
 import { useTheme } from 'styled-components';
 
@@ -33,7 +29,7 @@ const Header: React.FC<HeaderOptions> = ({
 }: HeaderOptions): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
-    const { isCookiesAccepted } = useCookies();
+    const { localCart } = useCart();
     const { isAuthenticated, getTokenCookie, logout } = useAuth();
 
     const [cartAmount, setCartAmount] = useState(0);
@@ -41,12 +37,10 @@ const Header: React.FC<HeaderOptions> = ({
     const [isLogged] = useState(isAuthenticated() || !!getTokenCookie());
 
     useEffect(() => {
-        if (isCookiesAccepted) {
-            setCartAmount(
-                parseInt(getCookie(CookiesEnum.CART_AMOUNT_KEY)) || 0
-            );
+        if (localCart) {
+            setCartAmount(localCart.length);
         }
-    }, []);
+    }, [localCart]);
 
     const getProgressState = (): number => {
         const location = history.location.pathname;
