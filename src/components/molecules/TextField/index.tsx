@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'styled-components';
 
@@ -22,10 +22,11 @@ interface TextFieldProps {
     errorMessage?: string;
     length?: number;
     validation?: (text: string) => boolean;
-    onTextChange(text: string): void;
+    onTextChange?(text: string): void;
     onKeyDown?(event: React.KeyboardEvent<HTMLInputElement>): void;
     isValid?(errorState: boolean): void;
     inputStyle?: React.CSSProperties;
+    isDisabled?: boolean;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
@@ -40,16 +41,21 @@ const TextField: React.FC<TextFieldProps> = ({
     onTextChange,
     onKeyDown,
     isValid,
-    inputStyle
+    inputStyle,
+    isDisabled = false
 }: TextFieldProps): JSX.Element => {
     const theme = useTheme();
 
     const [error, setError] = useState(false);
-    const [text, setText] = useState(value);
+    const [text, setText] = useState('');
+
+    useEffect(() => {
+        setText(value);
+    }, [value]);
 
     const onFieldChange = (text: string): void => {
         setText(text);
-        onTextChange(text);
+        if (onTextChange) onTextChange(text);
     };
 
     const inputValidation = (text: string): void => {
@@ -88,6 +94,8 @@ const TextField: React.FC<TextFieldProps> = ({
     return (
         <Container className={`${name}-field-container`} style={style}>
             <InputField
+                tabIndex={isDisabled ? -1 : 0}
+                className={isDisabled ? 'disabled' : ''}
                 value={text}
                 onKeyDown={onKeyDown}
                 onChange={(event) => onFieldChange(event.target.value)}
