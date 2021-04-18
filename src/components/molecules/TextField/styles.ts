@@ -173,4 +173,17 @@ export const InputField = styled.input`
                 ? props.theme.colors.defaultRed
                 : props.theme.colors.defaultHighlightGreyBlue};
     }
+
+    &.disabled {
+        pointer-events: none;
+        color: ${(props) => props.theme.colors.defaultDarkBlue};
+    }
+
+    &.disabled ~ ${InputLabel} {
+        color: ${(props) => props.theme.colors.defaultGrey};
+    }
+
+    &.disabled ~ ${InputBorder}::before {
+        background-color: ${(props) => props.theme.colors.defaultGrey};
+    }
 `;

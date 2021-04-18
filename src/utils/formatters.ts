@@ -2,6 +2,11 @@ export const formatPrice = (price: number): string => {
     return price.toFixed(2).replace(/\./, ',');
 };
 
+export const maskString = (value: string, pattern: string): string => {
+    let i = 0;
+    return pattern.replace(/#/g, () => value[i++] || '');
+};
+
 export const formatQueryParam = (param: string): string => {
     return param
         .toLowerCase()

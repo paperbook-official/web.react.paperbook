@@ -55,6 +55,7 @@ export const Container = styled.div`
 
     &:hover {
         background-color: ${(props) => props.theme.colors.defaultLightGrey};
+        box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.2);
     }
 `;
 

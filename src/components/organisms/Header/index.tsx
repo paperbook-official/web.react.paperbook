@@ -6,7 +6,9 @@ import { useCart } from '../../../hooks/useCart';
 
 import { useTheme } from 'styled-components';
 
+import { ReactComponent as CreditCardIcon } from '../../../assets/icons/credit-card.svg';
 import { ReactComponent as CartIcon } from '../../../assets/icons/shopping-cart.svg';
+import { ReactComponent as UserIcon } from '../../../assets/icons/user.svg';
 
 import Cart from '../../atoms/Cart';
 import Logo from '../../atoms/Logo';
@@ -125,9 +127,9 @@ const Header: React.FC<HeaderOptions> = ({
                         >
                             Identificação
                         </span>
-                        <CartIcon
-                            height="26"
-                            width="26"
+                        <UserIcon
+                            height="25"
+                            width="25"
                             color={getIconColor(2)}
                         />
                     </ProgressNameContainer>
@@ -138,7 +140,7 @@ const Header: React.FC<HeaderOptions> = ({
                         >
                             Pagamento
                         </span>
-                        <CartIcon
+                        <CreditCardIcon
                             height="26"
                             width="26"
                             color={getIconColor(3)}

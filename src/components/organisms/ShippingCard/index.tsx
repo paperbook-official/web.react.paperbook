@@ -39,12 +39,14 @@ import {
 
 interface ShippingCardProps {
     options: ShippingOptionData[];
+    showOnlyOptions?: boolean;
     onClose(): void;
 }
 
 const ShippingCard: React.FC<ShippingCardProps> = ({
     options,
-    onClose
+    onClose,
+    showOnlyOptions
 }: ShippingCardProps): JSX.Element => {
     const theme = useTheme();
     const {
@@ -114,7 +116,9 @@ const ShippingCard: React.FC<ShippingCardProps> = ({
 
     return (
         <Container className="shipping-card-container shipping-card-container-move-in">
-            <CardTitle>Opções de entrega</CardTitle>
+            <CardTitle>
+                Opções de entrega {showOnlyOptions && `- ${cep}`}
+            </CardTitle>
             <CloseButtonContainer onClick={onCloseClick}>
                 <CloseIcon
                     onMouseEnter={() => setIconScale(1.2)}
@@ -151,27 +155,29 @@ const ShippingCard: React.FC<ShippingCardProps> = ({
                 </CepContainer>
             ) : (
                 <>
-                    <TopicContainer>
-                        <TopicTitle>Endereço</TopicTitle>
-                        <AddressContainer>
-                            <AddressIconContainer>
-                                <MapIcon
-                                    color={theme.colors.defaultBlue}
-                                    height={iconSize}
-                                    width={iconSize}
-                                />
-                            </AddressIconContainer>
-                            <InfoContainer>
-                                <CityState>
-                                    {address?.localidade}, {address?.uf}
-                                </CityState>
-                                <CEP>CEP: {cep}</CEP>
-                            </InfoContainer>
-                            <ChangeCEP onClick={handleChangeCepClick}>
-                                Alterar
-                            </ChangeCEP>
-                        </AddressContainer>
-                    </TopicContainer>
+                    {!showOnlyOptions && (
+                        <TopicContainer>
+                            <TopicTitle>Endereço</TopicTitle>
+                            <AddressContainer>
+                                <AddressIconContainer>
+                                    <MapIcon
+                                        color={theme.colors.defaultBlue}
+                                        height={iconSize}
+                                        width={iconSize}
+                                    />
+                                </AddressIconContainer>
+                                <InfoContainer>
+                                    <CityState>
+                                        {address?.localidade}, {address?.uf}
+                                    </CityState>
+                                    <CEP>CEP: {cep}</CEP>
+                                </InfoContainer>
+                                <ChangeCEP onClick={handleChangeCepClick}>
+                                    Alterar
+                                </ChangeCEP>
+                            </AddressContainer>
+                        </TopicContainer>
+                    )}
                     <TopicContainer style={{ marginTop: 25 }}>
                         <TopicTitle>Envio</TopicTitle>
                         <OptionContainer>
