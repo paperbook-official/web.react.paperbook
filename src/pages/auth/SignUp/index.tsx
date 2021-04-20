@@ -63,9 +63,13 @@ const SignUp: React.FC = (): JSX.Element => {
     const [isPasswordValid, setPasswordValid] = useState(false);
     const [isConfirmPasswordValid, setConfirmPasswordValid] = useState(false);
 
+    const [isLoading, setLoading] = useState(false);
+
     const paperbookIconSize = 50;
 
     const handleButtonClick = async (): Promise<void> => {
+        setLoading(true);
+
         const payload: CreateUserPayload = {
             name,
             lastName,
@@ -95,6 +99,7 @@ const SignUp: React.FC = (): JSX.Element => {
                 if (isRememberActive) {
                     setTokenCookie(data.token, expires);
                 }
+                setLoading(false);
             }
             history.push('/');
         } catch (error) {
@@ -103,6 +108,7 @@ const SignUp: React.FC = (): JSX.Element => {
                 'E-mail já existe ou conexão falhou!',
                 ActionResultEnum.ERROR
             );
+            setLoading(false);
         }
     };
 
@@ -257,6 +263,7 @@ const SignUp: React.FC = (): JSX.Element => {
                     disabled={!isFormValid()}
                     label="Vamos lá"
                     handleClick={handleButtonClick}
+                    isLoading={isLoading}
                 />
                 <AuthToggleScreen
                     style={{ marginBottom: 20 }}
