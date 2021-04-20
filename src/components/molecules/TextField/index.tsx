@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'styled-components';
 
+import { maskString } from '../../../utils/formatters';
+
 import { ReactComponent as AlertIcon } from '../../../assets/icons/alert-triangle.svg';
 
 import {
@@ -15,33 +17,39 @@ import {
 
 interface TextFieldProps {
     style?: React.CSSProperties;
+    inputStyle?: React.CSSProperties;
     value?: string;
     label: string;
     name: string;
     type?: string;
     errorMessage?: string;
     length?: number;
+    mask?: string;
     validation?: (text: string) => boolean;
     onTextChange?(text: string): void;
     onKeyDown?(event: React.KeyboardEvent<HTMLInputElement>): void;
     isValid?(errorState: boolean): void;
-    inputStyle?: React.CSSProperties;
+    onInputBlur?(): void;
+    onInputFocus?(): void;
     isDisabled?: boolean;
 }
 
 const TextField: React.FC<TextFieldProps> = ({
     style,
+    inputStyle,
     value = '',
     label,
     name,
     type = 'text',
     errorMessage = '',
     length,
+    mask,
     validation,
     onTextChange,
     onKeyDown,
     isValid,
-    inputStyle,
+    onInputBlur,
+    onInputFocus,
     isDisabled = false
 }: TextFieldProps): JSX.Element => {
     const theme = useTheme();
@@ -50,16 +58,51 @@ const TextField: React.FC<TextFieldProps> = ({
     const [text, setText] = useState('');
 
     useEffect(() => {
-        setText(value);
+        setText(mask ? maskString(value, mask) : value);
     }, [value]);
 
-    const onFieldChange = (text: string): void => {
-        setText(text);
-        if (onTextChange) onTextChange(text);
+    const onFieldChange = (txt: string): void => {
+        if (mask) {
+            setText(maskString(txt, mask));
+
+            if (onTextChange) {
+                const maskElements: string[] = [];
+
+                for (const symbol of mask) {
+                    if (symbol !== '#' && !maskElements.includes(symbol))
+                        maskElements.push(symbol);
+                }
+
+                let rawText = txt;
+                for (const symbol of maskElements) {
+                    const regex = new RegExp(
+                        symbol === ' ' ? '[\\s]' : `\\${symbol}`,
+                        'g'
+                    );
+
+                    rawText = rawText.replace(regex, '');
+                }
+
+                onTextChange(rawText);
+            }
+        } else {
+            setText(txt);
+            if (onTextChange) onTextChange(txt);
+        }
     };
 
-    const inputValidation = (text: string): void => {
-        if (validation && !validation(text)) {
+    const onBlur = (val: string): void => {
+        inputValidation(val);
+        if (onInputBlur) onInputBlur();
+    };
+
+    const onFocus = (): void => {
+        clearError();
+        if (onInputFocus) onInputFocus();
+    };
+
+    const inputValidation = (txt: string): void => {
+        if (validation && !validation(txt)) {
             setError(true);
             if (isValid) isValid(false);
             const container = document.getElementsByClassName(
@@ -99,8 +142,8 @@ const TextField: React.FC<TextFieldProps> = ({
                 value={text}
                 onKeyDown={onKeyDown}
                 onChange={(event) => onFieldChange(event.target.value)}
-                onBlur={(event) => inputValidation(event.target.value)}
-                onFocus={clearError}
+                onBlur={(event) => onBlur(event.target.value)}
+                onFocus={onFocus}
                 name={name}
                 type={type}
                 theme={theme}
