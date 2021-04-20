@@ -1,15 +1,7 @@
-import styled, { DefaultTheme } from 'styled-components';
-
-interface ButtonStyleProps {
-    theme: DefaultTheme;
-    disabled: boolean;
-}
+import styled from 'styled-components';
 
 export const Label = styled.span`
-    color: ${(props: ButtonStyleProps) =>
-        props.disabled
-            ? props.theme.colors.defaultGrey
-            : props.theme.colors.defaultDarkBlue};
+    color: ${(props) => props.theme.colors.defaultDarkBlue};
     font-size: 1.3rem;
     font-weight: 500;
 
@@ -17,36 +9,46 @@ export const Label = styled.span`
 `;
 
 export const Container = styled.button`
-    ${(props: ButtonStyleProps) => !props.disabled && 'cursor: pointer;'}
-    outline: none;
-    background-color: transparent;
-    border: 3px solid
-        ${(props) =>
-            props.disabled
-                ? props.theme.colors.defaultGrey
-                : props.theme.colors.defaultDarkBlue};
-    border-radius: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     width: 210px;
     height: 60px;
 
+    border: 3px solid ${(props) => props.theme.colors.defaultDarkBlue};
+    border-radius: 150px;
+    background-color: transparent;
+    outline: none;
+    cursor: pointer;
+
     transition: all 0.3s;
 
     &:hover {
-        ${(props: ButtonStyleProps) =>
-            !props.disabled && 'border-color: transparent;'}
-        background-color: ${(props) =>
-            props.disabled
-                ? 'transparent'
-                : props.theme.colors.defaultDarkBlue};
-        ${(props: ButtonStyleProps) =>
-            !props.disabled && 'transform: translateY(-5px);'}
+        border-color: transparent;
+        background-color: ${(props) => props.theme.colors.defaultDarkBlue};
+        transform: translateY(-5px);
     }
 
     &:hover ${Label} {
-        color: ${(props) =>
-            props.disabled
-                ? props.theme.colors.defaultGrey
-                : props.theme.colors.defaultLightGrey};
+        color: ${(props) => props.theme.colors.defaultLightGrey};
+    }
+
+    &.disabled {
+        border: 3px solid ${(props) => props.theme.colors.defaultGrey};
+        background-color: transparent;
+        cursor: default;
+        transform: translateY(0);
+    }
+
+    &.disabled ${Label} {
+        color: ${(props) => props.theme.colors.defaultGrey};
+    }
+
+    &.loading {
+        border: transparent;
+        background-color: transparent;
+        cursor: default;
+        transform: translateY(0);
     }
 `;
