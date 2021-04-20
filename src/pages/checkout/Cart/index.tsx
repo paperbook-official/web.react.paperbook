@@ -83,11 +83,11 @@ const Cart: React.FC = (): JSX.Element => {
         setCartStorage(cartResponse);
         const cartProducts = cartResponse.map((cart) => cart.product);
 
-        if (cartProducts) {
+        if (cartProducts && cartResponse.length > 0) {
             setProducts(cartProducts);
             setLoadingCart(false);
 
-            if (!option && cep) {
+            if (!option && cep && cep.length > 0) {
                 setOption(options[0]);
                 setShippingPrice(options[0].price);
             }
@@ -108,11 +108,13 @@ const Cart: React.FC = (): JSX.Element => {
                     .reduce((previous, current) => previous + current)
             );
 
-            setTotalPrice(
-                option ? price + option.price : price + options[0].price
-            );
+            const totPrice = option
+                ? price + option.price
+                : price + options[0].price;
 
-            const instAmount = Math.max(
+            setTotalPrice(totPrice);
+
+            const instAmount = Math.min(
                 ...cartProducts.map((product) => product.installmentAmount)
             );
             setInstallmentAmount(instAmount);
@@ -153,9 +155,9 @@ const Cart: React.FC = (): JSX.Element => {
     }, []);
 
     useEffect(() => {
-        if (!cep || cep === '') {
+        if (!cep) {
             setShippingPrice(undefined);
-            setTotalPrice(orderPrice);
+            if (orderPrice) setTotalPrice(orderPrice);
         } else if (!option) {
             setOption(options[0]);
         }
@@ -237,7 +239,7 @@ const Cart: React.FC = (): JSX.Element => {
             );
             setInterestFree(noInsterestFree.length === 0);
 
-            const instAmount = Math.max(
+            const instAmount = Math.min(
                 ...productList.map((product) => product.installmentAmount)
             );
             setInstallmentAmount(instAmount);
