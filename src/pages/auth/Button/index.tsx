@@ -1,5 +1,7 @@
 import React from 'react';
 
+import LoadingDots from '../../../components/atoms/LoadingDots';
+
 import { Container, Label } from './styles';
 
 interface ButtonProps {
@@ -7,17 +9,23 @@ interface ButtonProps {
     handleClick(): void;
     style?: React.CSSProperties;
     disabled?: boolean;
+    isLoading?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
-    label = 'Label',
+    label,
     handleClick,
     style,
-    disabled = false
+    disabled,
+    isLoading
 }: ButtonProps): JSX.Element => {
     return (
-        <Container disabled={disabled} style={style} onClick={handleClick}>
-            <Label disabled={disabled}>{label}</Label>
+        <Container
+            className={isLoading ? 'loading' : disabled ? 'disabled' : ''}
+            style={style}
+            onClick={handleClick}
+        >
+            {isLoading ? <LoadingDots /> : <Label>{label}</Label>}
         </Container>
     );
 };

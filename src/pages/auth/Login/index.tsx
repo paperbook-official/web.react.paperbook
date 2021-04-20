@@ -49,10 +49,13 @@ const Login: React.FC = (): JSX.Element => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isEmailValid, setEmailValid] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     const paperbookIconSize = 50;
 
     const handleButtonClick = async (): Promise<void> => {
+        setLoading(true);
+
         const payload: LoginPayload = {
             email,
             password
@@ -73,6 +76,7 @@ const Login: React.FC = (): JSX.Element => {
 
                 const userData = await login(data.token);
                 setMe(userData);
+                setLoading(false);
             }
         } catch (error) {
             const response = error.response.data;
@@ -90,6 +94,7 @@ const Login: React.FC = (): JSX.Element => {
                     ActionResultEnum.ERROR
                 );
             }
+            setLoading(false);
         }
     };
 
@@ -170,6 +175,7 @@ const Login: React.FC = (): JSX.Element => {
                     disabled={!isEmailValid || password.length <= 4}
                     label="Continuar"
                     handleClick={handleButtonClick}
+                    isLoading={isLoading}
                 />
                 <AuthToggleScreen
                     style={{ marginBottom: 20 }}
