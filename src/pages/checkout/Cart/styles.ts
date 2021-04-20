@@ -29,6 +29,16 @@ export const Content = styled.div`
 
         background-color: ${(props) => props.theme.colors.defaultGrey}88;
     }
+
+    @media (max-width: 1400px) {
+        width: 84%;
+        margin: 60px 8%;
+    }
+
+    @media (max-width: 1300px) {
+        width: 90%;
+        margin: 60px 5%;
+    }
 `;
 
 export const Title = styled.h1`
