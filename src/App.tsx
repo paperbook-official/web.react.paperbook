@@ -6,6 +6,7 @@ import CartProvider from './contexts/cartContext';
 import CategoryProvider from './contexts/categoryContext';
 import CookiesProvider from './contexts/cookiesContext';
 import LoadingProvider from './contexts/loadingContext';
+import OrderProvider from './contexts/orderContext';
 import ProductProvider from './contexts/productContext';
 import ShippingProvider from './contexts/shippingContext';
 import UserProvider from './contexts/userContext';
@@ -27,11 +28,13 @@ const App: React.FC = (): JSX.Element => {
                             <AuthProvider>
                                 <UserProvider>
                                     <CartProvider>
-                                        <CategoryProvider>
-                                            <ProductProvider>
-                                                <Routes />
-                                            </ProductProvider>
-                                        </CategoryProvider>
+                                        <OrderProvider>
+                                            <CategoryProvider>
+                                                <ProductProvider>
+                                                    <Routes />
+                                                </ProductProvider>
+                                            </CategoryProvider>
+                                        </OrderProvider>
                                     </CartProvider>
                                 </UserProvider>
                             </AuthProvider>

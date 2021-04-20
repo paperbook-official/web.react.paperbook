@@ -7,6 +7,22 @@ export const maskString = (value: string, pattern: string): string => {
     return pattern.replace(/#/g, () => value[i++] || '');
 };
 
+export const xFilledString = (text: string, length: number): string => {
+    let newText = '';
+    let index = 0;
+
+    for (const char of text) {
+        newText += char;
+        index++;
+    }
+
+    for (let i = index; i < length; i++) {
+        newText += 'X';
+    }
+
+    return newText;
+};
+
 export const formatQueryParam = (param: string): string => {
     return param
         .toLowerCase()
@@ -45,7 +61,10 @@ export const insertParamInQuery = (
                 }
             } else {
                 newQuery += `${
-                    newQuery[newQuery.length - 1] === '&' ? '' : '&'
+                    newQuery[newQuery.length - 1] === '&' ||
+                    newQuery[newQuery.length - 1] === '?'
+                        ? ''
+                        : '&'
                 }${param}=${value}`;
             }
         } else {

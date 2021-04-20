@@ -9,6 +9,7 @@ import { UserProxy } from '../../../models/proxies/user/user';
 
 import { setCookie } from '../../../services/cookies';
 
+import { useCart } from '../../../hooks/useCart';
 import { useCookies } from '../../../hooks/useCookies';
 import { useShipping } from '../../../hooks/useShipping';
 import { useUser } from '../../../hooks/useUser';
@@ -52,6 +53,7 @@ const Identification: React.FC = (): JSX.Element => {
         deleteUserAddress
     } = useUser();
     const { address, getAddress, setAddress, options, setCep } = useShipping();
+    const { localCart } = useCart();
 
     const [isLogged, setLogged] = useState(false);
     const [user, setUser] = useState<UserProxy>();
@@ -90,6 +92,7 @@ const Identification: React.FC = (): JSX.Element => {
     };
 
     useEffect(() => {
+        if (!localCart) history.push('/cart');
         setLoadingData(true);
         loadCurrentAddress();
     }, []);
@@ -197,6 +200,40 @@ const Identification: React.FC = (): JSX.Element => {
         );
     };
 
+    const getCpfMask = (): string | undefined => {
+        if (user) {
+            const len = user.cpf ? user.cpf.length : 0;
+            if (len < 4) {
+                return '###';
+            } else if (len < 7) {
+                return '###.###';
+            } else if (len < 10) {
+                return '###.###.###';
+            } else {
+                return '###.###.###-##';
+            }
+        }
+
+        return undefined;
+    };
+
+    const getPhoneMask = (): string | undefined => {
+        if (user) {
+            const len = user.phone ? user.phone.length : 0;
+            if (len < 3) {
+                return '##';
+            } else if (len < 7) {
+                return '(##) ####';
+            } else if (len < 11) {
+                return '(##) ####-####';
+            } else {
+                return '(##) #####-####';
+            }
+        }
+
+        return undefined;
+    };
+
     return (
         <Container>
             <Header isSecondary />
@@ -257,8 +294,10 @@ const Identification: React.FC = (): JSX.Element => {
                                         user && setUser({ ...user, cpf: text })
                                     }
                                     type="text"
+                                    mask={getCpfMask()}
                                     errorMessage="CPF inválido!"
                                     validation={cpfValidation}
+                                    length={14}
                                     style={{ width: '47%' }}
                                 />
                                 <TextField
@@ -270,8 +309,10 @@ const Identification: React.FC = (): JSX.Element => {
                                         setUser({ ...user, phone: text })
                                     }
                                     type="text"
+                                    mask={getPhoneMask()}
                                     errorMessage="Telefone  inválido!"
                                     validation={phoneValidation}
+                                    length={15}
                                     style={{ width: '47%' }}
                                 />
                             </div>

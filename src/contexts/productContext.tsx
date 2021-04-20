@@ -2,6 +2,7 @@ import React, { createContext } from 'react';
 
 import { GetMany } from '../models/getMany';
 import { CreateProductPayload } from '../models/payloads/products/createProduct';
+import { UpdateProductPayload } from '../models/payloads/products/updateProduct';
 import { CategoryProxy } from '../models/proxies/category/category';
 import { ProductProxy } from '../models/proxies/product/product';
 import { ProductReviewProxy } from '../models/proxies/product/productReview';
@@ -13,8 +14,14 @@ import { useAuth } from '../hooks/useAuth';
 
 import { insertParamInQuery } from '../utils/formatters';
 
+import { AxiosResponse } from 'axios';
+
 export interface ProductContextData {
     createProduct(product: CreateProductPayload): Promise<ProductProxy>;
+    updateProduct(
+        product: UpdateProductPayload,
+        id: number
+    ): Promise<AxiosResponse<void>>;
     getProductById(id: number, join?: string): Promise<ProductProxy>;
     getProductCategories(id: number): Promise<CategoryProxy[]>;
     getProductRaitings(id: number): Promise<RatingProxy[]>;
@@ -110,6 +117,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     ): Promise<ProductProxy> => {
         const response = await api.post<ProductProxy>('/products', product);
         return response.data;
+    };
+
+    const updateProduct = async (
+        product: UpdateProductPayload,
+        id: number
+    ): Promise<AxiosResponse<void>> => {
+        const response = await api.patch<void>('/products/' + id, product, {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        return response;
     };
 
     const getProductById = async (
@@ -294,6 +311,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         <ProductContext.Provider
             value={{
                 createProduct,
+                updateProduct,
                 getProductById,
                 getProductCategories,
                 getProductRaitings,

@@ -1,5 +1,5 @@
 export enum OrderStatus {
-    Confirmed = 0,
-    Pendent = 1,
-    Canceled = 2
+    CONFIRMED = 0,
+    PENDING = 1,
+    CANCELED = 2
 }
