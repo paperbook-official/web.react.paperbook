@@ -228,6 +228,11 @@ export const Topic = styled.span`
 
     transition: all 0.2s;
 
+    &.active {
+        color: ${(props) => props.theme.colors.defaultBlue};
+        font-weight: 500;
+    }
+
     &:hover {
         color: ${(props) => props.theme.colors.defaultBlue};
     }

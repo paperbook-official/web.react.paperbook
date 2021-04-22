@@ -398,6 +398,12 @@ const Search: React.FC = (): JSX.Element => {
                                     onClick={() =>
                                         handleCategoryClick(category)
                                     }
+                                    className={
+                                        parseInt(query.get('catId') || '') ===
+                                        category.id
+                                            ? 'active'
+                                            : ''
+                                    }
                                 >
                                     {category.name}
                                 </Topic>
@@ -422,6 +428,11 @@ const Search: React.FC = (): JSX.Element => {
                                 <Topic
                                     key={index}
                                     onClick={() => handleLocalClick(state[0])}
+                                    className={
+                                        (query.get('state') || '') === state[0]
+                                            ? 'active'
+                                            : ''
+                                    }
                                 >
                                     {state[1]}
                                 </Topic>
@@ -441,7 +452,14 @@ const Search: React.FC = (): JSX.Element => {
                     )}
                     <TopicsContainer>
                         <span className="topic-title">Pagamento</span>
-                        <Topic onClick={handleInterestFree}>Sem juros</Topic>
+                        <Topic
+                            onClick={handleInterestFree}
+                            className={
+                                query.get('interestFree') ? 'active' : ''
+                            }
+                        >
+                            Sem juros
+                        </Topic>
                     </TopicsContainer>
                     <TopicsContainer>
                         <span className="topic-title">Preço</span>
@@ -652,6 +670,15 @@ const Search: React.FC = (): JSX.Element => {
                                                     : handleLocalClick(
                                                           content.id
                                                       )
+                                            }
+                                            className={
+                                                parseInt(
+                                                    query.get('catId') || ''
+                                                ) === content.id ||
+                                                query.get('state') ===
+                                                    content.id
+                                                    ? 'active'
+                                                    : ''
                                             }
                                         >
                                             {content.name}
