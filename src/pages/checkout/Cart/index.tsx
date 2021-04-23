@@ -14,6 +14,7 @@ import LoadingDots from '../../../components/atoms/LoadingDots';
 import Logo from '../../../components/atoms/Logo';
 import Modal from '../../../components/atoms/Modal';
 import ShippingInfo from '../../../components/atoms/ShippingInfo';
+import Footer from '../../../components/organisms/Footer';
 import Header from '../../../components/organisms/Header';
 import ShippingCard from '../../../components/organisms/ShippingCard';
 import { useTheme } from 'styled-components';
@@ -406,98 +407,95 @@ const Cart: React.FC = (): JSX.Element => {
                     </ListContainer>
                     {!isLoadingCart && products && products.length > 0 && (
                         <OrderResultContainer>
-                            <div>
-                                <OrderResult>
-                                    <h2>Resumo do pedido</h2>
-                                    <div className="shipping-info">
-                                        <ShippingInfo
-                                            onShippingOptionsClick={() =>
-                                                setShippingCardVisible(true)
-                                            }
-                                            cep={address}
-                                            option={option}
-                                        />
-                                    </div>
-                                    <OrderPriceContainer>
-                                        <OrderResultRow>
-                                            <span className="items">
-                                                <strong className="item-amount">
-                                                    {productsAmount}
-                                                </strong>{' '}
-                                                itens
-                                            </span>
-                                            <span className="price">
-                                                R$ {formatPrice(orderPrice)}
-                                            </span>
-                                        </OrderResultRow>
-                                        <OrderResultRow>
-                                            <span className="shipping">
-                                                Frete
-                                            </span>
-                                            <span
-                                                className={`shipping-price ${
-                                                    shippingPrice !==
-                                                        undefined &&
-                                                    shippingPrice === 0
-                                                        ? 'free'
-                                                        : !shippingPrice
-                                                        ? 'pending'
-                                                        : ''
-                                                }`}
-                                            >
-                                                {shippingPrice !== undefined
-                                                    ? shippingPrice === 0
-                                                        ? 'Grátis'
-                                                        : `R$ ${formatPrice(
-                                                              shippingPrice
-                                                          )}`
-                                                    : 'Pendente'}
-                                            </span>
-                                        </OrderResultRow>
-                                        <div className="price-divider"></div>
-                                        <OrderResultRow>
-                                            <span>Total</span>
-                                            <span className="total-price">
-                                                R$ {formatPrice(totalPrice)}
-                                            </span>
-                                        </OrderResultRow>
+                            {/* <div className="order-container"> */}
+                            <OrderResult>
+                                <h2>Resumo do pedido</h2>
+                                <div className="shipping-info">
+                                    <ShippingInfo
+                                        onShippingOptionsClick={() =>
+                                            setShippingCardVisible(true)
+                                        }
+                                        cep={address}
+                                        option={option}
+                                    />
+                                </div>
+                                <OrderPriceContainer>
+                                    <OrderResultRow>
+                                        <span className="items">
+                                            <strong className="item-amount">
+                                                {productsAmount}
+                                            </strong>{' '}
+                                            itens
+                                        </span>
+                                        <span className="price">
+                                            R$ {formatPrice(orderPrice)}
+                                        </span>
+                                    </OrderResultRow>
+                                    <OrderResultRow>
+                                        <span className="shipping">Frete</span>
                                         <span
-                                            className={`installment-price ${
-                                                isInterestFree
-                                                    ? 'interest-free'
+                                            className={`shipping-price ${
+                                                shippingPrice !== undefined &&
+                                                shippingPrice === 0
+                                                    ? 'free'
+                                                    : !shippingPrice
+                                                    ? 'pending'
                                                     : ''
                                             }`}
                                         >
-                                            {installmentAmount}x R${' '}
-                                            {formatPrice(
-                                                installmentPrice /
-                                                    installmentAmount
-                                            )}{' '}
-                                            {isInterestFree && 'sem juros'}
+                                            {shippingPrice !== undefined
+                                                ? shippingPrice === 0
+                                                    ? 'Grátis'
+                                                    : `R$ ${formatPrice(
+                                                          shippingPrice
+                                                      )}`
+                                                : 'Pendente'}
                                         </span>
-                                    </OrderPriceContainer>
-                                    <ContinueButton
-                                        disabled={!cep || !option}
-                                        className={
-                                            !cep || !option ? 'disabled' : ''
-                                        }
-                                        onClick={() =>
-                                            history.push('/identification')
-                                        }
+                                    </OrderResultRow>
+                                    <div className="price-divider"></div>
+                                    <OrderResultRow>
+                                        <span>Total</span>
+                                        <span className="total-price">
+                                            R$ {formatPrice(totalPrice)}
+                                        </span>
+                                    </OrderResultRow>
+                                    <span
+                                        className={`installment-price ${
+                                            isInterestFree
+                                                ? 'interest-free'
+                                                : ''
+                                        }`}
                                     >
-                                        Continuar
-                                    </ContinueButton>
-                                    <BuyMoreButton
-                                        onClick={() => history.push('/')}
-                                    >
-                                        Continuar comprando
-                                    </BuyMoreButton>
-                                </OrderResult>
-                            </div>
+                                        {installmentAmount}x R${' '}
+                                        {formatPrice(
+                                            installmentPrice / installmentAmount
+                                        )}{' '}
+                                        {isInterestFree && 'sem juros'}
+                                    </span>
+                                </OrderPriceContainer>
+                                <ContinueButton
+                                    disabled={!cep || !option}
+                                    className={
+                                        !cep || !option ? 'disabled' : ''
+                                    }
+                                    onClick={() =>
+                                        history.push('/identification')
+                                    }
+                                >
+                                    Continuar
+                                </ContinueButton>
+                                <BuyMoreButton
+                                    onClick={() => history.push('/')}
+                                >
+                                    Continuar comprando
+                                </BuyMoreButton>
+                            </OrderResult>
+                            {/* </div> */}
                         </OrderResultContainer>
                     )}
                 </OrderDetailsContainer>
             </Content>
+            <Footer />
             {isShippingCardVisible && (
                 <Modal>
                     <ShippingCard

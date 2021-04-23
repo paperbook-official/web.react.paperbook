@@ -12,6 +12,7 @@ import SocialMedia from '../../components/atoms/SocialMedia';
 import CategoriesBar from '../../components/molecules/CategoriesBar';
 import CustomHeader from '../../components/organisms/CustomHeader';
 import CustomProductCard from '../../components/organisms/CustomProductCard';
+import Footer from '../../components/organisms/Footer';
 import Header from '../../components/organisms/Header';
 import ProductList from '../../components/organisms/ProductList';
 import { useTheme } from 'styled-components';
@@ -231,6 +232,7 @@ const Home: React.FC = (): JSX.Element => {
             >
                 <Header />
             </HeaderContainer>
+            <Footer />
         </Container>
     );
 };

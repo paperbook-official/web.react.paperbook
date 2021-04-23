@@ -16,6 +16,7 @@ import { useShipping } from '../../hooks/useShipping';
 import Logo from '../../components/atoms/Logo';
 import Modal from '../../components/atoms/Modal';
 import Rating from '../../components/atoms/Rating';
+import Footer from '../../components/organisms/Footer';
 import Header from '../../components/organisms/Header';
 import ProductBuyingCard from '../../components/organisms/ProductBuyingCard';
 import ShippingCard from '../../components/organisms/ShippingCard';
@@ -248,6 +249,7 @@ const Product: React.FC = () => {
                     </ProductCardContainer>
                 </ProductContainer>
             </Content>
+            <Footer />
             {isShippingCardVisible && (
                 <Modal>
                     <ShippingCard

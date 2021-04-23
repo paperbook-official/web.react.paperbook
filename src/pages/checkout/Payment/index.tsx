@@ -15,6 +15,7 @@ import LoadingDots from '../../../components/atoms/LoadingDots';
 import Logo from '../../../components/atoms/Logo';
 import Selector from '../../../components/atoms/Selector';
 import TextField from '../../../components/molecules/TextField';
+import Footer from '../../../components/organisms/Footer';
 import Header from '../../../components/organisms/Header';
 import { useTheme } from 'styled-components';
 
@@ -239,226 +240,247 @@ const Payment: React.FC = (): JSX.Element => {
         <Container>
             {!checkOrder && <Header isSecondary />}
             {!checkOrder && (
-                <Content>
-                    <Title>Pagamento do pedido</Title>
-                    <div className="divider"></div>
-                    {isLoadingData ? (
-                        <div className="loading-container">
-                            <LoadingDots />
-                        </div>
-                    ) : (
-                        <PaymentContainer>
-                            <FieldsContainer>
-                                <h3>Dados bancários</h3>
-                                <div className="row-container">
-                                    <TextField
-                                        value={cardNumber}
-                                        label="Número do cartão"
-                                        name="cardNumber"
-                                        onTextChange={(cardNum: string) =>
-                                            setCardNumber(
-                                                cardNum.replace(/\s/g, '')
-                                            )
-                                        }
-                                        type="text"
-                                        mask={getCardNumberMask()}
-                                        errorMessage="Número do cartão inválido"
-                                        validation={(cardNumber: string) =>
-                                            cardNumberRegex.test(
-                                                cardNumber.replace(/\s/g, '')
-                                            )
-                                        }
-                                        length={19}
-                                        style={{ width: '100%' }}
-                                    />
-                                </div>
-                                <div className="row-container">
-                                    <TextField
-                                        label="Nome no cartão"
-                                        name="cardHolder"
-                                        onTextChange={(cardHolder: string) =>
-                                            setCardHolder(cardHolder)
-                                        }
-                                        type="text"
-                                        errorMessage="Nome inválido"
-                                        validation={(cardHolder: string) =>
-                                            cardHolderRegex.test(cardHolder)
-                                        }
-                                        style={{ width: '100%' }}
-                                    />
-                                </div>
-                                <div className="row-container">
-                                    <TextField
-                                        value={expirationDate}
-                                        label="Validade"
-                                        name="expirationDate"
-                                        onTextChange={(
-                                            expirationDate: string
-                                        ) => setExpirationDate(expirationDate)}
-                                        type="text"
-                                        mask={getExpirationDateMask()}
-                                        errorMessage="Validade inválido"
-                                        validation={(expDate: string) =>
-                                            expirationDateRegex.test(expDate)
-                                        }
-                                        length={5}
-                                        style={{ width: '47%' }}
-                                    />
-                                    <TextField
-                                        label="CVV"
-                                        name="cvv"
-                                        onTextChange={(cvv: string) =>
-                                            setCvv(cvv)
-                                        }
-                                        onInputFocus={() =>
-                                            setCreditCardTurned(true)
-                                        }
-                                        onInputBlur={() =>
-                                            setCreditCardTurned(false)
-                                        }
-                                        type="text"
-                                        errorMessage="CVV inválido"
-                                        validation={(cvv: string) =>
-                                            cvvRegex.test(cvv)
-                                        }
-                                        length={3}
-                                        style={{ width: '47%' }}
-                                    />
-                                </div>
-                                {installments && (
-                                    <Selector
-                                        style={{ alignSelf: 'center' }}
-                                        items={installments}
-                                        onSelect={setSelectedInstallment}
-                                    />
-                                )}
-                                <div className="button-container">
-                                    <Button
-                                        className={
-                                            !isFormValid() ? 'disabled' : ''
-                                        }
-                                        disabled={!isFormValid()}
-                                        onClick={handleFinishClick}
-                                    >
-                                        Finalizar
-                                    </Button>
-                                    <Button
-                                        className="secondary"
-                                        onClick={() =>
-                                            history.push('/identification')
-                                        }
-                                    >
-                                        Voltar
-                                    </Button>
-                                </div>
-                            </FieldsContainer>
-                            <div className="vertical-divider"></div>
-                            <CreditCardContainer>
-                                <CreditCard
-                                    className={
-                                        isCreditCardTurned ? 'turned' : ''
-                                    }
-                                >
-                                    <div className="credit-card front">
-                                        <WorldIcon
-                                            height="180"
-                                            width="300"
-                                            color="#0003"
-                                            style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                left: '50%',
-                                                transform:
-                                                    'translate(-50%, -50%)',
-                                                zIndex: -1
-                                            }}
-                                        />
-                                        <div className="paperbook-logo">
-                                            <Logo showTitle={false} size={34} />
-                                        </div>
-                                        <ChipIcon
-                                            color="#ededed"
-                                            height="30"
-                                            width="30"
-                                        />
-                                        <span className="card-number">
-                                            {maskString(
-                                                xFilledString(cardNumber, 16),
-                                                '#### #### #### ####'
-                                            )}
-                                        </span>
-                                        <span className="card-holder">
-                                            {cardHolder.toUpperCase()}
-                                        </span>
-                                        <span className="expiration-date">
-                                            <span className="exp-string">
-                                                Validade
-                                            </span>
-                                            <div className="exp-container">
-                                                <span className="exp-month">
-                                                    {xFilledString(
-                                                        expirationDate.substr(
-                                                            0,
-                                                            2
-                                                        ),
-                                                        2
-                                                    )}
-                                                </span>
-                                                /
-                                                <span className="exp-year">
-                                                    {expirationDate.includes(
-                                                        '/'
+                <>
+                    <Content>
+                        <Title>Pagamento do pedido</Title>
+                        <div className="divider"></div>
+                        {isLoadingData ? (
+                            <div className="loading-container">
+                                <LoadingDots />
+                            </div>
+                        ) : (
+                            <PaymentContainer>
+                                <FieldsContainer>
+                                    <h3>Dados bancários</h3>
+                                    <div className="row-container">
+                                        <TextField
+                                            value={cardNumber}
+                                            label="Número do cartão"
+                                            name="cardNumber"
+                                            onTextChange={(cardNum: string) =>
+                                                setCardNumber(
+                                                    cardNum.replace(/\s/g, '')
+                                                )
+                                            }
+                                            type="text"
+                                            mask={getCardNumberMask()}
+                                            errorMessage="Número do cartão inválido"
+                                            validation={(cardNumber: string) =>
+                                                cardNumberRegex.test(
+                                                    cardNumber.replace(
+                                                        /\s/g,
+                                                        ''
                                                     )
-                                                        ? xFilledString(
-                                                              expirationDate.substr(
-                                                                  3,
-                                                                  2
-                                                              ),
-                                                              2
-                                                          )
-                                                        : xFilledString(
-                                                              expirationDate.substr(
-                                                                  2,
-                                                                  2
-                                                              ),
-                                                              2
-                                                          )}
-                                                </span>
-                                            </div>
-                                        </span>
-                                    </div>
-                                    <div className="credit-card back">
-                                        <WorldIcon
-                                            height="180"
-                                            width="300"
-                                            color="#0003"
-                                            style={{
-                                                position: 'absolute',
-                                                top: '50%',
-                                                left: '50%',
-                                                transform:
-                                                    'translate(-50%, -50%)',
-                                                zIndex: -1
-                                            }}
+                                                )
+                                            }
+                                            length={19}
+                                            style={{ width: '100%' }}
                                         />
-                                        <div className="card-black-bar"></div>
-                                        <div className="card-secret-container">
-                                            <div className="card-secret-bar"></div>
-                                            <div className="card-secret">
-                                                <span className="card-cvv">
-                                                    {xFilledString(cvv, 3)}
+                                    </div>
+                                    <div className="row-container">
+                                        <TextField
+                                            label="Nome no cartão"
+                                            name="cardHolder"
+                                            onTextChange={(
+                                                cardHolder: string
+                                            ) => setCardHolder(cardHolder)}
+                                            type="text"
+                                            errorMessage="Nome inválido"
+                                            validation={(cardHolder: string) =>
+                                                cardHolderRegex.test(cardHolder)
+                                            }
+                                            style={{ width: '100%' }}
+                                        />
+                                    </div>
+                                    <div className="row-container">
+                                        <TextField
+                                            value={expirationDate}
+                                            label="Validade"
+                                            name="expirationDate"
+                                            onTextChange={(
+                                                expirationDate: string
+                                            ) =>
+                                                setExpirationDate(
+                                                    expirationDate
+                                                )
+                                            }
+                                            type="text"
+                                            mask={getExpirationDateMask()}
+                                            errorMessage="Validade inválido"
+                                            validation={(expDate: string) =>
+                                                expirationDateRegex.test(
+                                                    expDate
+                                                )
+                                            }
+                                            length={5}
+                                            style={{ width: '47%' }}
+                                        />
+                                        <TextField
+                                            label="CVV"
+                                            name="cvv"
+                                            onTextChange={(cvv: string) =>
+                                                setCvv(cvv)
+                                            }
+                                            onInputFocus={() =>
+                                                setCreditCardTurned(true)
+                                            }
+                                            onInputBlur={() =>
+                                                setCreditCardTurned(false)
+                                            }
+                                            type="text"
+                                            errorMessage="CVV inválido"
+                                            validation={(cvv: string) =>
+                                                cvvRegex.test(cvv)
+                                            }
+                                            length={3}
+                                            style={{ width: '47%' }}
+                                        />
+                                    </div>
+                                    {installments && (
+                                        <Selector
+                                            style={{ alignSelf: 'center' }}
+                                            items={installments}
+                                            onSelect={setSelectedInstallment}
+                                        />
+                                    )}
+                                    <div className="button-container">
+                                        <Button
+                                            className={
+                                                !isFormValid() ? 'disabled' : ''
+                                            }
+                                            disabled={!isFormValid()}
+                                            onClick={handleFinishClick}
+                                        >
+                                            Finalizar
+                                        </Button>
+                                        <Button
+                                            className="secondary"
+                                            onClick={() =>
+                                                history.push('/identification')
+                                            }
+                                        >
+                                            Voltar
+                                        </Button>
+                                    </div>
+                                </FieldsContainer>
+                                <div className="vertical-divider"></div>
+                                <CreditCardContainer>
+                                    <CreditCard
+                                        className={
+                                            isCreditCardTurned ? 'turned' : ''
+                                        }
+                                    >
+                                        <div className="credit-card front">
+                                            <WorldIcon
+                                                height="180"
+                                                width="300"
+                                                color="#0003"
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform:
+                                                        'translate(-50%, -50%)',
+                                                    zIndex: -1
+                                                }}
+                                            />
+                                            <div className="paperbook-logo">
+                                                <Logo
+                                                    showTitle={false}
+                                                    size={34}
+                                                />
+                                            </div>
+                                            <ChipIcon
+                                                color="#ededed"
+                                                height="30"
+                                                width="30"
+                                            />
+                                            <span className="card-number">
+                                                {maskString(
+                                                    xFilledString(
+                                                        cardNumber,
+                                                        16
+                                                    ),
+                                                    '#### #### #### ####'
+                                                )}
+                                            </span>
+                                            <span className="card-holder">
+                                                {cardHolder.toUpperCase()}
+                                            </span>
+                                            <span className="expiration-date">
+                                                <span className="exp-string">
+                                                    Validade
                                                 </span>
+                                                <div className="exp-container">
+                                                    <span className="exp-month">
+                                                        {xFilledString(
+                                                            expirationDate.substr(
+                                                                0,
+                                                                2
+                                                            ),
+                                                            2
+                                                        )}
+                                                    </span>
+                                                    /
+                                                    <span className="exp-year">
+                                                        {expirationDate.includes(
+                                                            '/'
+                                                        )
+                                                            ? xFilledString(
+                                                                  expirationDate.substr(
+                                                                      3,
+                                                                      2
+                                                                  ),
+                                                                  2
+                                                              )
+                                                            : xFilledString(
+                                                                  expirationDate.substr(
+                                                                      2,
+                                                                      2
+                                                                  ),
+                                                                  2
+                                                              )}
+                                                    </span>
+                                                </div>
+                                            </span>
+                                        </div>
+                                        <div className="credit-card back">
+                                            <WorldIcon
+                                                height="180"
+                                                width="300"
+                                                color="#0003"
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform:
+                                                        'translate(-50%, -50%)',
+                                                    zIndex: -1
+                                                }}
+                                            />
+                                            <div className="card-black-bar"></div>
+                                            <div className="card-secret-container">
+                                                <div className="card-secret-bar"></div>
+                                                <div className="card-secret">
+                                                    <span className="card-cvv">
+                                                        {xFilledString(cvv, 3)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="paperbook-logo">
+                                                <Logo
+                                                    showTitle={false}
+                                                    size={34}
+                                                />
                                             </div>
                                         </div>
-                                        <div className="paperbook-logo">
-                                            <Logo showTitle={false} size={34} />
-                                        </div>
-                                    </div>
-                                </CreditCard>
-                            </CreditCardContainer>
-                        </PaymentContainer>
-                    )}
-                </Content>
+                                    </CreditCard>
+                                </CreditCardContainer>
+                            </PaymentContainer>
+                        )}
+                    </Content>
+                    <Footer />
+                </>
             )}
             {checkOrder && (
                 <CheckOrder>

@@ -191,17 +191,14 @@ export const DeleteContainer = styled.div`
 export const OrderResultContainer = styled.div`
     position: relative;
     width: 280px;
-
-    & > div {
-        position: absolute;
-    }
 `;
 
 export const OrderResult = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: fixed;
+    position: sticky;
+    top: 20px;
     gap: 20px;
 
     width: 280px;

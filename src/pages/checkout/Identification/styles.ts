@@ -5,7 +5,6 @@ export const Container = styled.div`
 
     min-height: 100vh;
     width: 100%;
-    padding-bottom: 60px;
 
     background-color: ${(props) => props.theme.colors.background};
 `;
@@ -17,7 +16,7 @@ export const Content = styled.div`
     height: 100%;
     width: 80%;
 
-    margin: 60px 10% 0 10%;
+    margin: 60px 10% 60px 10%;
     padding: 20px;
 
     border-radius: 5px;

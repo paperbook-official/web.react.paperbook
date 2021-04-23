@@ -15,6 +15,7 @@ import LoadingDots from '../../components/atoms/LoadingDots';
 import Modal from '../../components/atoms/Modal';
 import Paginator from '../../components/atoms/Paginator';
 import SortByDropdown from '../../components/atoms/SortByDropdown';
+import Footer from '../../components/organisms/Footer';
 import Header from '../../components/organisms/Header';
 import ProductCard from '../../components/organisms/ProductCard';
 import ProductCardRow from '../../components/organisms/ProductCardRow';
@@ -631,6 +632,7 @@ const Search: React.FC = (): JSX.Element => {
                     )}
                 </ListContainer>
             </Content>
+            <Footer />
             {isModalVisible && (
                 <Modal onClickOutside={handleModalClose}>
                     <ModalCard

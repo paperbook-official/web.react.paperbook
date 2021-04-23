@@ -18,6 +18,7 @@ import AddressCard from '../../../components/atoms/AddressCard';
 import LoadingDots from '../../../components/atoms/LoadingDots';
 import Modal from '../../../components/atoms/Modal';
 import TextField from '../../../components/molecules/TextField';
+import Footer from '../../../components/organisms/Footer';
 import Header from '../../../components/organisms/Header';
 import ShippingCard from '../../../components/organisms/ShippingCard';
 
@@ -426,6 +427,7 @@ const Identification: React.FC = (): JSX.Element => {
                     </IdentificationContainer>
                 )}
             </Content>
+            <Footer />
             {isShippingCardVisible && (
                 <Modal>
                     <ShippingCard

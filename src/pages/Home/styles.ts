@@ -94,6 +94,8 @@ export const SecondPageContainer = styled.div`
 
     min-height: 100vh;
     width: 100%;
+
+    margin-bottom: 140px;
 `;
 
 export const HeaderContainer = styled.div`
