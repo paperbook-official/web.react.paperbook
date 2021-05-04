@@ -22,7 +22,7 @@ export interface ProductContextData {
         product: UpdateProductPayload,
         id: number
     ): Promise<AxiosResponse<void>>;
-    getProductById(id: number, join?: string): Promise<ProductProxy>;
+    getProductById(id: number, join?: string[]): Promise<ProductProxy>;
     getProductCategories(id: number): Promise<CategoryProxy[]>;
     getProductRaitings(id: number): Promise<RatingProxy[]>;
     getProductReview(id: number): Promise<ProductReviewProxy>;
@@ -43,7 +43,7 @@ export interface ProductContextData {
         page: number,
         offset: number,
         limit: number,
-        join?: string,
+        join?: string[],
         orderBy?: string[]
     ): Promise<GetMany<ProductProxy>>;
     getProductsByPrice(
@@ -51,34 +51,34 @@ export interface ProductContextData {
         page: number,
         offset: number,
         limit: number,
-        join?: string,
+        join?: string[],
         orderBy?: string[]
     ): Promise<GetMany<ProductProxy>>;
     getProductsOnSale(
         page: number,
         offset: number,
         limit: number,
-        join?: string,
+        join?: string[],
         orderBy?: string[]
     ): Promise<GetMany<ProductProxy>>;
     getInterestFree(
         page: number,
         offset: number,
         limit: number,
-        join?: string,
+        join?: string[],
         orderBy?: string[]
     ): Promise<GetMany<ProductProxy>>;
     getRecentProducts(
         page: number,
         offset: number,
         limit: number,
-        join?: string
+        join?: string[]
     ): Promise<GetMany<ProductProxy>>;
     getWellRated(
         page: number,
         offset: number,
         limit: number,
-        join?: string,
+        join?: string[],
         orderBy?: string[]
     ): Promise<GetMany<ProductProxy>>;
 }
@@ -99,7 +99,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     const concatParam = (url: string, param: string, value: string[]) => {
         let fullUrl: string = url;
         value.forEach((val, index) => {
-            if (index !== 0) {
+            if (!url.includes('?')) {
+                fullUrl += '?';
+            }
+            if (index === 0 && fullUrl[fullUrl.length - 1] !== '?') {
+                fullUrl += '&';
+            } else if (index !== 0) {
                 fullUrl += '&';
             }
             fullUrl += param + '=' + val;
@@ -131,10 +136,10 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
     const getProductById = async (
         id: number,
-        join = 'user||name'
+        join = ['user||name']
     ): Promise<ProductProxy> => {
         let url = `/products/${id}?`;
-        url += `join=${join}`;
+        url = concatParam(url, 'join', join);
 
         const response = await api.get<ProductProxy>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -205,12 +210,15 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name',
+        join = ['user||name'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
-        url += `join=${join}&`;
-        url += `limit=${limit}&offset=${offset}&page=${page}`;
+        url = concatParam(url, 'join', join);
+
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -223,13 +231,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name',
+        join = ['user||name'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/less-than?', 'sort', orderBy);
-        url += `&maxPrice=${price}`;
-        url += `&join=${join}`;
-        url += `&limit=${limit}&offset=${offset}&page=${page}`;
+        url = concatParam(url, 'join', join);
+
+        url = insertParamInQuery(url, 'maxPrice', price);
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -241,11 +252,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name',
+        join = ['user||name'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/on-sale?', 'sort', orderBy);
-        url += `join=${join}&`;
+        url = concatParam(url, 'join', join);
         url += `limit=${limit}&offset=${offset}&page=${page}`;
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
@@ -258,7 +269,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name',
+        join = ['user||name'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam(
@@ -266,8 +277,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
             'sort',
             orderBy
         );
-        url += `join=${join}&`;
-        url += `limit=${limit}&offset=${offset}&page=${page}`;
+        url = concatParam(url, 'join', join);
+
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -279,9 +293,14 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name'
+        join = ['user||name']
     ): Promise<GetMany<ProductProxy>> => {
-        const url = `/products/recents?join=${join}&limit=${limit}&offset=${offset}&page=${page}`;
+        let url = concatParam('/products/recent?', 'join', join);
+
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
+
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
         });
@@ -292,12 +311,15 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = 'user||name',
+        join = ['user||name'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
-        url += `join=${join}&`;
-        url += `limit=${limit}&offset=${offset}&page=${page}`;
+        url = concatParam(url, 'join', join);
+
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
