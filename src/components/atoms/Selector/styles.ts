@@ -13,6 +13,7 @@ export const SelectorContainer = styled.div`
     left: 2.5%;
 
     width: 95%;
+    z-index: 10;
 
     transform-origin: top center;
     transform: rotateX(-90deg);
