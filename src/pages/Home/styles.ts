@@ -107,3 +107,101 @@ export const HeaderContainer = styled.div`
 
     transition: all 0.3s;
 `;
+
+export const ModalCard = styled.div`
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    width: 500px;
+    height: 360px;
+    padding: 20px 0;
+
+    border-radius: 5px;
+    background-color: ${(props) => props.theme.colors.white};
+
+    & > h1 {
+        font-size: 1.4rem;
+        font-weight: 500;
+        color: ${(props) => props.theme.colors.defaultDarkGrey};
+
+        padding: 0 20px;
+    }
+
+    & > div.modal-content {
+        display: grid;
+        grid-row-gap: 20px;
+        grid-column-gap: 10px;
+        grid-template-columns: repeat(auto-fill, 216px);
+
+        height: 280px;
+
+        margin-top: 10px;
+        padding: 20px;
+
+        overflow-y: scroll;
+
+        ::-webkit-scrollbar-track {
+            background-color: ${(props) => props.theme.colors.defaultGrey}66;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            background-color: ${(props) => props.theme.colors.white};
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: ${(props) =>
+                props.theme.colors.defaultHighlightGreyBlue};
+            border-radius: 5px;
+        }
+    }
+
+    &.modal-container-move-in {
+        animation-name: modalmovein;
+        animation-duration: 0.4s;
+        animation-fill-mode: forwards;
+        animation-delay: 0s;
+    }
+
+    &.modal-container-move-out {
+        animation-name: modalmoveout;
+        animation-duration: 0.2s;
+        animation-fill-mode: forwards;
+        animation-delay: 0s;
+    }
+
+    @keyframes modalmovein {
+        from {
+            transform: scale(0);
+        }
+        to {
+            transform: scale(1);
+        }
+    }
+
+    @keyframes modalmoveout {
+        from {
+            transform: scale(1);
+        }
+        to {
+            transform: scale(0);
+        }
+    }
+`;
+
+export const Topic = styled.span`
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: ${(props) => props.theme.colors.defaultDarkGrey};
+    cursor: pointer;
+    line-height: 1.5rem;
+
+    transition: all 0.2s;
+
+    &:hover {
+        color: ${(props) => props.theme.colors.defaultBlue};
+    }
+`;

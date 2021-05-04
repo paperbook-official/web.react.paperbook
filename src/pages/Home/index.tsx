@@ -8,6 +8,8 @@ import { ProductProxy } from '../../models/proxies/product/product';
 import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
 
+import LoadingDots from '../../components/atoms/LoadingDots';
+import Modal from '../../components/atoms/Modal';
 import SocialMedia from '../../components/atoms/SocialMedia';
 import CategoriesBar from '../../components/molecules/CategoriesBar';
 import CustomHeader from '../../components/organisms/CustomHeader';
@@ -29,10 +31,12 @@ import {
     HeaderContainer,
     Image,
     ImageContainer,
+    ModalCard,
     SecondPageContainer,
     ScrollDown,
     TextContainer,
-    Title
+    Title,
+    Topic
 } from './styles';
 
 const Home: React.FC = (): JSX.Element => {
@@ -47,7 +51,13 @@ const Home: React.FC = (): JSX.Element => {
     } = useProduct();
     const { getCategories } = useCategory();
 
-    const prices: number[] = [10, 20, 30, 40, 50];
+    const prices: number[] = [30, 40, 50, 60];
+
+    const [modalContent, setModalContent] = useState<
+        { id: number; name: string }[]
+    >([]);
+    const [isLoadingModal, setLoadingModal] = useState(false);
+    const [isModalVisible, setModalVisible] = useState(false);
 
     const [isHeaderHidden, setHeaderHidden] = useState(true);
     const [headerPosition, setHeaderPosition] = useState(-100);
@@ -55,6 +65,7 @@ const Home: React.FC = (): JSX.Element => {
     const [customCardProduct, setCustomCardProduct] = useState<ProductProxy>();
     const [isLoadingCustomCard, setLoadingCustomCard] = useState(false);
     const [categories, setCategories] = useState<CategoryProxy[]>([]);
+    const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
 
     useEffect(() => {
         getCategoriesList();
@@ -117,7 +128,7 @@ const Home: React.FC = (): JSX.Element => {
             page: number,
             offset: number,
             itemsPerPage: number,
-            join?: string,
+            join?: string[],
             orderBy?: string[]
         ) => Promise<GetMany<ProductProxy>>
     ): Promise<GetMany<ProductProxy>> => {
@@ -140,6 +151,29 @@ const Home: React.FC = (): JSX.Element => {
         return data;
     };
 
+    const handleModalClose = (): void => {
+        const modal = document.getElementsByClassName('modal-container')[0];
+        modal.classList.add('modal-container-move-out');
+        setTimeout(() => {
+            setModalVisible(false);
+        }, 200);
+    };
+
+    const handleSeeAllCategories = async (): Promise<void> => {
+        setModalVisible(true);
+        setLoadingModal(true);
+
+        if (allCategories && allCategories.length > 0) {
+            setModalContent(allCategories);
+        } else {
+            const categories = await getCategories();
+            setAllCategories(categories);
+            setModalContent(categories);
+        }
+
+        setLoadingModal(false);
+    };
+
     return (
         <Container theme={theme}>
             <FirstPageContainer>
@@ -156,7 +190,7 @@ const Home: React.FC = (): JSX.Element => {
                     <CategoriesBar
                         categoriesList={categories}
                         onClick={onCategoryClick}
-                        onMoreClick={console.log}
+                        onMoreClick={handleSeeAllCategories}
                     />
                 )}
                 <TextContainer>
@@ -233,6 +267,44 @@ const Home: React.FC = (): JSX.Element => {
                 <Header />
             </HeaderContainer>
             <Footer />
+            {isModalVisible && (
+                <Modal onClickOutside={handleModalClose}>
+                    <ModalCard
+                        className="modal-container modal-container-move-in"
+                        style={{ display: isLoadingModal ? 'flex' : 'block' }}
+                    >
+                        {isLoadingModal ? (
+                            <LoadingDots />
+                        ) : (
+                            <>
+                                <h1>Categorias</h1>
+                                <div
+                                    className="modal-content"
+                                    style={{
+                                        overflowY:
+                                            modalContent.length === 12
+                                                ? 'hidden'
+                                                : 'scroll'
+                                    }}
+                                >
+                                    {modalContent.map((content) => (
+                                        <Topic
+                                            key={content.id}
+                                            onClick={() =>
+                                                onCategoryClick(
+                                                    content as CategoryProxy
+                                                )
+                                            }
+                                        >
+                                            {content.name}
+                                        </Topic>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </ModalCard>
+                </Modal>
+            )}
         </Container>
     );
 };
