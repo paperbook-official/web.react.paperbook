@@ -14,6 +14,7 @@ export const Container = styled.div`
     max-height: 100px;
     padding: 15px;
 
+    z-index: 10000;
     border-radius: 5px;
 
     transform: scale(0);
