@@ -1,7 +1,6 @@
 import { OrderStatus } from '../../enums/order';
-import { ProductProxy } from '../product/product';
+import { ProductGroupProxy } from '../product/productGroup';
 import { UserProxy } from '../user/user';
-import { AddressProxy } from './../address/address';
 
 export interface OrderProxy {
     id: number;
@@ -10,15 +9,13 @@ export interface OrderProxy {
     isActive: boolean;
     status: OrderStatus;
     trackingCode: string;
-    amount: number;
+    cep: string;
+    houseNumber: number;
     installmentAmount: number;
-    totalPrice: number;
-    addressId: number;
+    shippingPrice: number;
     userId: number;
-    productId: number;
 
     // relations
-    address?: AddressProxy;
     user?: UserProxy;
-    product?: ProductProxy;
+    productGroups?: ProductGroupProxy[];
 }
