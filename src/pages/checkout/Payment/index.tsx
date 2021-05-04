@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
-import { OrderStatus } from '../../../models/enums/order';
-import { CreateOrderPayload } from '../../../models/payloads/order/createOrder';
 
 import { useActionResult } from '../../../hooks/useActionResult';
 import { useCart } from '../../../hooks/useCart';
-import { useOrder } from '../../../hooks/useOrder';
 import { useShipping } from '../../../hooks/useShipping';
 import { useUser } from '../../../hooks/useUser';
 
@@ -50,9 +47,8 @@ const Payment: React.FC = (): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
     const { me, selectedAddress } = useUser();
-    const { localCart, deleteLocalCart } = useCart();
+    const { localCart, deleteLocalCart, finishOrder } = useCart();
     const { option } = useShipping();
-    const { createOrder } = useOrder();
     const { show } = useActionResult();
 
     const [cardNumber, setCardNumber] = useState('');
@@ -182,47 +178,10 @@ const Payment: React.FC = (): JSX.Element => {
         );
     };
 
-    const getTrackingCode = (): string => {
-        return 'xxxxxxxxxxxxx'.replace(/[x]/g, (c: string) => {
-            const r = (Math.random() * 16) | 0;
-            const v = c == 'x' ? r : (r & 0x3) | 0x8;
-            return v.toString(16).toUpperCase();
-        });
-    };
-
     const handleFinishClick = async (): Promise<void> => {
         if (me && selectedAddress && localCart) {
-            const orders: CreateOrderPayload[] = [];
-            localCart.forEach((cartStorage) => {
-                const product = cartStorage.product;
-                const order = {
-                    userId: me.id,
-                    productId: product.id,
-                    addressId: selectedAddress,
-                    amount: cartStorage.amount,
-                    trackingCode: getTrackingCode(),
-                    status: OrderStatus.PENDING,
-                    installmentAmount: selectedInstallment + 1,
-                    totalPrice:
-                        product.installmentPrice &&
-                        product.installmentPrice > product.price &&
-                        selectedInstallment > 0
-                            ? product.installmentPrice *
-                              (1 - product.discount) *
-                              cartStorage.amount
-                            : product.price *
-                              (1 - product.discount) *
-                              cartStorage.amount
-                };
-                orders.push(order);
-            });
             try {
-                const promises = orders.map(
-                    async (order) => await createOrder(order)
-                );
-
-                await Promise.all(promises);
-
+                await finishOrder();
                 deleteLocalCart();
                 setCheckOrder(true);
             } catch (error) {

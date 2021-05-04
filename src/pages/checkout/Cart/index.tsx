@@ -6,6 +6,7 @@ import { ProductProxy } from '../../../models/proxies/product/product';
 import { useCart } from '../../../hooks/useCart';
 import { useLoading } from '../../../hooks/useLoading';
 import { useShipping } from '../../../hooks/useShipping';
+import { useUser } from '../../../hooks/useUser';
 
 import { CartStorage } from '../../../contexts/cartContext';
 
@@ -49,12 +50,15 @@ const Cart: React.FC = (): JSX.Element => {
     const { address, cep, option, options, setOption } = useShipping();
     const {
         cart,
+        insertProductInAccCart,
+        loadCart,
         localCart,
-        updateLocalCart,
         removeProductFromCart,
-        loadCart
+        removeProductFromAccCart,
+        updateLocalCart
     } = useCart();
     const { setLoadingContent } = useLoading();
+    const { me } = useUser();
 
     const [isLoadingCart, setLoadingCart] = useState(false);
     const [isShippingCardVisible, setShippingCardVisible] = useState(false);
@@ -205,6 +209,8 @@ const Cart: React.FC = (): JSX.Element => {
         if (index !== -1) {
             if (newCartStorage) setCartStorage(newCartStorage);
 
+            if (me) removeProductFromAccCart(product.id, prodAmount);
+
             productList.splice(index, 1);
             setProducts(productList);
 
@@ -296,11 +302,25 @@ const Cart: React.FC = (): JSX.Element => {
             newAmount = currentAmount + 1;
             newOrderPrice = orderPrice + product.price * (1 - product.discount);
             newInstallmentPrice = installmentPrice + discount;
+
+            if (me) {
+                insertProductInAccCart(
+                    product.id,
+                    Math.abs(currentCart.amount - amount)
+                );
+            }
         } else if (currentAmount - 1 > 0) {
             newProductAmount--;
             newAmount = currentAmount - 1;
             newOrderPrice = orderPrice - product.price * (1 - product.discount);
             newInstallmentPrice = installmentPrice - discount;
+
+            if (me) {
+                removeProductFromAccCart(
+                    product.id,
+                    Math.abs(currentCart.amount - amount)
+                );
+            }
         }
 
         setProductsAmount(newAmount);
@@ -407,7 +427,6 @@ const Cart: React.FC = (): JSX.Element => {
                     </ListContainer>
                     {!isLoadingCart && products && products.length > 0 && (
                         <OrderResultContainer>
-                            {/* <div className="order-container"> */}
                             <OrderResult>
                                 <h2>Resumo do pedido</h2>
                                 <div className="shipping-info">
@@ -490,7 +509,6 @@ const Cart: React.FC = (): JSX.Element => {
                                     Continuar comprando
                                 </BuyMoreButton>
                             </OrderResult>
-                            {/* </div> */}
                         </OrderResultContainer>
                     )}
                 </OrderDetailsContainer>

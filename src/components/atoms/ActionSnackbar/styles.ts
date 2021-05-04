@@ -10,30 +10,34 @@ export const Container = styled.div`
     right: 20px;
     top: 20px;
 
-    width: 350px;
+    min-width: 350px;
+    max-width: 550px;
     max-height: 100px;
     padding: 15px;
 
-    z-index: 10000;
     border-radius: 5px;
 
     transform: scale(0);
 
-    &.snackbar-move-in-animation {
-        animation-name: snackbarmovein;
+    & .text {
+        font-size: 0.85rem;
+    }
+
+    &.action-snackbar-move-in-animation {
+        animation-name: actionsnackbarmovein;
         animation-duration: 0.3s;
         animation-delay: 0s;
         animation-fill-mode: forwards;
     }
 
-    &.snackbar-move-out-animation {
-        animation-name: snackbarmoveout;
+    &.action-snackbar-move-out-animation {
+        animation-name: actionsnackbarmoveout;
         animation-duration: 0.4s;
         animation-delay: 0s;
         animation-fill-mode: forwards;
     }
 
-    @keyframes snackbarmovein {
+    @keyframes actionsnackbarmovein {
         0% {
             transform: scale(0);
         }
@@ -45,7 +49,7 @@ export const Container = styled.div`
         }
     }
 
-    @keyframes snackbarmoveout {
+    @keyframes actionsnackbarmoveout {
         0% {
             transform: translateX(0);
         }
@@ -58,35 +62,24 @@ export const Container = styled.div`
     }
 `;
 
-export const TextContainer = styled.div`
+export const ActionButtonsContainer = styled.div`
     display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-`;
-
-export const Title = styled.span`
-    font-size: 1.1rem;
-    font-weight: 600;
-`;
-
-export const Description = styled.span`
-    font-size: 0.9rem;
-    font-weight: 400;
-`;
-
-export const CloseButton = styled.div`
-    display: flex;
-    justify-content: center;
     align-items: center;
+    gap: 10px;
+`;
 
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-
-    margin-left: 30px;
+export const ActionButton = styled.button`
+    padding: 3px 7px;
 
     cursor: pointer;
+    background: none;
+    outline: none;
+    border: none;
+    border-radius: 5px;
 
-    border-radius: 50px;
+    transition: all 0.3s;
+
+    &:hover {
+        background-color: #fff4;
+    }
 `;
