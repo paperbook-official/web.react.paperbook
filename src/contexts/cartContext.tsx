@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 
+import { FinishOrderPayload } from '../models/payloads/order/createOrder';
 import { OrderProxy } from '../models/proxies/order/order';
 import { ProductProxy } from '../models/proxies/product/product';
 import { ProductGroupProxy } from '../models/proxies/product/productGroup';
@@ -31,7 +32,7 @@ export interface CartContextData {
         amount?: number
     ): CartStorage[] | null | undefined;
     deleteLocalCart(): void;
-    finishOrder(): Promise<void>;
+    finishOrder(payload: FinishOrderPayload): Promise<void>;
 }
 
 interface CartProviderProps {
@@ -94,47 +95,53 @@ export const CartProvider: React.FC<CartProviderProps> = ({
         let cartToSet = 'null';
 
         if (token) {
-            const response = await api.get<ShoppingCartProxy>(
-                '/users/me/shopping-cart?join=productGroups',
-                {
-                    headers: { Authorization: 'Bearer ' + token }
-                }
-            );
+            try {
+                const response = await api.get<ShoppingCartProxy>(
+                    '/users/me/shopping-cart?join=productGroups',
+                    {
+                        headers: { Authorization: 'Bearer ' + token }
+                    }
+                );
 
-            const lCart = getLocalCart();
+                const lCart = getLocalCart();
 
-            if (response.data) {
-                const cartStorage: CartStorage[] = [];
+                if (response.data) {
+                    const cartStorage: CartStorage[] = [];
 
-                const promises =
-                    response.data.productGroups?.map((productGroup) => {
-                        return api
-                            .get<ProductProxy>(
-                                '/products/' + productGroup.productId
-                            )
-                            .then((productResponse) => {
-                                cartStorage.push({
-                                    amount: productGroup.amount,
-                                    product: productResponse.data
+                    const promises =
+                        response.data.productGroups?.map((productGroup) => {
+                            return api
+                                .get<ProductProxy>(
+                                    '/products/' + productGroup.productId
+                                )
+                                .then((productResponse) => {
+                                    cartStorage.push({
+                                        amount: productGroup.amount,
+                                        product: productResponse.data
+                                    });
                                 });
-                            });
-                    }) || [];
+                        }) || [];
 
-                await Promise.all(promises);
+                    await Promise.all(promises);
 
-                setCart(response.data);
+                    setCart(response.data);
 
-                if (lCart) {
-                    if (cartStorage) {
-                        cartToSet = lCart;
+                    if (lCart) {
+                        if (cartStorage) {
+                            cartToSet = lCart;
+                        } else {
+                            cartToSet = lCart;
+                        }
                     } else {
-                        cartToSet = lCart;
+                        cartToSet = JSON.stringify(cartStorage || 'null');
                     }
                 } else {
-                    cartToSet = JSON.stringify(cartStorage || 'null');
+                    cartToSet = getLocalCart() || 'null';
                 }
-            } else {
-                cartToSet = getLocalCart() || 'null';
+            } catch (error) {
+                if (error.response.status !== 404) {
+                    console.log(error);
+                }
             }
 
             if (cartToSet) setLocalCart(JSON.parse(cartToSet));
@@ -269,10 +276,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({
         return localCart;
     };
 
-    const finishOrder = async (): Promise<void> => {
+    const finishOrder = async ({
+        addressId,
+        shippingPrice,
+        installmentAmount
+    }: FinishOrderPayload): Promise<void> => {
         await api.post<OrderProxy>(
             '/users/me/shopping-cart/finish',
-            {},
+            { addressId, shippingPrice, installmentAmount },
             {
                 headers: { Authorization: 'Bearer ' + token }
             }
