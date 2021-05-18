@@ -95,6 +95,15 @@ const ProductList: React.FC<ProductListProps> = ({
         );
     };
 
+    const getProductRating = (product: ProductProxy): number => {
+        if (product.ratings) {
+            const stars = product.ratings.map((rating) => rating.stars || 0);
+            const average = stars.reduce((a, b) => a + b, 0);
+            return average || 0;
+        }
+        return 0;
+    };
+
     return (
         <Container
             style={style}
@@ -127,7 +136,7 @@ const ProductList: React.FC<ProductListProps> = ({
                                 key={product.id}
                                 product={product}
                                 onClick={onProductClick}
-                                rating={4}
+                                rating={getProductRating(product)}
                             />
                         ))}
                         <ChangePageIconContainer

@@ -29,9 +29,9 @@ import {
 } from './styles';
 
 interface ProductBuyingCardProps {
-    product: ProductProxy;
-    review?: ProductReviewProxy;
     cep?: CEPProxy;
+    product: ProductProxy;
+    review: ProductReviewProxy;
     shippingOption?: ShippingOptionData;
     onShippingOptionsClick(): void;
     onBuyClick(product: ProductProxy): void;
@@ -40,8 +40,8 @@ interface ProductBuyingCardProps {
 }
 
 const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
-    product,
     cep,
+    product,
     shippingOption,
     onShippingOptionsClick,
     onBuyClick,
@@ -69,10 +69,7 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
             <HeaderContainer>
                 <Title>{product.name}</Title>
                 <span className="rating">
-                    <Rating
-                        rating={Math.round(review?.average || 0)}
-                        size={16}
-                    />
+                    <Rating rating={Math.round(review.average)} size={16} />
                     {review && review.total > 0 && (
                         <RatingAmount>{review.total}</RatingAmount>
                     )}

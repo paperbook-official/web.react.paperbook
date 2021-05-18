@@ -173,7 +173,7 @@ const Search: React.FC = (): JSX.Element => {
                 currentPage as number,
                 0,
                 itemsPerPage,
-                [],
+                ['ratings'],
                 [],
                 search.toLowerCase(),
                 categoryId || '',
@@ -317,7 +317,7 @@ const Search: React.FC = (): JSX.Element => {
                 pageNumber,
                 0,
                 itemsPerPage,
-                [],
+                ['ratings'],
                 [],
                 search.toLowerCase(),
                 categoryId || '',
@@ -379,6 +379,15 @@ const Search: React.FC = (): JSX.Element => {
 
         setModalContent(states);
         setLoadingModal(false);
+    };
+
+    const getProductRating = (product: ProductProxy): number => {
+        if (product.ratings) {
+            const stars = product.ratings.map((rating) => rating.stars || 0);
+            const average = stars.reduce((a, b) => a + b, 0);
+            return average || 0;
+        }
+        return 0;
     };
 
     return (
@@ -585,7 +594,7 @@ const Search: React.FC = (): JSX.Element => {
                                               `/products/${product.id}`
                                           )
                                       }
-                                      rating={4}
+                                      rating={getProductRating(product)}
                                   />
                               ) : (
                                   <ProductCardRow
@@ -608,7 +617,7 @@ const Search: React.FC = (): JSX.Element => {
                                               `/products/${product.id}`
                                           )
                                       }
-                                      rating={4}
+                                      rating={getProductRating(product)}
                                   />
                               )
                           )

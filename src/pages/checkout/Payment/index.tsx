@@ -179,9 +179,13 @@ const Payment: React.FC = (): JSX.Element => {
     };
 
     const handleFinishClick = async (): Promise<void> => {
-        if (me && selectedAddress && localCart) {
+        if (me && selectedAddress && localCart && option) {
             try {
-                await finishOrder();
+                await finishOrder({
+                    addressId: selectedAddress,
+                    shippingPrice: option.price,
+                    installmentAmount: selectedInstallment + 1
+                });
                 deleteLocalCart();
                 setCheckOrder(true);
             } catch (error) {

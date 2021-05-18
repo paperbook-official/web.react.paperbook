@@ -3,6 +3,8 @@ import React, { createContext } from 'react';
 import { GetMany } from '../models/getMany';
 import { CreateProductPayload } from '../models/payloads/products/createProduct';
 import { UpdateProductPayload } from '../models/payloads/products/updateProduct';
+import { CreateRating } from '../models/payloads/rating/createRating';
+import { UpdateRating } from '../models/payloads/rating/updateRating';
 import { CategoryProxy } from '../models/proxies/category/category';
 import { ProductProxy } from '../models/proxies/product/product';
 import { ProductReviewProxy } from '../models/proxies/product/productReview';
@@ -24,8 +26,17 @@ export interface ProductContextData {
     ): Promise<AxiosResponse<void>>;
     getProductById(id: number, join?: string[]): Promise<ProductProxy>;
     getProductCategories(id: number): Promise<CategoryProxy[]>;
-    getProductRaitings(id: number): Promise<RatingProxy[]>;
+    getProductRatings(id: number): Promise<RatingProxy[]>;
     getProductReview(id: number): Promise<ProductReviewProxy>;
+    createProductRating(rating: CreateRating): Promise<void>;
+    getUserProductRating(
+        userId: number,
+        productId: number
+    ): Promise<RatingProxy[]>;
+    updateProductRating(
+        ratingId: number,
+        updateRating: UpdateRating
+    ): Promise<void>;
     searchProducts(
         page: number,
         offset: number,
@@ -136,7 +147,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
     const getProductById = async (
         id: number,
-        join = ['user||name']
+        join = ['user||name', 'ratings']
     ): Promise<ProductProxy> => {
         let url = `/products/${id}?`;
         url = concatParam(url, 'join', join);
@@ -156,7 +167,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         return response.data;
     };
 
-    const getProductRaitings = async (id: number): Promise<RatingProxy[]> => {
+    const getProductRatings = async (id: number): Promise<RatingProxy[]> => {
         const response = await api.get<RatingProxy[]>(
             `/products/${id}/ratings`
         );
@@ -172,11 +183,39 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         return response.data;
     };
 
+    const createProductRating = async (rating: CreateRating): Promise<void> => {
+        await api.post<void>('/ratings', rating, {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+    };
+
+    const updateProductRating = async (
+        ratingId: number,
+        updateRating: UpdateRating
+    ): Promise<void> => {
+        await api.patch<void>('/ratings/' + ratingId, updateRating, {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+    };
+
+    const getUserProductRating = async (
+        userId: number,
+        productId: number
+    ): Promise<RatingProxy[]> => {
+        const response = await api.get<RatingProxy[]>(
+            `products/${productId}/ratings?filter=userId||$eq||${userId}`,
+            {
+                headers: { Authorization: 'Bearer ' + token }
+            }
+        );
+        return response.data;
+    };
+
     const searchProducts = async (
         page: number,
         offset: number,
         limit: number,
-        join: string[] = [],
+        join = ['ratings'],
         orderBy: string[] = [],
         name?: string,
         categoryId?: string,
@@ -202,6 +241,8 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url = insertParamInQuery(url, 'offset', offset);
         url = insertParamInQuery(url, 'page', page);
 
+        console.log(url);
+
         const response = await api.get<GetMany<ProductProxy>>(url);
         return response.data;
     };
@@ -210,7 +251,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
@@ -231,7 +272,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/less-than?', 'sort', orderBy);
@@ -252,7 +293,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products/on-sale?', 'sort', orderBy);
@@ -269,7 +310,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam(
@@ -293,7 +334,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name']
+        join = ['user||name', 'ratings']
     ): Promise<GetMany<ProductProxy>> => {
         let url = concatParam('/products/recent?', 'join', join);
 
@@ -311,7 +352,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         page: number,
         offset: number,
         limit: number,
-        join = ['user||name'],
+        join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/products?', 'sort', orderBy);
@@ -336,8 +377,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
                 updateProduct,
                 getProductById,
                 getProductCategories,
-                getProductRaitings,
+                getProductRatings,
                 getProductReview,
+                createProductRating,
+                updateProductRating,
+                getUserProductRating,
                 searchProducts,
                 getProducts,
                 getProductsByPrice,

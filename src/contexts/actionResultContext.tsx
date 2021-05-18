@@ -3,6 +3,7 @@ import React, { createContext, useState } from 'react';
 import { ActionResultEnum } from '../models/enums/actionResultTypes';
 
 import Snackbar from '../components/atoms/Snackbar';
+import Tooltip from '../components/atoms/Tooltip';
 
 export interface ActionResultContextData {
     title: string;
@@ -14,6 +15,9 @@ export interface ActionResultContextData {
     isVisible: boolean;
     setVisible(value: boolean): void;
     show(title: string, description: string, type: ActionResultEnum): void;
+    isTooltipVisible: boolean;
+    setTooltipVisible(value: boolean): void;
+    setTooltipText(text: string): void;
 }
 
 interface ActionResultProviderProps {
@@ -31,6 +35,8 @@ export const ActionResultProvider: React.FC<ActionResultProviderProps> = ({
     const [description, setDescription] = useState('');
     const [type, setType] = useState(ActionResultEnum.ERROR);
     const [isVisible, setVisible] = useState(false);
+    const [isTooltipVisible, setTooltipVisible] = useState(false);
+    const [tooltipText, setTooltipText] = useState('');
 
     const show = (
         title: string,
@@ -56,7 +62,10 @@ export const ActionResultProvider: React.FC<ActionResultProviderProps> = ({
                 setType,
                 isVisible,
                 setVisible,
-                show
+                show,
+                isTooltipVisible,
+                setTooltipVisible,
+                setTooltipText
             }}
         >
             {children}
@@ -68,6 +77,7 @@ export const ActionResultProvider: React.FC<ActionResultProviderProps> = ({
                     onClose={() => setVisible(false)}
                 />
             )}
+            {isTooltipVisible && <Tooltip text={tooltipText} />}
         </ActionResultContext.Provider>
 
         //#endregion

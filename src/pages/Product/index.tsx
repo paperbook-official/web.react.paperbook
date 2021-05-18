@@ -47,7 +47,7 @@ const Product: React.FC = () => {
     const {
         getProductById,
         getProductCategories,
-        getProductRaitings,
+        getProductRatings,
         getProductReview
     } = useProduct();
     const { address, option, options, setOption } = useShipping();
@@ -78,7 +78,7 @@ const Product: React.FC = () => {
         );
         setCategories(categoriesResponse);
 
-        const ratingsResponse = await getProductRaitings(productsResponse.id);
+        const ratingsResponse = await getProductRatings(productsResponse.id);
         setRatings(ratingsResponse);
 
         const reviewResponse = await getProductReview(productsResponse.id);
@@ -232,7 +232,7 @@ const Product: React.FC = () => {
                         )}
                     </ProductInfoContainer>
                     <ProductCardContainer>
-                        {product && (
+                        {product && review && (
                             <ProductBuyingCard
                                 product={product}
                                 review={review}

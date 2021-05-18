@@ -174,15 +174,17 @@ const Header: React.FC<HeaderOptions> = ({
                             </AuthOptionsContainer>
                         ) : (
                             <AuthOptionsContainer>
-                                <Link
-                                    to="/orders"
-                                    style={{
-                                        textDecoration: 'none',
-                                        marginRight: 30
-                                    }}
-                                >
-                                    <AuthOption>Meus pedidos</AuthOption>
-                                </Link>
+                                {history.location.pathname !== '/orders' && (
+                                    <Link
+                                        to="/orders"
+                                        style={{
+                                            textDecoration: 'none',
+                                            marginRight: 30
+                                        }}
+                                    >
+                                        <AuthOption>Meus pedidos</AuthOption>
+                                    </Link>
+                                )}
                                 <AuthOption
                                     style={{ marginRight: 30 }}
                                     onClick={logout}

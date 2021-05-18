@@ -16,6 +16,7 @@ import Cart from '../pages/checkout/Cart';
 import Identification from '../pages/checkout/Identification';
 import Payment from '../pages/checkout/Payment';
 import Home from '../pages/Home';
+import Orders from '../pages/Orders';
 import Product from '../pages/Product';
 import Products from '../pages/Products';
 import Search from '../pages/Search';
@@ -108,6 +109,7 @@ const Routes = (): JSX.Element => {
                     component={Identification}
                 />
                 <PrivateRoute exact path="/payment" component={Payment} />
+                <PrivateRoute exact path="/orders" component={Orders} />
                 <PrivateRoute path="/products/new" component={Products} />
                 <Route path="*" component={() => <h1>Page Not Found</h1>} />
             </Switch>
