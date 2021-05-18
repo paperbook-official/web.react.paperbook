@@ -2,8 +2,8 @@ import styled from 'styled-components';
 
 export const Button = styled.div`
     position: fixed;
-    bottom: 1.8rem;
-    right: 1.8rem;
+    bottom: 20px;
+    right: 20px;
     z-index: 100;
     height: 60px;
     width: 60px;
@@ -21,22 +21,20 @@ export const Button = styled.div`
     transition: transform 0.3s;
 
     & > svg {
-        transform: scale(1.2);
-        &:hover {
-            transform: scale(1.4);
-        }
+        height: 24px;
+        width: 24px;
+
+        color: ${(props) => props.theme.colors.white};
+
+        transition: all 0.3s;
     }
 
-    &:active {
-        transform: scale(0.8);
-
-        svg {
-            transform: scale(1.1);
-        }
+    &:hover > svg {
+        transform: scale(1.1);
     }
 
     &.active {
-        display: none !important;
+        display: none;
     }
 
     &.animate-out {

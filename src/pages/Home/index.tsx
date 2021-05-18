@@ -8,6 +8,7 @@ import { ProductProxy } from '../../models/proxies/product/product';
 import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
 
+import FloatButton from '../../components/atoms/FloatButton';
 import LoadingDots from '../../components/atoms/LoadingDots';
 import Modal from '../../components/atoms/Modal';
 import SocialMedia from '../../components/atoms/SocialMedia';
@@ -22,6 +23,7 @@ import { useTheme } from 'styled-components';
 import { getRandom } from '../../utils/arrayManagement';
 import { formatPrice, formatQueryParam } from '../../utils/formatters';
 
+import { ReactComponent as TagIcon } from '../../assets/icons/tag.svg';
 import openBook from '../../assets/images/open-book.jpg';
 
 import {
@@ -176,6 +178,11 @@ const Home: React.FC = (): JSX.Element => {
 
     return (
         <Container theme={theme}>
+            <FloatButton
+                Icon={TagIcon}
+                text="Quero vender"
+                onClick={console.log}
+            />
             <FirstPageContainer>
                 <ImageContainer>
                     <Image
