@@ -22,13 +22,15 @@ import {
     ProgressBar
 } from './styles';
 
-interface HeaderOptions {
+interface HeaderProps {
     isSecondary?: boolean;
+    onSearch?(text: string): void | Promise<void>;
 }
 
-const Header: React.FC<HeaderOptions> = ({
-    isSecondary
-}: HeaderOptions): JSX.Element => {
+const Header: React.FC<HeaderProps> = ({
+    isSecondary,
+    onSearch
+}: HeaderProps): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
     const { localCart } = useCart();
@@ -149,7 +151,7 @@ const Header: React.FC<HeaderOptions> = ({
                 </ProgressContainer>
             ) : (
                 <>
-                    <SearchBar />
+                    <SearchBar onSearch={onSearch} />
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                         {!isLogged ? (
                             <AuthOptionsContainer>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { ActionResultEnum } from '../../models/enums/actionResultTypes';
+import { GetMany } from '../../models/getMany';
 import { OrderProxy } from '../../models/proxies/order/order';
 import { ProductProxy } from '../../models/proxies/product/product';
 
@@ -46,6 +47,16 @@ import {
     TotalMatches
 } from './styles';
 
+interface SearchOrdersProps {
+    page?: number;
+    offset?: number;
+    itemsPerPage?: number;
+    filter?: string[];
+    join?: string[];
+    cep?: string;
+    status?: string;
+}
+
 const Orders: React.FC = (): JSX.Element => {
     const history = useHistory();
     const query = useQuery();
@@ -75,33 +86,53 @@ const Orders: React.FC = (): JSX.Element => {
     const [pageAmount, setPageAmount] = useState(0);
     const [totalMatches, setTotalMatches] = useState(0);
 
+    const itemsPerPage = 2;
+
     const getCurrentUrl = (): string => {
         return history.location.pathname + history.location.search;
     };
 
-    const initialState = async (): Promise<void> => {
-        setLoadingContent(true);
+    const searchOrders = async (
+        searchParams?: SearchOrdersProps
+    ): Promise<GetMany<OrderProxy>> => {
+        const getParam = (queryParam: string, text?: string): string => {
+            let param = text;
+            if (!(param || param === '')) {
+                param = query.get(queryParam) || '';
+            }
+            return param;
+        };
 
-        const queryCep = query.get('cep');
-        const status = query.get('status');
+        const queryCep = getParam('cep', searchParams?.cep);
+        const status = getParam('status', searchParams?.status);
         const queryPage = query.get('page');
 
-        const filter = [];
+        const filter: string[] = [];
 
         if (queryCep) filter.push(`cep||$eq||${queryCep}`);
         if (status) filter.push(`status||$eq||${status}`);
 
         const response = await getOrders(
-            parseInt(queryPage || '1'),
-            0,
-            2,
-            filter
+            searchParams?.page || parseInt(queryPage || '1'),
+            searchParams?.offset || 0,
+            searchParams?.itemsPerPage || itemsPerPage,
+            searchParams?.filter || filter,
+            searchParams?.join
         );
 
+        console.log(response);
+
+        setOrders(response.data);
         setTotalMatches(response.total);
         setPageAmount(response.pageCount);
 
-        setOrders(response.data);
+        return response;
+    };
+
+    const initialState = async (): Promise<void> => {
+        setLoadingContent(true);
+
+        await searchOrders();
 
         setLoadingContent(false);
     };
@@ -124,36 +155,36 @@ const Orders: React.FC = (): JSX.Element => {
             setPage(pageNumber);
             window.scrollTo(0, 0);
 
-            const queryCep = query.get('cep');
-            const status = query.get('status');
-
-            const filter = [];
-
-            if (queryCep) filter.push(`cep||$eq||${queryCep}`);
-            if (status) filter.push(`status||$eq||${status}`);
-
-            const response = await getOrders(pageNumber, 0, 2, filter);
-
-            setOrders(response.data);
+            await searchOrders({
+                page: pageNumber
+            });
         }
 
         setLoadingContent(false);
     };
 
-    const filterBy = (name: string, value: string | number): void => {
+    const filterBy = async (
+        name: string,
+        value: string | number
+    ): Promise<void> => {
         const url = insertParamInQuery(getCurrentUrl(), name, value);
 
         if (decodeURIComponent(url) !== decodeURIComponent(getCurrentUrl())) {
             const to = removeQueryParam(url, 'page');
             history.push(to);
-            window.location.reload();
+
+            await searchOrders({
+                [name]: value.toString()
+            });
         }
     };
 
     const onRateClick = async (product: ProductProxy): Promise<void> => {
         setModalLoading(true);
+
         setRatingProduct(product);
         setModalVisible(true);
+
         if (me) {
             const ratingResponse = await getUserProductRating(
                 me.id,
@@ -165,6 +196,7 @@ const Orders: React.FC = (): JSX.Element => {
                 setRateText(ratingResponse[0].text || '');
             }
         }
+
         setModalLoading(false);
     };
 

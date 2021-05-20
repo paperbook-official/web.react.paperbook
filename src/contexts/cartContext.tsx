@@ -132,21 +132,19 @@ export const CartProvider: React.FC<CartProviderProps> = ({
                     setCart(response.data);
 
                     if (lCart) {
-                        if (cartStorage) {
-                            const payload: CartStorage[] = JSON.parse(lCart);
-                            api.post<ShoppingCartProxy>(
-                                '/users/me/shopping-cart/add?clean=true',
-                                payload.map((p) => ({
-                                    amount: p.amount,
-                                    productId: p.product.id
-                                })),
-                                {
-                                    headers: {
-                                        Authorization: 'Bearer ' + bToken
-                                    }
+                        const payload: CartStorage[] = JSON.parse(lCart);
+                        api.post<ShoppingCartProxy>(
+                            '/users/me/shopping-cart/add?clean=true',
+                            payload.map((p) => ({
+                                amount: p.amount,
+                                productId: p.product.id
+                            })),
+                            {
+                                headers: {
+                                    Authorization: 'Bearer ' + bToken
                                 }
-                            );
-                        }
+                            }
+                        );
                         cartToSet = lCart;
                     } else {
                         if (cartStorage && cartStorage.length > 0) {
