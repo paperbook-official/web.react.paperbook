@@ -56,6 +56,20 @@ interface GenericObject {
     name: string;
 }
 
+interface SearchProductsProps {
+    page?: number;
+    offset?: number;
+    itemsPerPage?: number;
+    join?: string[];
+    order?: string[];
+    search?: string;
+    categoryId?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    state?: string;
+    freeOfInterests?: boolean;
+}
+
 const sortOptions = ['Mais Relevantes', 'Menor Preço', 'Maior Preço'];
 const itemsPerPage = 5;
 
@@ -139,6 +153,50 @@ const Search: React.FC = (): JSX.Element => {
         }
     };
 
+    const searchProductsPage = async (
+        searchParams?: SearchProductsProps
+    ): Promise<GetMany<ProductProxy>> => {
+        const getParam = (queryParam: string, text?: string): string => {
+            let param = text;
+            if (!(param || param === '')) {
+                param = query.get(queryParam) || '';
+            }
+            return param;
+        };
+
+        const categoryId = getParam('catId', searchParams?.categoryId);
+        const state = getParam('state', searchParams?.state);
+        const freeOfInterests = query.get('interestFree');
+
+        const search = formatQueryToCommon(
+            getParam('search', searchParams?.search)
+        );
+        const queryMinPrice = getParam('minPrice', searchParams?.minPrice);
+        const queryMaxPrice = getParam('maxPrice', searchParams?.maxPrice);
+
+        const queryPage = query.get('page');
+
+        const response = await searchProducts(
+            searchParams?.page || parseInt(queryPage || '1'),
+            searchParams?.offset || 0,
+            searchParams?.itemsPerPage || itemsPerPage,
+            searchParams?.join || ['ratings'],
+            searchParams?.order || [],
+            search.toLowerCase(),
+            categoryId,
+            queryMinPrice,
+            queryMaxPrice,
+            state,
+            searchParams?.freeOfInterests || freeOfInterests === 'true'
+        );
+
+        setProducts(response.data);
+        setTotalMatches(response.total);
+        setPageAmount(response.pageCount);
+
+        return response;
+    };
+
     const initialState = async (): Promise<void> => {
         setLoadingContent(true);
 
@@ -155,12 +213,7 @@ const Search: React.FC = (): JSX.Element => {
             const currentPage = setQueryParam('page', 1);
 
             const search = formatQueryToCommon(query.get('search') || ''),
-                category = formatQueryToCommon(query.get('category') || ''),
-                categoryId = query.get('catId'),
-                state = query.get('state'),
-                minPrice = query.get('minPrice'),
-                maxPrice = query.get('maxPrice'),
-                freeOfInterests = query.get('interestFree');
+                category = formatQueryToCommon(query.get('category') || '');
 
             const queryToCommon = search || category || '';
             setTitle(queryToCommon);
@@ -169,23 +222,9 @@ const Search: React.FC = (): JSX.Element => {
             setCategories(responseCat);
             getBrStates();
 
-            const response = await searchProducts(
-                currentPage as number,
-                0,
-                itemsPerPage,
-                ['ratings'],
-                [],
-                search.toLowerCase(),
-                categoryId || '',
-                minPrice || '',
-                maxPrice || '',
-                state || '',
-                freeOfInterests === 'true'
-            );
-
-            setTotalMatches(response.total);
-            setPageAmount(Math.ceil(response.total / itemsPerPage));
-            setProducts(response.data);
+            await searchProductsPage({
+                page: currentPage as number
+            });
 
             const querySort = query.get('orderBy');
             if (querySort) {
@@ -202,7 +241,26 @@ const Search: React.FC = (): JSX.Element => {
         initialState();
     }, []);
 
-    const handleCategoryClick = (category: CategoryProxy) => {
+    const onSearch = async (text: string): Promise<void> => {
+        setLoadingContent(true);
+
+        await searchProductsPage({
+            search: text,
+            categoryId: '',
+            minPrice: '',
+            maxPrice: '',
+            state: '',
+            freeOfInterests: false
+        });
+
+        setLoadingContent(false);
+    };
+
+    const handleCategoryClick = async (
+        category: CategoryProxy
+    ): Promise<void> => {
+        setLoadingContent(true);
+
         const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'category', category.name);
         const newUrl = insertParamInQuery(url, 'catId', category.id);
@@ -210,19 +268,31 @@ const Search: React.FC = (): JSX.Element => {
         if (decodeURIComponent(newUrl) !== decodeURIComponent(origUrl)) {
             const to = removeQueryParam(newUrl, 'page');
             history.push(to);
-            window.location.reload();
+
+            await searchProductsPage({
+                categoryId: category.id.toString()
+            });
         }
+
+        setLoadingContent(false);
     };
 
-    const handleLocalClick = (state: string) => {
+    const handleLocalClick = async (state: string): Promise<void> => {
+        setLoadingContent(true);
+
         const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'state', state);
 
         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
             const to = removeQueryParam(url, 'page');
             history.push(to);
-            window.location.reload();
+
+            await searchProductsPage({
+                state
+            });
         }
+
+        setLoadingContent(false);
     };
 
     const changePrice = (price: string, mode: string) => {
@@ -235,20 +305,31 @@ const Search: React.FC = (): JSX.Element => {
         }
     };
 
-    const handleInterestFree = (): void => {
+    const handleInterestFree = async (): Promise<void> => {
+        setLoadingContent(true);
+
         const origUrl = getCurrentUrl();
         const url = insertParamInQuery(origUrl, 'interestFree', 'true');
 
         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
             const to = removeQueryParam(url, 'page');
             history.push(to);
-            window.location.reload();
+
+            await searchProductsPage({
+                freeOfInterests: true
+            });
         }
+
+        setLoadingContent(false);
     };
 
-    const handlePriceFilterClick = (min: string, max: string): void => {
-        const origUrl = getCurrentUrl();
+    const handlePriceFilterClick = async (
+        min: string,
+        max: string
+    ): Promise<void> => {
+        setLoadingContent(true);
 
+        const origUrl = getCurrentUrl();
         let url = origUrl;
 
         if (min && min.length > 0) {
@@ -266,11 +347,19 @@ const Search: React.FC = (): JSX.Element => {
         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
             const to = removeQueryParam(url, 'page');
             history.push(to);
-            window.location.reload();
+
+            await searchProductsPage({
+                minPrice: min,
+                maxPrice: max
+            });
         }
+
+        setLoadingContent(false);
     };
 
-    const handleSortClick = (option: number): void => {
+    const handleSortClick = async (option: number): Promise<void> => {
+        setLoadingContent(true);
+
         const origUrl = getCurrentUrl();
 
         if (option !== 0) {
@@ -283,16 +372,18 @@ const Search: React.FC = (): JSX.Element => {
             if (url !== decodeURIComponent(origUrl)) {
                 const to = removeQueryParam(url, 'page');
                 history.push(to);
-                window.location.reload();
             }
         } else {
             const url = removeQueryParam(origUrl, 'orderBy');
             if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
                 const to = removeQueryParam(url, 'page');
                 history.push(to);
-                window.location.reload();
+
+                await searchProductsPage();
             }
         }
+
+        setLoadingContent(false);
     };
 
     const handlePageChange = async (pageNumber: number): Promise<void> => {
@@ -306,27 +397,9 @@ const Search: React.FC = (): JSX.Element => {
             setPage(pageNumber);
             window.scrollTo(0, 0);
 
-            const search = formatQueryToCommon(query.get('search') || ''),
-                categoryId = query.get('catId'),
-                state = query.get('state'),
-                minPrice = query.get('minPrice'),
-                maxPrice = query.get('maxPrice'),
-                freeOfInterests = query.get('interestFree');
-
-            const response: GetMany<ProductProxy> = await searchProducts(
-                pageNumber,
-                0,
-                itemsPerPage,
-                ['ratings'],
-                [],
-                search.toLowerCase(),
-                categoryId || '',
-                minPrice || '',
-                maxPrice || '',
-                state || '',
-                freeOfInterests === 'true'
-            );
-            setProducts(response.data);
+            await searchProductsPage({
+                page: pageNumber
+            });
         }
 
         setLoadingContent(false);
@@ -392,7 +465,7 @@ const Search: React.FC = (): JSX.Element => {
 
     return (
         <Container style={{ overflow: isModalVisible ? 'hidden' : 'visible' }}>
-            <Header />
+            <Header onSearch={onSearch} />
             <Content>
                 <InfoContainer>
                     <TitleContainer>
