@@ -60,6 +60,7 @@ const Home: React.FC = (): JSX.Element => {
     >([]);
     const [isLoadingModal, setLoadingModal] = useState(false);
     const [isModalVisible, setModalVisible] = useState(false);
+    const [isButtonVisible, setButtonVisible] = useState(true);
 
     const [isHeaderHidden, setHeaderHidden] = useState(true);
     const [headerPosition, setHeaderPosition] = useState(-100);
@@ -74,8 +75,37 @@ const Home: React.FC = (): JSX.Element => {
         getCustomCardProduct();
         if (window.pageYOffset >= 150 && isHeaderHidden) {
             setHeaderPosition(0);
+            setHeaderHidden(false);
         } else if (window.pageYOffset < 150 && !isHeaderHidden) {
             setHeaderPosition(-100);
+            setHeaderHidden(true);
+        }
+
+        if (
+            document.body.scrollHeight - 300 <=
+                window.pageYOffset + window.innerHeight &&
+            isButtonVisible
+        ) {
+            const elm = document.getElementById('float-button');
+            elm?.classList.add('animate-out');
+            setTimeout(() => {
+                elm?.classList.add('active');
+                elm?.classList.remove('animate-out');
+            }, 100);
+            setButtonVisible(false);
+        } else if (
+            document.body.scrollHeight - 300 >
+                window.pageYOffset + window.innerHeight &&
+            !isButtonVisible
+        ) {
+            const elm = document.getElementById('float-button');
+
+            elm?.classList.remove('active');
+            elm?.classList.add('animate-in');
+            setTimeout(() => {
+                elm?.classList.remove('animate-in');
+            }, 500);
+            setButtonVisible(true);
         }
     }, []);
 
@@ -86,6 +116,33 @@ const Home: React.FC = (): JSX.Element => {
         } else if (window.pageYOffset < 150 && !isHeaderHidden) {
             setHeaderPosition(-100);
             setHeaderHidden(true);
+        }
+
+        if (
+            document.body.scrollHeight - 300 <=
+                window.pageYOffset + window.innerHeight &&
+            isButtonVisible
+        ) {
+            const elm = document.getElementById('float-button');
+            elm?.classList.add('animate-out');
+            setTimeout(() => {
+                elm?.classList.add('active');
+                elm?.classList.remove('animate-out');
+            }, 100);
+            setButtonVisible(false);
+        } else if (
+            document.body.scrollHeight - 300 >
+                window.pageYOffset + window.innerHeight &&
+            !isButtonVisible
+        ) {
+            const elm = document.getElementById('float-button');
+
+            elm?.classList.remove('active');
+            elm?.classList.add('animate-in');
+            setTimeout(() => {
+                elm?.classList.remove('animate-in');
+            }, 500);
+            setButtonVisible(true);
         }
     };
 
