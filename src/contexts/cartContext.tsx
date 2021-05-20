@@ -3,12 +3,12 @@ import React, { createContext, useEffect, useState } from 'react';
 import { FinishOrderPayload } from '../models/payloads/order/createOrder';
 import { OrderProxy } from '../models/proxies/order/order';
 import { ProductProxy } from '../models/proxies/product/product';
-import { ProductGroupProxy } from '../models/proxies/product/productGroup';
 import { ShoppingCartProxy } from '../models/proxies/shoppingCart/shoppingCart';
 
 import api from '../services/api';
 
 import { useAuth } from '../hooks/useAuth';
+import { useCookies } from '../hooks/useCookies';
 import { useUser } from '../hooks/useUser';
 
 export interface CartStorage {
@@ -46,7 +46,8 @@ export const CartContext = createContext<CartContextData>(
 export const CartProvider: React.FC<CartProviderProps> = ({
     children
 }: CartProviderProps) => {
-    const { token } = useAuth();
+    const { isCookiesAccepted } = useCookies();
+    const { token, getTokenCookie } = useAuth();
     const { me } = useUser();
 
     const [cart, setCart] = useState<ShoppingCartProxy>();
@@ -72,13 +73,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({
     };
 
     const insertProductInAccCart = (productId: number, amount = 1): void => {
-        api.post(
-            '/users/me/shopping-cart/add',
-            { amount, productId },
-            {
-                headers: { Authorization: 'Bearer ' + token }
-            }
-        );
+        api.post('/users/me/shopping-cart/add', [{ amount, productId }], {
+            headers: { Authorization: 'Bearer ' + token }
+        });
     };
 
     const removeProductFromAccCart = (productId: number, amount = 1): void => {
@@ -94,12 +91,20 @@ export const CartProvider: React.FC<CartProviderProps> = ({
     const loadCart = async (): Promise<CartStorage[]> => {
         let cartToSet = 'null';
 
-        if (token) {
+        let cookieToken = null;
+
+        if (isCookiesAccepted) {
+            cookieToken = getTokenCookie();
+        }
+
+        const bToken = token || cookieToken;
+
+        if (bToken) {
             try {
                 const response = await api.get<ShoppingCartProxy>(
                     '/users/me/shopping-cart?join=productGroups',
                     {
-                        headers: { Authorization: 'Bearer ' + token }
+                        headers: { Authorization: 'Bearer ' + bToken }
                     }
                 );
 
@@ -112,12 +117,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({
                         response.data.productGroups?.map((productGroup) => {
                             return api
                                 .get<ProductProxy>(
-                                    '/products/' + productGroup.productId
+                                    `/products/${productGroup.productId}?join=user||name`
                                 )
                                 .then((productResponse) => {
                                     cartStorage.push({
-                                        amount: productGroup.amount,
-                                        product: productResponse.data
+                                        product: productResponse.data,
+                                        amount: productGroup.amount
                                     });
                                 });
                         }) || [];
@@ -128,11 +133,28 @@ export const CartProvider: React.FC<CartProviderProps> = ({
 
                     if (lCart) {
                         if (cartStorage) {
-                            cartToSet = lCart;
-                        } else {
-                            cartToSet = lCart;
+                            const payload: CartStorage[] = JSON.parse(lCart);
+                            api.post<ShoppingCartProxy>(
+                                '/users/me/shopping-cart/add?clean=true',
+                                payload.map((p) => ({
+                                    amount: p.amount,
+                                    productId: p.product.id
+                                })),
+                                {
+                                    headers: {
+                                        Authorization: 'Bearer ' + bToken
+                                    }
+                                }
+                            );
                         }
+                        cartToSet = lCart;
                     } else {
+                        if (cartStorage && cartStorage.length > 0) {
+                            window.localStorage.setItem(
+                                'paperbook-cart',
+                                JSON.stringify(cartStorage)
+                            );
+                        }
                         cartToSet = JSON.stringify(cartStorage || 'null');
                     }
                 } else {
@@ -185,33 +207,31 @@ export const CartProvider: React.FC<CartProviderProps> = ({
         setLocalCart(newCart);
 
         if (me) {
-            const response = await api.post<ProductGroupProxy>(
+            const response = await api.post<ShoppingCartProxy>(
                 '/users/me/shopping-cart/add',
-                {
-                    amount: cartStorage.amount,
-                    productId: cartStorage.product.id
-                },
+                [
+                    {
+                        amount: cartStorage.amount,
+                        productId: cartStorage.product.id
+                    }
+                ],
                 {
                     headers: { Authorization: 'Bearer ' + token }
                 }
             );
 
-            const productGroup = response.data;
+            const shoppingCart = response.data;
 
             if (cart) {
                 setCart({
                     ...cart,
-                    productGroups: [...(cart.productGroups || []), productGroup]
+                    productGroups: [
+                        ...(cart.productGroups || []),
+                        ...(shoppingCart.productGroups || [])
+                    ]
                 });
-            } else if (productGroup.shoppingCartId) {
-                setCart({
-                    id: productGroup.shoppingCartId,
-                    createdAt: productGroup.createdAt,
-                    updatedAt: productGroup.updatedAt,
-                    isActive: true,
-                    userId: me.id,
-                    productGroups: [response.data]
-                });
+            } else if (shoppingCart.id) {
+                setCart(shoppingCart);
             }
         }
     };
