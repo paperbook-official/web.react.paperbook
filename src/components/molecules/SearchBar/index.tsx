@@ -9,7 +9,13 @@ import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
 
 import { Container, SearchInput, SearchLabel } from './styles';
 
-const SearchBar: React.FC = (): JSX.Element => {
+interface SearchBarProps {
+    onSearch?(text: string): void | Promise<void>;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({
+    onSearch
+}: SearchBarProps): JSX.Element => {
     const query = useQuery();
     const history = useHistory();
 
@@ -48,7 +54,7 @@ const SearchBar: React.FC = (): JSX.Element => {
                     '/products?search=' + formatQueryParam(searchText)
                 );
 
-            window.location.reload();
+            if (onSearch) onSearch(searchText);
         }
     };
 
