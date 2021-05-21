@@ -77,11 +77,11 @@ export const OrderProvider: React.FC<OrderProviderProps> = ({
     ): Promise<GetMany<OrderProxy>> => {
         let url = concatParam('/users/me/orders?', 'join', join);
         url = concatParam(url, 'filter', filter);
+        url = concatParam(url, 'sort', ['status,ASC', 'updatedAt,DESC']);
 
         url = insertParamInQuery(url, 'page', page);
         url = insertParamInQuery(url, 'offset', offset);
         url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'sort', 'status,ASC');
 
         const response = await api.get<GetMany<OrderProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
