@@ -8,4 +8,5 @@ export interface CreateProductPayload {
     discount?: number;
     stockAmount: number;
     userId: number;
+    categoryIds?: number[];
 }
