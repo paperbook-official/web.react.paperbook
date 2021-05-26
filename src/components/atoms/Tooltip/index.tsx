@@ -20,7 +20,7 @@ const Tooltip: React.FC<TooltipProps> = ({
                     (event.clientY - 30 > 0 ? top : top + 50) + 'px';
 
                 tooltip.style.right =
-                    window.innerWidth - event.clientX - 10 + 'px';
+                    window.innerWidth - event.clientX - 0 + 'px';
             }
         }
     };

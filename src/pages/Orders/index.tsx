@@ -86,7 +86,7 @@ const Orders: React.FC = (): JSX.Element => {
     const [pageAmount, setPageAmount] = useState(0);
     const [totalMatches, setTotalMatches] = useState(0);
 
-    const itemsPerPage = 2;
+    const itemsPerPage = 10;
 
     const getCurrentUrl = (): string => {
         return history.location.pathname + history.location.search;
@@ -119,8 +119,6 @@ const Orders: React.FC = (): JSX.Element => {
             searchParams?.filter || filter,
             searchParams?.join
         );
-
-        console.log(response);
 
         setOrders(response.data);
         setTotalMatches(response.total);

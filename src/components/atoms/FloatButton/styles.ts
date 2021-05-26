@@ -21,11 +21,7 @@ export const Button = styled.div`
     transition: transform 0.3s;
 
     & > svg {
-        height: 24px;
-        width: 24px;
-
         color: ${(props) => props.theme.colors.white};
-
         transition: all 0.3s;
     }
 

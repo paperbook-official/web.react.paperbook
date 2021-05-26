@@ -14,7 +14,7 @@ import useQuery from '../../hooks/useQuery';
 import LoadingDots from '../../components/atoms/LoadingDots';
 import Modal from '../../components/atoms/Modal';
 import Paginator from '../../components/atoms/Paginator';
-import SortByDropdown from '../../components/atoms/SortByDropdown';
+// import SortByDropdown from '../../components/atoms/SortByDropdown';
 import Footer from '../../components/organisms/Footer';
 import Header from '../../components/organisms/Header';
 import ProductCard from '../../components/organisms/ProductCard';
@@ -70,8 +70,8 @@ interface SearchProductsProps {
     freeOfInterests?: boolean;
 }
 
-const sortOptions = ['Mais Relevantes', 'Menor Preço', 'Maior Preço'];
-const itemsPerPage = 5;
+// const sortOptions = ['Mais Relevantes', 'Menor Preço', 'Maior Preço'];
+const itemsPerPage = 24;
 
 const Search: React.FC = (): JSX.Element => {
     const query = useQuery();
@@ -89,7 +89,7 @@ const Search: React.FC = (): JSX.Element => {
     const [brStates, setBrStates] = useState<string[][]>();
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
-    const [sortBy, setSortBy] = useState<number>();
+    // const [sortBy, setSortBy] = useState<number>();
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState<GenericObject[]>([]);
@@ -226,12 +226,12 @@ const Search: React.FC = (): JSX.Element => {
                 page: currentPage as number
             });
 
-            const querySort = query.get('orderBy');
-            if (querySort) {
-                setSortBy(querySort.includes('DESC') ? 3 : 2);
-            } else {
-                setSortBy(1);
-            }
+            // const querySort = query.get('orderBy');
+            // if (querySort) {
+            //     setSortBy(querySort.includes('DESC') ? 3 : 2);
+            // } else {
+            //     setSortBy(1);
+            // }
         }
 
         setLoadingContent(false);
@@ -357,34 +357,34 @@ const Search: React.FC = (): JSX.Element => {
         setLoadingContent(false);
     };
 
-    const handleSortClick = async (option: number): Promise<void> => {
-        setLoadingContent(true);
+    // const handleSortClick = async (option: number): Promise<void> => {
+    //     setLoadingContent(true);
 
-        const origUrl = getCurrentUrl();
+    //     const origUrl = getCurrentUrl();
 
-        if (option !== 0) {
-            const url = insertParamInQuery(
-                origUrl,
-                'orderBy',
-                option === 1 ? 'price' : 'price-DESC'
-            );
+    //     if (option !== 0) {
+    //         const url = insertParamInQuery(
+    //             origUrl,
+    //             'orderBy',
+    //             option === 1 ? 'price' : 'price-DESC'
+    //         );
 
-            if (url !== decodeURIComponent(origUrl)) {
-                const to = removeQueryParam(url, 'page');
-                history.push(to);
-            }
-        } else {
-            const url = removeQueryParam(origUrl, 'orderBy');
-            if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
-                const to = removeQueryParam(url, 'page');
-                history.push(to);
+    //         if (url !== decodeURIComponent(origUrl)) {
+    //             const to = removeQueryParam(url, 'page');
+    //             history.push(to);
+    //         }
+    //     } else {
+    //         const url = removeQueryParam(origUrl, 'orderBy');
+    //         if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
+    //             const to = removeQueryParam(url, 'page');
+    //             history.push(to);
 
-                await searchProductsPage();
-            }
-        }
+    //             await searchProductsPage();
+    //         }
+    //     }
 
-        setLoadingContent(false);
-    };
+    //     setLoadingContent(false);
+    // };
 
     const handlePageChange = async (pageNumber: number): Promise<void> => {
         setLoadingContent(true);
@@ -606,7 +606,7 @@ const Search: React.FC = (): JSX.Element => {
                     }}
                     isListDisplay={displayType === 'L'}
                 >
-                    {sortBy && (
+                    {/* {sortBy && (
                         <SortByDropdown
                             style={{
                                 position: 'absolute',
@@ -617,7 +617,7 @@ const Search: React.FC = (): JSX.Element => {
                             defaultOption={sortBy}
                             onChange={handleSortClick}
                         />
-                    )}
+                    )} */}
                     <SwitchIcon
                         className={`list ${
                             displayType === 'L' ? 'selected' : ''

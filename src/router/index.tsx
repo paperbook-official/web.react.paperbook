@@ -18,8 +18,8 @@ import Payment from '../pages/checkout/Payment';
 import Home from '../pages/Home';
 import Orders from '../pages/Orders';
 import Product from '../pages/Product';
-import Products from '../pages/Products';
 import Search from '../pages/Search';
+import UserProducts from '../pages/UserProducts';
 
 interface PrivateRouteProps {
     component: React.FC;
@@ -101,6 +101,7 @@ const Routes = (): JSX.Element => {
                 <AuthRoute exact path="/signup" component={SignUp} />
                 <AuthRoute exact path="/login" component={Login} />
                 <Route exact path="/products" component={Search} />
+                <PrivateRoute path="/products/me" component={UserProducts} />
                 <Route exact path="/products/:id" component={Product} />
                 <Route exact path="/cart" component={Cart} />
                 <PrivateRoute
@@ -110,7 +111,6 @@ const Routes = (): JSX.Element => {
                 />
                 <PrivateRoute exact path="/payment" component={Payment} />
                 <PrivateRoute exact path="/orders" component={Orders} />
-                <PrivateRoute path="/products/new" component={Products} />
                 <Route path="*" component={() => <h1>Page Not Found</h1>} />
             </Switch>
         </BrowserRouter>

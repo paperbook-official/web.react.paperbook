@@ -28,6 +28,7 @@ export interface ProductContextData {
     getProductCategories(id: number): Promise<CategoryProxy[]>;
     getProductRatings(id: number): Promise<RatingProxy[]>;
     getProductReview(id: number): Promise<ProductReviewProxy>;
+    uploadImage(image: File): Promise<ImageUploadProxy>;
     createProductRating(rating: CreateRating): Promise<void>;
     getUserProductRating(
         userId: number,
@@ -94,6 +95,10 @@ export interface ProductContextData {
     ): Promise<GetMany<ProductProxy>>;
 }
 
+interface ImageUploadProxy {
+    url: string;
+}
+
 interface ProductProviderProps {
     children: JSX.Element;
 }
@@ -126,6 +131,25 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         }
 
         return fullUrl;
+    };
+
+    const uploadImage = async (image: File): Promise<ImageUploadProxy> => {
+        const formData = new FormData();
+        console.log(image);
+        formData.append('file', image);
+        console.log(formData.getAll('file'));
+        const response = await api.post<ImageUploadProxy>(
+            '/medias/upload',
+            formData,
+            {
+                headers: {
+                    Authentication: 'Bearer ' + token,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        );
+        console.log(response);
+        return response.data;
     };
 
     const createProduct = async (
@@ -373,6 +397,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
         <ProductContext.Provider
             value={{
+                uploadImage,
                 createProduct,
                 updateProduct,
                 getProductById,

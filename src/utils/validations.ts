@@ -65,3 +65,13 @@ export const numberValidation = (number: string): boolean => {
     const regex = /^[1-9][0-9]*$/;
     return regex.test(number);
 };
+
+export const priceValidation = (price: string): boolean => {
+    const regex = /^\d+(,\d{1,2})?$/;
+    return regex.test(price);
+};
+
+export const percentageValidation = (percentage: string): boolean => {
+    const regex = /(^100(\.0{1,2})?$)|(^([1-9]([0-9])?|0)(\.[0-9]{1,2})?$)/g;
+    return regex.test(percentage);
+};
