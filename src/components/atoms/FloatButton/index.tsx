@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { useActionResult } from '../../../hooks/useActionResult';
 
@@ -8,6 +8,7 @@ interface FloatButtonProps {
     Icon: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
     text: string;
     onClick(): void;
+    iconSize?: number;
     style?: React.CSSProperties;
 }
 
@@ -15,9 +16,14 @@ const FloatButton: React.FC<FloatButtonProps> = ({
     Icon,
     text,
     onClick,
+    iconSize = 24,
     style
 }: FloatButtonProps): JSX.Element => {
     const { setTooltipVisible, setTooltipText } = useActionResult();
+
+    useEffect(() => {
+        return () => setTooltipVisible(false);
+    }, []);
 
     return (
         <Button
@@ -30,7 +36,7 @@ const FloatButton: React.FC<FloatButtonProps> = ({
             onClick={onClick}
             style={style}
         >
-            <Icon />
+            <Icon height={iconSize} width={iconSize} />
         </Button>
     );
 };
