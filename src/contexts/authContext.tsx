@@ -69,6 +69,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     const logout = (): void => {
         removeCookie(CookiesEnum.TOKEN_KEY);
+        setTokenCookie('', 0);
         setToken(undefined);
         window.location.reload();
     };
