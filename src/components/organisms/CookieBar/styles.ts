@@ -17,6 +17,8 @@ export const Container = styled.div`
     border-radius: 5px;
     padding: 20px;
 
+    z-index: 15000;
+
     transform: translateY(180px);
 
     background-color: ${(props) => props.theme.colors.defaultDarkBlue};
