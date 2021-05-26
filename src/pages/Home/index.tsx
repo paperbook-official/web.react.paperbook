@@ -7,12 +7,14 @@ import { ProductProxy } from '../../models/proxies/product/product';
 
 import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
+import { useUser } from '../../hooks/useUser';
 
 import FloatButton from '../../components/atoms/FloatButton';
 import LoadingDots from '../../components/atoms/LoadingDots';
 import Modal from '../../components/atoms/Modal';
 import SocialMedia from '../../components/atoms/SocialMedia';
 import CategoriesBar from '../../components/molecules/CategoriesBar';
+import SellerIdentification from '../../components/molecules/SellerIdentification';
 import CustomHeader from '../../components/organisms/CustomHeader';
 import CustomProductCard from '../../components/organisms/CustomProductCard';
 import Footer from '../../components/organisms/Footer';
@@ -23,6 +25,7 @@ import { useTheme } from 'styled-components';
 import { getRandom } from '../../utils/arrayManagement';
 import { formatPrice, formatQueryParam } from '../../utils/formatters';
 
+import { ReactComponent as MultiTagIcon } from '../../assets/icons/tag-multiple.svg';
 import { ReactComponent as TagIcon } from '../../assets/icons/tag.svg';
 import openBook from '../../assets/images/open-book.jpg';
 
@@ -48,10 +51,11 @@ const Home: React.FC = (): JSX.Element => {
         getProductsByPrice,
         getProductsOnSale,
         getInterestFree,
-        getRecentProducts,
-        getWellRated
+        getRecentProducts
+        // getWellRated
     } = useProduct();
     const { getCategories } = useCategory();
+    const { me } = useUser();
 
     const prices: number[] = [30, 40, 50, 60];
 
@@ -70,80 +74,58 @@ const Home: React.FC = (): JSX.Element => {
     const [categories, setCategories] = useState<CategoryProxy[]>([]);
     const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
 
+    const [isSellerModalVisible, setSellerModalVisible] = useState(false);
+
+    const updateElements = (): void => {
+        if (window.pageYOffset >= 150 && isHeaderHidden) {
+            setHeaderPosition(0);
+            setHeaderHidden(false);
+        } else if (window.pageYOffset < 150 && !isHeaderHidden) {
+            setHeaderPosition(-100);
+            setHeaderHidden(true);
+        }
+
+        if (
+            (document.body.scrollHeight - 300 <=
+                window.pageYOffset + window.innerHeight &&
+                isButtonVisible) ||
+            isSellerModalVisible
+        ) {
+            const elm = document.getElementById('float-button');
+            elm?.classList.add('animate-out');
+            setTimeout(() => {
+                elm?.classList.add('active');
+                elm?.classList.remove('animate-out');
+            }, 100);
+            setButtonVisible(false);
+        } else if (
+            document.body.scrollHeight - 300 >
+                window.pageYOffset + window.innerHeight &&
+            !isButtonVisible
+        ) {
+            const elm = document.getElementById('float-button');
+
+            elm?.classList.remove('active');
+            elm?.classList.add('animate-in');
+            setTimeout(() => {
+                elm?.classList.remove('animate-in');
+            }, 500);
+            setButtonVisible(true);
+        }
+    };
+
     useEffect(() => {
         getCategoriesList();
         getCustomCardProduct();
-        if (window.pageYOffset >= 150 && isHeaderHidden) {
-            setHeaderPosition(0);
-            setHeaderHidden(false);
-        } else if (window.pageYOffset < 150 && !isHeaderHidden) {
-            setHeaderPosition(-100);
-            setHeaderHidden(true);
-        }
-
-        if (
-            document.body.scrollHeight - 300 <=
-                window.pageYOffset + window.innerHeight &&
-            isButtonVisible
-        ) {
-            const elm = document.getElementById('float-button');
-            elm?.classList.add('animate-out');
-            setTimeout(() => {
-                elm?.classList.add('active');
-                elm?.classList.remove('animate-out');
-            }, 100);
-            setButtonVisible(false);
-        } else if (
-            document.body.scrollHeight - 300 >
-                window.pageYOffset + window.innerHeight &&
-            !isButtonVisible
-        ) {
-            const elm = document.getElementById('float-button');
-
-            elm?.classList.remove('active');
-            elm?.classList.add('animate-in');
-            setTimeout(() => {
-                elm?.classList.remove('animate-in');
-            }, 500);
-            setButtonVisible(true);
-        }
+        updateElements();
     }, []);
 
+    useEffect(() => {
+        updateElements();
+    }, [isSellerModalVisible]);
+
     window.onscroll = (): void => {
-        if (window.pageYOffset >= 150 && isHeaderHidden) {
-            setHeaderPosition(0);
-            setHeaderHidden(false);
-        } else if (window.pageYOffset < 150 && !isHeaderHidden) {
-            setHeaderPosition(-100);
-            setHeaderHidden(true);
-        }
-
-        if (
-            document.body.scrollHeight - 300 <=
-                window.pageYOffset + window.innerHeight &&
-            isButtonVisible
-        ) {
-            const elm = document.getElementById('float-button');
-            elm?.classList.add('animate-out');
-            setTimeout(() => {
-                elm?.classList.add('active');
-                elm?.classList.remove('animate-out');
-            }, 100);
-            setButtonVisible(false);
-        } else if (
-            document.body.scrollHeight - 300 >
-                window.pageYOffset + window.innerHeight &&
-            !isButtonVisible
-        ) {
-            const elm = document.getElementById('float-button');
-
-            elm?.classList.remove('active');
-            elm?.classList.add('animate-in');
-            setTimeout(() => {
-                elm?.classList.remove('animate-in');
-            }, 500);
-            setButtonVisible(true);
-        }
+        updateElements();
     };
 
     const scrollDown = (): void => {
@@ -165,18 +147,8 @@ const Home: React.FC = (): JSX.Element => {
 
     const getCustomCardProduct = async (): Promise<void> => {
         setLoadingCustomCard(true);
-        const responseSale = await getProductsOnSale(1, 0, 1);
-        if (responseSale.data[0]) {
-            setCustomCardProduct(responseSale.data[0]);
-        } else {
-            const responseIFree = await getInterestFree(1, 0, 1);
-            if (responseIFree.data[0]) {
-                setCustomCardProduct(responseIFree.data[0]);
-            } else {
-                const response = await getRecentProducts(1, 0, 1);
-                setCustomCardProduct(response.data[0]);
-            }
-        }
+        const response = await getRecentProducts(1, 0, 1);
+        setCustomCardProduct(response.data[0]);
         setLoadingCustomCard(false);
     };
 
@@ -233,12 +205,33 @@ const Home: React.FC = (): JSX.Element => {
         setLoadingModal(false);
     };
 
+    const handleFloatButtonClick = (): void => {
+        if (me) {
+            if (canSell()) {
+                history.push('/products/me');
+            } else {
+                setSellerModalVisible(true);
+            }
+        } else {
+            history.push('/login');
+        }
+    };
+
+    const handleSellerConfirm = (): void => {
+        setSellerModalVisible(false);
+    };
+
+    const canSell = (): boolean => {
+        return me?.permissions === 'seller' || me?.permissions === 'admin';
+    };
+
     return (
-        <Container theme={theme}>
+        <Container theme={theme} className={isSellerModalVisible ? 'ovfh' : ''}>
             <FloatButton
-                Icon={TagIcon}
-                text="Quero vender"
-                onClick={console.log}
+                Icon={canSell() ? MultiTagIcon : TagIcon}
+                iconSize={canSell() ? 34 : 24}
+                text={canSell() ? 'Meus produtos' : 'Quero vender'}
+                onClick={handleFloatButtonClick}
             />
             <FirstPageContainer>
                 <ImageContainer>
@@ -315,7 +308,7 @@ const Home: React.FC = (): JSX.Element => {
                         history.push('/products/' + product.id)
                     }
                 />
-                <ProductList
+                {/* <ProductList
                     topicTitle={`Bem avaliados`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getWellRated)
@@ -323,7 +316,7 @@ const Home: React.FC = (): JSX.Element => {
                     onProductClick={(product) =>
                         history.push('/products/' + product.id)
                     }
-                />
+                /> */}
             </SecondPageContainer>
             <HeaderContainer
                 style={{ transform: `translateY(${headerPosition}px)` }}
@@ -367,6 +360,13 @@ const Home: React.FC = (): JSX.Element => {
                             </>
                         )}
                     </ModalCard>
+                </Modal>
+            )}
+            {isSellerModalVisible && (
+                <Modal onClickOutside={() => setSellerModalVisible(false)}>
+                    <SellerIdentification
+                        onConfirmClick={handleSellerConfirm}
+                    />
                 </Modal>
             )}
         </Container>
