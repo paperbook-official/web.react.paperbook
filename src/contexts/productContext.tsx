@@ -57,9 +57,18 @@ export interface ProductContextData {
         minPrice?: string,
         maxPrice?: string,
         state?: string,
+        hasDiscount?: boolean,
         freeOfInterests?: boolean
     ): Promise<GetMany<ProductProxy>>;
     getProducts(
+        page: number,
+        offset: number,
+        limit: number,
+        join?: string[],
+        orderBy?: string[]
+    ): Promise<GetMany<ProductProxy>>;
+    getProductsByCategory(
+        categoryId: number,
         page: number,
         offset: number,
         limit: number,
@@ -94,7 +103,7 @@ export interface ProductContextData {
         limit: number,
         join?: string[]
     ): Promise<GetMany<ProductProxy>>;
-    getWellRated(
+    getMostBought(
         page: number,
         offset: number,
         limit: number,
@@ -258,10 +267,21 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         minPrice?: string,
         maxPrice?: string,
         state?: string,
+        hasDiscount?: boolean,
         freeOfInterests?: boolean
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam('/search?', 'sort', orderBy);
         url = concatParam(url, 'join', join);
+
+        if (userId && hasDiscount)
+            url = concatParam(url, 'filter', [
+                `userId||$eq||${userId}`,
+                'discount||$gt||0'
+            ]);
+        else if (userId)
+            url = insertParamInQuery(url, 'filter', `userId||$eq||${userId}`);
+        else if (hasDiscount)
+            url = insertParamInQuery(url, 'filter', 'discount||$gt||0');
 
         url = insertParamInQuery(url, 'name', name || '');
         url = insertParamInQuery(url, 'categoryId', categoryId || '');
@@ -273,9 +293,6 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
             'freeOfInterests',
             freeOfInterests ? 'true' : ''
         );
-
-        if (userId)
-            url = insertParamInQuery(url, 'filter', `userId||$eq||${userId}`);
 
         url = insertParamInQuery(url, 'limit', limit);
         url = insertParamInQuery(url, 'offset', offset);
@@ -298,6 +315,32 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         url = insertParamInQuery(url, 'limit', limit);
         url = insertParamInQuery(url, 'offset', offset);
         url = insertParamInQuery(url, 'page', page);
+
+        const response = await api.get<GetMany<ProductProxy>>(url, {
+            headers: { Authorization: 'Bearer ' + token }
+        });
+        return response.data;
+    };
+
+    const getProductsByCategory = async (
+        categoryId: number,
+        page: number,
+        offset: number,
+        limit: number,
+        join = ['categories', 'user||name', 'ratings'],
+        orderBy: string[] = []
+    ): Promise<GetMany<ProductProxy>> => {
+        let url = concatParam('/products?', 'sort', orderBy);
+        url = concatParam(url, 'join', join);
+
+        url = insertParamInQuery(url, 'limit', limit);
+        url = insertParamInQuery(url, 'offset', offset);
+        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(
+            url,
+            'filter',
+            `categories.id||$eq||${categoryId}`
+        );
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -411,7 +454,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         return response.data;
     };
 
-    const getWellRated = async (
+    const getMostBought = async (
         page: number,
         offset: number,
         limit: number,
@@ -449,11 +492,12 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
                 getUserProductRating,
                 searchProducts,
                 getProducts,
+                getProductsByCategory,
                 getProductsByPrice,
                 getProductsOnSale,
                 getInterestFree,
                 getRecentProducts,
-                getWellRated
+                getMostBought
             }}
         >
             {children}
