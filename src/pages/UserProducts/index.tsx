@@ -118,7 +118,8 @@ const UserProducts: React.FC = () => {
 
                 setProducts(productsList);
             } else {
-                setProducts([...products, { ...product, user: me }]);
+                setTotalMatches((totalMatches || 0) + 1);
+                setProducts([{ ...product, user: me }, ...products]);
             }
         }
     };
