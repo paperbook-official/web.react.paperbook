@@ -85,15 +85,15 @@ const SignUp: React.FC = (): JSX.Element => {
         try {
             const userData = await signUp(payload);
             setMe(userData);
-            console.log(userData);
 
             const data = await getToken(authPayload);
-            console.log(data);
+
             if (data.token) {
+                const expLen = data.expiresIn.length - 1;
                 const expires =
-                    data.expiresIn[1] === 'a'
-                        ? parseInt(data.expiresIn[0]) * 365
-                        : parseInt(data.expiresIn[0]);
+                    data.expiresIn[expLen] === 'a'
+                        ? parseInt(data.expiresIn.substr(0, expLen)) * 365
+                        : parseInt(data.expiresIn.substr(0, expLen));
 
                 setToken(data.token);
                 if (isRememberActive) {
