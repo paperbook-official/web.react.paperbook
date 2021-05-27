@@ -162,14 +162,14 @@ const ProductCreation: React.FC<ProductCreationProps> = ({
                     imageUrl,
                     name: nameText.trim(),
                     description: descriptionText.trim(),
-                    price: parseFloat(fullPriceText.trim().replace(/,/, '.')),
+                    price: parseFloat(fullPriceText.trim().replace(/,/g, '.')),
                     installmentPrice:
                         installmentPriceText.trim().length > 0 &&
                         parseFloat(
-                            installmentPriceText.trim().replace(/,/, '.')
-                        ) > parseFloat(fullPriceText.trim().replace(/,/, '.'))
+                            installmentPriceText.trim().replace(/,/g, '.')
+                        ) > parseFloat(fullPriceText.trim().replace(/,/g, '.'))
                             ? parseFloat(
-                                  installmentPriceText.trim().replace(/,/, '.')
+                                  installmentPriceText.trim().replace(/,/g, '.')
                               )
                             : undefined,
                     installmentAmount:
@@ -179,7 +179,7 @@ const ProductCreation: React.FC<ProductCreationProps> = ({
                     discount:
                         discountAmountText.trim().length > 0
                             ? parseFloat(
-                                  discountAmountText.trim().replace(/,/, '.')
+                                  discountAmountText.trim().replace(/,/g, '.')
                               ) / 100
                             : undefined,
                     stockAmount: parseInt(stockAmountText.trim()),
@@ -187,23 +187,46 @@ const ProductCreation: React.FC<ProductCreationProps> = ({
                 };
 
                 try {
+                    const discountValue =
+                        discountAmountText.trim().length > 0
+                            ? parseFloat(
+                                  discountAmountText.trim().replace(/,/g, '.')
+                              ) / 100
+                            : 0;
+
                     if (product) {
                         await updateProduct(productPayload, product.id);
+
                         onComplete({
+                            ...productPayload,
                             id: product.id,
                             categories: categoriesList,
-                            ...productPayload
+                            discount: discountValue
                         } as ProductProxy);
+
+                        show(
+                            'Produto atualizado',
+                            productPayload.name || '',
+                            ActionResultEnum.SUCCESS
+                        );
                     } else {
                         const response = await createProduct({
                             ...productPayload,
                             userId: me.id
                         } as CreateProductPayload);
+
                         onComplete({
+                            ...productPayload,
                             id: response.id,
                             categories: categoriesList,
-                            ...productPayload
+                            discount: discountValue
                         } as ProductProxy);
+
+                        show(
+                            'Produto criado',
+                            response.name,
+                            ActionResultEnum.SUCCESS
+                        );
                     }
                 } catch (error) {
                     show(
