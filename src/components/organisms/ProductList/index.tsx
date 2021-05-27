@@ -38,7 +38,9 @@ const ProductList: React.FC<ProductListProps> = ({
     const { isLoadingContent, setLoadingContent } = useLoading();
 
     const [itemsPerPage, setItemsPerPage] = useState(0);
+    const [pagesLoaded, setPagesLoaded] = useState(1);
     const [page, setPage] = useState(1);
+    const [pageAmount, setPageAmount] = useState(1);
     const [productsList, setProductsList] = useState<ProductProxy[]>([]);
     const [currentProducts, setCurrentProducts] = useState<ProductProxy[]>([]);
     const [totalProducts, setTotalProducts] = useState<number | null>(null);
@@ -46,10 +48,14 @@ const ProductList: React.FC<ProductListProps> = ({
 
     const setInitialState = async (): Promise<void> => {
         setLoading(true);
-        const response = await request(productAmount * 2, page);
+
+        const response = await request(productAmount, page);
+
+        setPageAmount(response.pageCount);
         setProductsList(response.data);
-        setCurrentProducts(response.data?.slice(0, productAmount));
+        setCurrentProducts(response.data);
         setTotalProducts(response.total);
+
         setLoading(false);
     };
 
@@ -62,29 +68,43 @@ const ProductList: React.FC<ProductListProps> = ({
         return (nPage - 1) * itemsPerPage;
     };
 
-    const getPageContent = (nPage: number): ProductProxy[] => {
+    const getPageContent = (
+        nPage: number,
+        list?: ProductProxy[]
+    ): ProductProxy[] => {
         const offset = getOffset(nPage);
-        const products = productsList.slice(offset, offset + itemsPerPage);
+        const products =
+            list || productsList.slice(offset, offset + itemsPerPage);
 
         return products.length === itemsPerPage || nPage === 1
             ? products
-            : productsList.slice(
-                  offset - (itemsPerPage - products.length),
-                  offset + itemsPerPage
-              );
+            : [
+                  ...productsList.slice(
+                      offset - (itemsPerPage - products.length),
+                      offset
+                  ),
+                  ...products
+              ];
     };
 
     const nextPage = async (): Promise<void> => {
         setLoadingContent(true);
 
         const nPage = page + 1;
-        setCurrentProducts(getPageContent(nPage));
-        setPage(nPage);
+        const currentProdList = [...productsList];
 
-        if (totalProducts && totalProducts > productsList.length) {
-            const response = await request(itemsPerPage, nPage + 1);
-            setProductsList([...productsList, ...response.data]);
+        if (nPage > pagesLoaded) {
+            setPagesLoaded(nPage);
+
+            const response = await request(itemsPerPage, nPage);
+
+            setProductsList([...currentProdList, ...response.data]);
+            setCurrentProducts(getPageContent(nPage, response.data));
+        } else {
+            setCurrentProducts(getPageContent(nPage));
         }
+
+        setPage(nPage);
 
         setLoadingContent(false);
     };
@@ -96,11 +116,7 @@ const ProductList: React.FC<ProductListProps> = ({
     };
 
     const hasMorePages = (): boolean => {
-        return (
-            !!totalProducts &&
-            totalProducts > itemsPerPage &&
-            totalProducts > page * itemsPerPage
-        );
+        return pageAmount > page;
     };
 
     const getProductRating = (product: ProductProxy): number => {

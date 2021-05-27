@@ -23,7 +23,7 @@ import Header from '../../components/organisms/Header';
 import ProductList from '../../components/organisms/ProductList';
 import { useTheme } from 'styled-components';
 
-import { getRandom } from '../../utils/arrayManagement';
+import { getRandom, range } from '../../utils/arrayManagement';
 import { formatPrice, formatQueryParam } from '../../utils/formatters';
 
 import { ReactComponent as MultiTagIcon } from '../../assets/icons/tag-multiple.svg';
@@ -71,6 +71,7 @@ const Home: React.FC = (): JSX.Element => {
     const [isHeaderHidden, setHeaderHidden] = useState(true);
     const [headerPosition, setHeaderPosition] = useState(-100);
     const [randomPrice] = useState(getRandom(prices));
+    const [randomCategory] = useState(getRandom(range(1, 5)));
     const [categoryTopic, setCategoryTopic] = useState<CategoryProxy>();
     const [customCardProduct, setCustomCardProduct] = useState<ProductProxy>();
     const [isLoadingCustomCard, setLoadingCustomCard] = useState(false);
@@ -78,8 +79,6 @@ const Home: React.FC = (): JSX.Element => {
     const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
 
     const [isSellerModalVisible, setSellerModalVisible] = useState(false);
-
-    const randomCategory = Math.floor(Math.random() * (5 - 1 + 1) + 1);
 
     const updateElements = (): void => {
         if (window.pageYOffset >= 150 && isHeaderHidden) {
