@@ -49,13 +49,14 @@ const Home: React.FC = (): JSX.Element => {
     const theme = useTheme();
     const history = useHistory();
     const {
+        getProductsByCategory,
         getProductsByPrice,
         getProductsOnSale,
         getInterestFree,
         getRecentProducts
         // getMostBought
     } = useProduct();
-    const { getCategories } = useCategory();
+    const { getCategories, getCategoryById } = useCategory();
     const { me } = useUser();
 
     const prices: number[] = [30, 40, 50, 60];
@@ -70,12 +71,15 @@ const Home: React.FC = (): JSX.Element => {
     const [isHeaderHidden, setHeaderHidden] = useState(true);
     const [headerPosition, setHeaderPosition] = useState(-100);
     const [randomPrice] = useState(getRandom(prices));
+    const [categoryTopic, setCategoryTopic] = useState<CategoryProxy>();
     const [customCardProduct, setCustomCardProduct] = useState<ProductProxy>();
     const [isLoadingCustomCard, setLoadingCustomCard] = useState(false);
     const [categories, setCategories] = useState<CategoryProxy[]>([]);
     const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
 
     const [isSellerModalVisible, setSellerModalVisible] = useState(false);
+
+    const randomCategory = Math.floor(Math.random() * (5 - 1 + 1) + 1);
 
     const updateElements = (): void => {
         if (window.pageYOffset >= 150 && isHeaderHidden) {
@@ -116,7 +120,7 @@ const Home: React.FC = (): JSX.Element => {
     };
 
     useEffect(() => {
-        getCategoriesList();
+        getCategoriesList(randomCategory);
         getCustomCardProduct();
         if (history.location.pathname === '/') updateElements();
     }, []);
@@ -141,9 +145,12 @@ const Home: React.FC = (): JSX.Element => {
         );
     };
 
-    const getCategoriesList = async (): Promise<void> => {
+    const getCategoriesList = async (randomCat: number): Promise<void> => {
         const categoriesRes = await getCategories(7);
         setCategories(categoriesRes);
+
+        const categoryRes = await getCategoryById(randomCat);
+        setCategoryTopic(categoryRes);
     };
 
     const getCustomCardProduct = async (): Promise<void> => {
@@ -176,6 +183,20 @@ const Home: React.FC = (): JSX.Element => {
         const offset = 0;
         const data = await getProductsByPrice(
             randomPrice,
+            page,
+            offset,
+            itemsPerPage
+        );
+        return data;
+    };
+
+    const getProductsByCategoryLocal = async (
+        itemsPerPage: number,
+        page: number
+    ): Promise<GetMany<ProductProxy>> => {
+        const offset = 0;
+        const data = await getProductsByCategory(
+            randomCategory,
             page,
             offset,
             itemsPerPage
@@ -289,6 +310,15 @@ const Home: React.FC = (): JSX.Element => {
                     topicTitle={`Ofertas`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getProductsOnSale)
+                    }
+                    onProductClick={(product) =>
+                        history.push('/products/' + product.id)
+                    }
+                />
+                <ProductList
+                    topicTitle={`${categoryTopic?.name || 'Por categoria'}`}
+                    request={(i: number, p: number) =>
+                        getProductsByCategoryLocal(i, p)
                     }
                     onProductClick={(product) =>
                         history.push('/products/' + product.id)
