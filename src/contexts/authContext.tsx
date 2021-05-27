@@ -9,6 +9,8 @@ import { UserProxy } from '../models/proxies/user/user';
 import api from '../services/api';
 import { getCookie, setCookie, removeCookie } from '../services/cookies';
 
+import { useCookies } from '../hooks/useCookies';
+
 export interface AuthContextData {
     token: string | undefined;
     setToken(token: string): void;
@@ -19,6 +21,7 @@ export interface AuthContextData {
     isAuthenticated(): boolean;
     getTokenCookie(): string | null;
     setTokenCookie(token: string, expires: number): void;
+    refreshToken(): Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -32,6 +35,8 @@ export const AuthContext = createContext<AuthContextData>(
 export const AuthProvider: React.FC<AuthProviderProps> = ({
     children
 }: AuthProviderProps) => {
+    const { isCookiesAccepted } = useCookies();
+
     const [token, setToken] = useState<string | undefined>(undefined);
 
     const login = async (token: string): Promise<UserProxy> => {
@@ -74,6 +79,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         window.location.reload();
     };
 
+    const refreshToken = async (): Promise<void> => {
+        const response = await api.post<TokenProxy>(
+            '/auth/refresh',
+            {},
+            {
+                headers: { Authorization: 'Bearer ' + token }
+            }
+        );
+
+        setToken(response.data.token);
+
+        if (isCookiesAccepted) {
+            const expLen = response.data.expiresIn.length - 1;
+            const expires =
+                response.data.expiresIn[expLen] === 'a'
+                    ? parseInt(response.data.expiresIn.substr(0, expLen)) * 365
+                    : parseInt(response.data.expiresIn[expLen]);
+            setTokenCookie(response.data.token, expires);
+        }
+    };
+
     return (
         //#region JSX
 
@@ -87,7 +113,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
                 logout,
                 isAuthenticated,
                 getTokenCookie,
-                setTokenCookie
+                setTokenCookie,
+                refreshToken
             }}
         >
             {children}
