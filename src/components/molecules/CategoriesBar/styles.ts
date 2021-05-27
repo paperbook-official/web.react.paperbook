@@ -17,14 +17,16 @@ export const Container = styled.div`
 `;
 
 export const Category = styled.span`
-    font-size: 1rem;
     color: ${(props) => props.theme.colors.background};
+    font-size: 1rem;
+    white-space: nowrap;
+
     cursor: pointer;
 
     transition: all 0.2s;
 
     &:hover {
-        font-size: 1.1rem;
         color: ${(props) => props.theme.colors.defaultGrey};
+        font-size: 1.1rem;
     }
 `;
