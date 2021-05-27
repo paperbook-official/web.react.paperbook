@@ -68,6 +68,7 @@ interface SearchProductsProps {
     minPrice?: string;
     maxPrice?: string;
     state?: string;
+    hasDiscount?: boolean;
     freeOfInterests?: boolean;
 }
 
@@ -169,6 +170,7 @@ const Search: React.FC = (): JSX.Element => {
         const categoryId = getParam('catId', searchParams?.categoryId);
         const state = getParam('state', searchParams?.state);
         const freeOfInterests = query.get('interestFree');
+        const hasDiscount = query.get('hasDiscount');
 
         const search = formatQueryToCommon(
             getParam('search', searchParams?.search)
@@ -195,6 +197,7 @@ const Search: React.FC = (): JSX.Element => {
             queryMinPrice,
             queryMaxPrice,
             state,
+            searchParams?.hasDiscount || hasDiscount === 'true',
             searchParams?.freeOfInterests || freeOfInterests === 'true'
         );
 
@@ -257,6 +260,7 @@ const Search: React.FC = (): JSX.Element => {
             maxPrice: '',
             state: '',
             userId: '',
+            hasDiscount: false,
             freeOfInterests: false
         });
 
@@ -324,6 +328,24 @@ const Search: React.FC = (): JSX.Element => {
 
             await searchProductsPage({
                 freeOfInterests: true
+            });
+        }
+
+        setLoadingContent(false);
+    };
+
+    const handleHasDiscount = async (): Promise<void> => {
+        setLoadingContent(true);
+
+        const origUrl = getCurrentUrl();
+        const url = insertParamInQuery(origUrl, 'hasDiscount', 'true');
+
+        if (decodeURIComponent(url) !== decodeURIComponent(origUrl)) {
+            const to = removeQueryParam(url, 'page');
+            history.push(to);
+
+            await searchProductsPage({
+                hasDiscount: true
             });
         }
 
@@ -549,6 +571,12 @@ const Search: React.FC = (): JSX.Element => {
                             }
                         >
                             Sem juros
+                        </Topic>
+                        <Topic
+                            onClick={handleHasDiscount}
+                            className={query.get('hasDiscount') ? 'active' : ''}
+                        >
+                            Em oferta
                         </Topic>
                     </TopicsContainer>
                     <TopicsContainer>
