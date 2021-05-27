@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { CEPProxy } from '../../../models/proxies/cep/cep';
 import { ProductProxy } from '../../../models/proxies/product/product';
@@ -50,6 +51,7 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
     review
 }: ProductBuyingCardProps): JSX.Element => {
     const theme = useTheme();
+    const history = useHistory();
 
     const [buyAmount, setBuyAmount] = useState(1);
 
@@ -62,6 +64,10 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
     const handleAmountChange = (amount: number): void => {
         setBuyAmount(amount);
         onAmountChange(amount);
+    };
+
+    const onSellerClick = (userId: number): void => {
+        history.push('/products?userId=' + userId);
     };
 
     return (
@@ -115,7 +121,15 @@ const ProductBuyingCard: React.FC<ProductBuyingCardProps> = ({
             />
 
             <SellerContainer>
-                Vendedor <span className="seller">{product.user?.name}</span>
+                Vendedor{' '}
+                <span
+                    className="seller"
+                    onClick={() =>
+                        product.user && onSellerClick(product.user.id)
+                    }
+                >
+                    {product.user?.name}
+                </span>
             </SellerContainer>
 
             <AmountPicker
