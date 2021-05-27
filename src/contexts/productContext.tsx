@@ -13,6 +13,7 @@ import { RatingProxy } from '../models/proxies/rating/rating';
 import api from '../services/api';
 
 import { useAuth } from '../hooks/useAuth';
+import { useUser } from '../hooks/useUser';
 
 import { insertParamInQuery } from '../utils/formatters';
 
@@ -30,6 +31,12 @@ export interface ProductContextData {
     getProductReview(id: number): Promise<ProductReviewProxy>;
     uploadImage(image: File): Promise<ImageUploadProxy>;
     createProductRating(rating: CreateRating): Promise<void>;
+    getUserProducts(
+        page: number,
+        limit: number,
+        join?: string[],
+        filter?: string[]
+    ): Promise<GetMany<ProductProxy> | null>;
     getUserProductRating(
         userId: number,
         productId: number
@@ -46,6 +53,7 @@ export interface ProductContextData {
         orderBy?: string[],
         name?: string,
         categoryId?: string,
+        userId?: string,
         minPrice?: string,
         maxPrice?: string,
         state?: string,
@@ -111,6 +119,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     children
 }: ProductProviderProps) => {
     const { token } = useAuth();
+    const { me } = useUser();
 
     const concatParam = (url: string, param: string, value: string[]) => {
         let fullUrl: string = url;
@@ -135,9 +144,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
     const uploadImage = async (image: File): Promise<ImageUploadProxy> => {
         const formData = new FormData();
-        console.log(image);
         formData.append('file', image);
-        console.log(formData.getAll('file'));
         const response = await api.post<ImageUploadProxy>(
             '/medias/upload',
             formData,
@@ -148,14 +155,18 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
                 }
             }
         );
-        console.log(response);
         return response.data;
     };
 
     const createProduct = async (
         product: CreateProductPayload
     ): Promise<ProductProxy> => {
-        const response = await api.post<ProductProxy>('/products', product);
+        const response = await api.post<ProductProxy>('/products', product, {
+            headers: {
+                Authorization: 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
         return response.data;
     };
 
@@ -243,6 +254,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         orderBy: string[] = [],
         name?: string,
         categoryId?: string,
+        userId?: string,
         minPrice?: string,
         maxPrice?: string,
         state?: string,
@@ -261,11 +273,13 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
             'freeOfInterests',
             freeOfInterests ? 'true' : ''
         );
+
+        if (userId)
+            url = insertParamInQuery(url, 'filter', `userId||$eq||${userId}`);
+
         url = insertParamInQuery(url, 'limit', limit);
         url = insertParamInQuery(url, 'offset', offset);
         url = insertParamInQuery(url, 'page', page);
-
-        console.log(url);
 
         const response = await api.get<GetMany<ProductProxy>>(url);
         return response.data;
@@ -289,6 +303,31 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
             headers: { Authorization: 'Bearer ' + token }
         });
         return response.data;
+    };
+
+    const getUserProducts = async (
+        page: number,
+        limit: number,
+        join = ['user||name', 'ratings', 'categories'],
+        filter: string[] = []
+    ): Promise<GetMany<ProductProxy> | null> => {
+        if (me) {
+            let url: string = concatParam(
+                '/users/me/products?',
+                'filter',
+                filter
+            );
+            url = concatParam(url, 'join', join);
+
+            url = insertParamInQuery(url, 'limit', limit);
+            url = insertParamInQuery(url, 'page', page);
+
+            const response = await api.get<GetMany<ProductProxy>>(url, {
+                headers: { Authorization: 'Bearer ' + token }
+            });
+            return response.data;
+        }
+        return null;
     };
 
     const getProductsByPrice = async (
@@ -405,6 +444,7 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
                 getProductRatings,
                 getProductReview,
                 createProductRating,
+                getUserProducts,
                 updateProductRating,
                 getUserProductRating,
                 searchProducts,
