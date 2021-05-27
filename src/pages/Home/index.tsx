@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
+import { RolesEnum } from '../../models/enums/user';
 import { GetMany } from '../../models/getMany';
 import { CategoryProxy } from '../../models/proxies/category/category';
 import { ProductProxy } from '../../models/proxies/product/product';
@@ -52,7 +53,7 @@ const Home: React.FC = (): JSX.Element => {
         getProductsOnSale,
         getInterestFree,
         getRecentProducts
-        // getWellRated
+        // getMostBought
     } = useProduct();
     const { getCategories } = useCategory();
     const { me } = useUser();
@@ -117,15 +118,15 @@ const Home: React.FC = (): JSX.Element => {
     useEffect(() => {
         getCategoriesList();
         getCustomCardProduct();
-        updateElements();
+        if (history.location.pathname === '/') updateElements();
     }, []);
 
     useEffect(() => {
-        updateElements();
+        if (history.location.pathname === '/') updateElements();
     }, [isSellerModalVisible]);
 
     window.onscroll = (): void => {
-        updateElements();
+        if (history.location.pathname === '/') updateElements();
     };
 
     const scrollDown = (): void => {
@@ -222,7 +223,10 @@ const Home: React.FC = (): JSX.Element => {
     };
 
     const canSell = (): boolean => {
-        return me?.permissions === 'seller' || me?.permissions === 'admin';
+        return (
+            me?.permissions === RolesEnum.SELLER ||
+            me?.permissions === RolesEnum.ADMIN
+        );
     };
 
     return (
@@ -309,9 +313,9 @@ const Home: React.FC = (): JSX.Element => {
                     }
                 />
                 {/* <ProductList
-                    topicTitle={`Bem avaliados`}
+                    topicTitle={`Mais comprados`}
                     request={(i: number, p: number) =>
-                        getProductsByTopic(i, p, getWellRated)
+                        getProductsByTopic(i, p, getMostBought)
                     }
                     onProductClick={(product) =>
                         history.push('/products/' + product.id)

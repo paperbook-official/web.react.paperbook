@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ProductProxy } from '../../../models/proxies/product/product';
 
@@ -35,15 +35,33 @@ const ProductCard: React.FC<ProductCardProps> = ({
 }: ProductCardProps): JSX.Element => {
     const theme = useTheme();
 
-    const [currentPrice] = useState(product.price * (1 - product.discount));
-    const [currentInstallmentPrice] = useState(
-        !product.installmentPrice || product.installmentPrice <= product.price
-            ? currentPrice
-            : product.installmentPrice * (1 - product.discount)
-    );
-    const [hasDiscount] = useState(product.discount > 0);
-    const [hasInstallment] = useState(product.installmentAmount > 1);
-    const [isInterestFree] = useState(currentPrice >= currentInstallmentPrice);
+    const [currentPrice, setCurrentPrice] = useState(0);
+    const [currentInstallmentPrice, setCurrentInstallmentPrice] = useState(0);
+    const [hasDiscount, setHasDiscount] = useState(false);
+    const [hasInstallment, setHasInstallment] = useState(false);
+    const [isInterestFree, setInterestFree] = useState(false);
+
+    const initialState = async (): Promise<void> => {
+        const current = product.price * (1 - product.discount);
+        const currentInst =
+            !product.installmentPrice ||
+            product.installmentPrice <= product.price
+                ? current
+                : product.installmentPrice * (1 - product.discount);
+        setCurrentPrice(current);
+        setCurrentInstallmentPrice(currentInst);
+        setHasDiscount(product.discount > 0);
+        setHasInstallment(product.installmentAmount > 1);
+        setInterestFree(current >= currentInst);
+    };
+
+    useEffect(() => {
+        initialState();
+    }, []);
+
+    useEffect(() => {
+        initialState();
+    }, [product]);
 
     const getInstallment = (): number => {
         return currentInstallmentPrice / product.installmentAmount;

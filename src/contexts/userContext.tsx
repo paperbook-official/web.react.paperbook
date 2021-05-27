@@ -23,6 +23,7 @@ export interface UserContextData {
         address: UpdateAddressPayload,
         addressId: number
     ): Promise<void>;
+    updateUserRole(userId: number, role: string): Promise<void>;
     deleteUserAddress(addressId: number): Promise<void>;
 }
 
@@ -79,6 +80,19 @@ export const UserProvider: React.FC<UserProviderProps> = ({
         });
     };
 
+    const updateUserRole = async (
+        userId: number,
+        role: string
+    ): Promise<void> => {
+        await api.put(
+            `/users/${userId}/to-${role}`,
+            {},
+            {
+                headers: { Authorization: 'Bearer ' + token }
+            }
+        );
+    };
+
     const createUserAddress = async (
         address: CreateAddressPayload
     ): Promise<AddressProxy> => {
@@ -124,6 +138,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({
                 createUserAddress,
                 getUserAddresses,
                 updateUserAddress,
+                updateUserRole,
                 deleteUserAddress
             }}
         >

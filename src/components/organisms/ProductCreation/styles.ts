@@ -27,6 +27,10 @@ export const Container = styled.div`
 
     & .category-selector {
         width: 100%;
+
+        svg {
+            pointer-events: none;
+        }
     }
 
     & .category-selector-control {

@@ -8,15 +8,21 @@ import { BookReader, Container, EditIcon } from './styles';
 
 interface ImagePickerProps {
     onImagePick(image: File): void;
+    imageUrl?: string;
 }
 
 const ImagePicker: React.FC<ImagePickerProps> = ({
-    onImagePick
+    onImagePick,
+    imageUrl
 }: ImagePickerProps): JSX.Element => {
     const { show } = useActionResult();
 
     const [image, setImage] = useState('');
     const [imageFile, setImageFile] = useState<File>();
+
+    useEffect(() => {
+        if (imageUrl) setImage(imageUrl);
+    }, [imageUrl]);
 
     useEffect(() => {
         if (imageFile) onImagePick(imageFile);

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
+import { RolesEnum } from '../../../models/enums/user';
 import { UserProxy } from '../../../models/proxies/user/user';
 
 import { useActionResult } from '../../../hooks/useActionResult';
+import { useAuth } from '../../../hooks/useAuth';
 import { useUser } from '../../../hooks/useUser';
 
 import {
@@ -30,7 +32,8 @@ interface SellerIdentificationProps {
 const SellerIdentification: React.FC<SellerIdentificationProps> = ({
     onConfirmClick
 }: SellerIdentificationProps): JSX.Element => {
-    const { me, setMe, updateUser } = useUser();
+    const { refreshToken } = useAuth();
+    const { me, setMe, updateUser, updateUserRole } = useUser();
     const { show } = useActionResult();
 
     const [user, setUser] = useState<UserProxy>();
@@ -94,7 +97,11 @@ const SellerIdentification: React.FC<SellerIdentificationProps> = ({
                     user.id
                 );
 
-                setMe(user);
+                await updateUserRole(user.id, 'seller');
+
+                setMe({ ...user, permissions: RolesEnum.SELLER });
+
+                refreshToken();
 
                 setTimeout(() => {
                     setContainerScale(0);

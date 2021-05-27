@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router';
 
-import { BrStatesEnum } from '../../models/enums/brStates';
+// import { BrStatesEnum } from '../../models/enums/brStates';
 import { GetMany } from '../../models/getMany';
 import { CategoryProxy } from '../../models/proxies/category/category';
 import { ProductProxy } from '../../models/proxies/product/product';
@@ -64,6 +64,7 @@ interface SearchProductsProps {
     order?: string[];
     search?: string;
     categoryId?: string;
+    userId?: string;
     minPrice?: string;
     maxPrice?: string;
     state?: string;
@@ -86,7 +87,7 @@ const Search: React.FC = (): JSX.Element => {
     const [products, setProducts] = useState<ProductProxy[]>([]);
     const [categories, setCategories] = useState<CategoryProxy[]>([]);
     const [allCategories, setAllCategories] = useState<CategoryProxy[]>([]);
-    const [brStates, setBrStates] = useState<string[][]>();
+    // const [brStates, setBrStates] = useState<string[][]>();
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     // const [sortBy, setSortBy] = useState<number>();
@@ -103,35 +104,35 @@ const Search: React.FC = (): JSX.Element => {
         return history.location.pathname + history.location.search;
     };
 
-    const isState = (state: string): state is keyof typeof BrStatesEnum => {
-        return Object.keys(BrStatesEnum).indexOf(state) !== -1;
-    };
+    // const isState = (state: string): state is keyof typeof BrStatesEnum => {
+    //     return Object.keys(BrStatesEnum).indexOf(state) !== -1;
+    // };
 
-    const getBrStates = (): void => {
-        const states: string[][] = [];
-        const queryState = query.get('state');
+    // const getBrStates = (): void => {
+    //     const states: string[][] = [];
+    //     const queryState = query.get('state');
 
-        if (queryState && isState(queryState)) {
-            states.push([queryState, BrStatesEnum[queryState]]);
-        }
+    //     if (queryState && isState(queryState)) {
+    //         states.push([queryState, BrStatesEnum[queryState]]);
+    //     }
 
-        while (states.length < 9) {
-            for (const state in BrStatesEnum) {
-                if (isState(state)) {
-                    const brState = BrStatesEnum[state];
-                    if (
-                        Math.random() >= 0.4 &&
-                        !states.join().includes(brState)
-                    ) {
-                        states.push([state, brState]);
-                        if (states.length === 9) break;
-                    }
-                }
-            }
-        }
-        states.sort((s1, s2) => (s1[1] < s2[1] ? -1 : 1));
-        setBrStates(states);
-    };
+    //     while (states.length < 9) {
+    //         for (const state in BrStatesEnum) {
+    //             if (isState(state)) {
+    //                 const brState = BrStatesEnum[state];
+    //                 if (
+    //                     Math.random() >= 0.4 &&
+    //                     !states.join().includes(brState)
+    //                 ) {
+    //                     states.push([state, brState]);
+    //                     if (states.length === 9) break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     states.sort((s1, s2) => (s1[1] < s2[1] ? -1 : 1));
+    //     setBrStates(states);
+    // };
 
     const setQueryParam = (
         param: string,
@@ -164,6 +165,7 @@ const Search: React.FC = (): JSX.Element => {
             return param;
         };
 
+        const userId = getParam('userId', searchParams?.userId);
         const categoryId = getParam('catId', searchParams?.categoryId);
         const state = getParam('state', searchParams?.state);
         const freeOfInterests = query.get('interestFree');
@@ -176,6 +178,11 @@ const Search: React.FC = (): JSX.Element => {
 
         const queryPage = query.get('page');
 
+        const category = formatQueryToCommon(query.get('category') || '');
+
+        const queryToCommon = search || category || '';
+        setTitle(userId ? 'Anúncios do vendedor' : queryToCommon);
+
         const response = await searchProducts(
             searchParams?.page || parseInt(queryPage || '1'),
             searchParams?.offset || 0,
@@ -184,6 +191,7 @@ const Search: React.FC = (): JSX.Element => {
             searchParams?.order || [],
             search.toLowerCase(),
             categoryId,
+            userId,
             queryMinPrice,
             queryMaxPrice,
             state,
@@ -205,22 +213,20 @@ const Search: React.FC = (): JSX.Element => {
         if (
             !location ||
             location === '' ||
-            !(location.includes('search') || location.includes('category'))
+            !(
+                location.includes('search') ||
+                location.includes('category') ||
+                location.includes('userId')
+            )
         ) {
             history.push('/');
         } else {
             setQueryParam('displayType', 'G');
             const currentPage = setQueryParam('page', 1);
 
-            const search = formatQueryToCommon(query.get('search') || ''),
-                category = formatQueryToCommon(query.get('category') || '');
-
-            const queryToCommon = search || category || '';
-            setTitle(queryToCommon);
-
             const responseCat = await getCategories(9);
             setCategories(responseCat);
-            getBrStates();
+            // getBrStates();
 
             await searchProductsPage({
                 page: currentPage as number
@@ -250,6 +256,7 @@ const Search: React.FC = (): JSX.Element => {
             minPrice: '',
             maxPrice: '',
             state: '',
+            userId: '',
             freeOfInterests: false
         });
 
@@ -438,21 +445,21 @@ const Search: React.FC = (): JSX.Element => {
         setLoadingModal(false);
     };
 
-    const handleSeeAllStates = (): void => {
-        setModalVisible(true);
-        setLoadingModal(true);
+    // const handleSeeAllStates = (): void => {
+    //     setModalVisible(true);
+    //     setLoadingModal(true);
 
-        const states = [];
+    //     const states = [];
 
-        for (const state in BrStatesEnum) {
-            if (state && isState(state)) {
-                states.push({ id: state, name: BrStatesEnum[state] });
-            }
-        }
+    //     for (const state in BrStatesEnum) {
+    //         if (state && isState(state)) {
+    //             states.push({ id: state, name: BrStatesEnum[state] });
+    //         }
+    //     }
 
-        setModalContent(states);
-        setLoadingModal(false);
-    };
+    //     setModalContent(states);
+    //     setLoadingModal(false);
+    // };
 
     const getProductRating = (product: ProductProxy): number => {
         if (product.ratings) {
@@ -504,7 +511,7 @@ const Search: React.FC = (): JSX.Element => {
                             </Topic>
                         </TopicsContainer>
                     )}
-                    {brStates && (
+                    {/* {brStates && (
                         <TopicsContainer>
                             <span className="topic-title">Localização</span>
                             {brStates.map((state, index) => (
@@ -532,7 +539,7 @@ const Search: React.FC = (): JSX.Element => {
                                 Ver todas
                             </Topic>
                         </TopicsContainer>
-                    )}
+                    )} */}
                     <TopicsContainer>
                         <span className="topic-title">Pagamento</span>
                         <Topic

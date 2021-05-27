@@ -1,5 +1,5 @@
+import { CategoryProxy } from '../category/category';
 import { OrderProxy } from '../order/order';
-import { ProductCategoryProxy } from '../productCategory/productCategory';
 import { RatingProxy } from '../rating/rating';
 import { ShoppingCartProxy } from '../shoppingCart/shoppingCart';
 import { UserProxy } from '../user/user';
@@ -22,7 +22,7 @@ export interface ProductProxy {
     // relations
     user?: UserProxy;
     orders?: OrderProxy[];
-    productsCategories?: ProductCategoryProxy[];
+    categories?: CategoryProxy[];
     ratings?: RatingProxy[];
     shoppingCarts?: ShoppingCartProxy[];
 }

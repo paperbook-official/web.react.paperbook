@@ -3,13 +3,11 @@ import Select, { components } from 'react-select';
 
 import { ActionResultEnum } from '../../../models/enums/actionResultTypes';
 import { CreateProductPayload } from '../../../models/payloads/products/createProduct';
+import { UpdateProductPayload } from '../../../models/payloads/products/updateProduct';
 import { CategoryProxy } from '../../../models/proxies/category/category';
 import { ProductProxy } from '../../../models/proxies/product/product';
 
-import api from '../../../services/api';
-
 import { useActionResult } from '../../../hooks/useActionResult';
-import { useAuth } from '../../../hooks/useAuth';
 import { useCategory } from '../../../hooks/useCategory';
 import { useProduct } from '../../../hooks/useProduct';
 import { useUser } from '../../../hooks/useUser';
@@ -34,9 +32,17 @@ interface SelectProps {
     label: string;
 }
 
-const ProductCreation: React.FC = () => {
+interface ProductCreationProps {
+    onComplete(product: ProductProxy): void;
+    product?: ProductProxy;
+}
+
+const ProductCreation: React.FC<ProductCreationProps> = ({
+    onComplete,
+    product
+}: ProductCreationProps): JSX.Element => {
     const { me } = useUser();
-    const { token } = useAuth();
+    const { createProduct, updateProduct } = useProduct();
     const { show } = useActionResult();
     const { uploadImage } = useProduct();
     const { getCategories } = useCategory();
@@ -44,7 +50,9 @@ const ProductCreation: React.FC = () => {
     const [isFormLoading, setFormLoading] = useState(false);
     const [isCategoriesLoading, setCategoriesLoading] = useState(false);
     const [categories, setCategories] = useState<SelectProps[]>([]);
+    const [isMenuOpen, setMenuOpen] = useState(false);
 
+    const [productImage, setProductImage] = useState('');
     const [image, setImage] = useState<File>();
     const [nameText, setNameText] = useState('');
     const [descriptionText, setDescriptionText] = useState('');
@@ -78,10 +86,41 @@ const ProductCreation: React.FC = () => {
         await Promise.all(promises);
         setCategories(data);
 
+        if (product) {
+            const prodCategories = product.categories?.filter((cat) =>
+                data.find((c) => cat.id === c.value.id)
+            );
+
+            setCategoriesList(prodCategories || []);
+        }
+
         setCategoriesLoading(false);
     };
 
     useEffect(() => {
+        if (product) {
+            setProductImage(product.imageUrl);
+            setNameText(product.name);
+            setDescriptionText(product.description);
+            setFullPriceText(product.price.toString());
+            setInstallmentPriceText(product.installmentPrice?.toString() || '');
+            setInstallmentAmountText(
+                product.installmentAmount?.toString() || ''
+            );
+            setDiscountAmountText(
+                product.discount ? (product.discount * 100).toString() : ''
+            );
+            setStockAmountText(product.stockAmount.toString());
+
+            setNameValid(true);
+            setDescriptionValid(true);
+            setFullPriceValid(true);
+            setInstallmentPriceValid(true);
+            setInstallmentAmountValid(true);
+            setDiscountAmountValid(true);
+            setStockAmountValid(true);
+        }
+
         initialState();
     }, []);
 
@@ -94,30 +133,32 @@ const ProductCreation: React.FC = () => {
             isInstallmentAmountValid &&
             isDiscountAmountValid &&
             isStockAmountValid &&
-            !!image &&
+            (!!image || !!productImage) &&
             categoriesList.length > 0
         );
     };
 
-    const createProduct = async (): Promise<void> => {
-        if (me && image && isFormValid()) {
+    const handleCreateClick = async (): Promise<void> => {
+        if (me && (image || productImage) && isFormValid()) {
             setFormLoading(true);
-            let imageUrl = '';
-            try {
-                console.log(image);
-                const response = await uploadImage(image);
-                imageUrl = response.url;
-            } catch (error) {
-                console.log(error);
-                show(
-                    'Erro ao enviar a imagem',
-                    'Ocorreu um erro ao enviar a imagem!',
-                    ActionResultEnum.ERROR
-                );
+            let imageUrl = productImage || '';
+
+            if (image) {
+                try {
+                    const response = await uploadImage(image);
+                    imageUrl = response.url;
+                } catch (error) {
+                    console.log(error);
+                    show(
+                        'Erro ao enviar a imagem',
+                        'Ocorreu um erro ao enviar a imagem!',
+                        ActionResultEnum.ERROR
+                    );
+                }
             }
 
             if (imageUrl) {
-                const product: CreateProductPayload = {
+                const productPayload: UpdateProductPayload = {
                     imageUrl,
                     name: nameText.trim(),
                     description: descriptionText.trim(),
@@ -142,27 +183,31 @@ const ProductCreation: React.FC = () => {
                               ) / 100
                             : undefined,
                     stockAmount: parseInt(stockAmountText.trim()),
-                    userId: me.id,
                     categoryIds: categoriesList.map((c) => c.id)
                 };
 
-                console.log(product);
-
                 try {
-                    const response = await api.post<ProductProxy>(
-                        '/products',
-                        product,
-                        {
-                            headers: {
-                                Authorization: 'Bearer ' + token,
-                                'Content-Type': 'application/json'
-                            }
-                        }
-                    );
-                    console.log(response.data);
+                    if (product) {
+                        await updateProduct(productPayload, product.id);
+                        onComplete({
+                            id: product.id,
+                            categories: categoriesList,
+                            ...productPayload
+                        } as ProductProxy);
+                    } else {
+                        const response = await createProduct({
+                            ...productPayload,
+                            userId: me.id
+                        } as CreateProductPayload);
+                        onComplete({
+                            id: response.id,
+                            categories: categoriesList,
+                            ...productPayload
+                        } as ProductProxy);
+                    }
                 } catch (error) {
                     show(
-                        'Erro ao criar produto',
+                        `Erro ao ${product ? 'atualizar' : 'criar'} o produto`,
                         'Ocorreu um erro ao enviar o produto!',
                         ActionResultEnum.ERROR
                     );
@@ -179,8 +224,8 @@ const ProductCreation: React.FC = () => {
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const Input = (props: any): JSX.Element => (
-        <components.Control
+    const ValueContainer = (props: any): JSX.Element => (
+        <components.ValueContainer
             {...props}
             className={`category-selector-control ${
                 !categoriesList[0] ? 'empty' : ''
@@ -190,18 +235,55 @@ const ProductCreation: React.FC = () => {
             {categoriesList.length > 1 && (
                 <span className="rest"> +{categoriesList.length - 1}</span>
             )}
-        </components.Control>
+        </components.ValueContainer>
     );
+
+    const getSelectDefaultValue = (): SelectProps[] => {
+        const list = categoriesList.map((c) => c.id);
+        return categories.filter((cat) => list.includes(cat.value.id));
+    };
+
+    window.onclick = (event: MouseEvent): void => {
+        const target = event.target as HTMLElement;
+
+        const containsClass = (className: string): boolean => {
+            return target.classList.contains(className);
+        };
+
+        const classes = [
+            'category-selector',
+            'category-selector-control',
+            'selector__control',
+            'selector__indicator',
+            'selector__indicators',
+            'selector__indicator-separator'
+        ];
+
+        if (classes.some((c) => containsClass(c)) && !isMenuOpen) {
+            setMenuOpen(true);
+        }
+        if (
+            !containsClass('selector__menu') &&
+            !containsClass('selector__option') &&
+            isMenuOpen
+        ) {
+            setMenuOpen(false);
+        }
+    };
 
     return (
         <Container>
             <div className="field-row" style={{ height: 220 }}>
                 <ImagePickerContainer>
-                    <ImagePicker onImagePick={setImage} />
+                    <ImagePicker
+                        onImagePick={setImage}
+                        imageUrl={productImage}
+                    />
                 </ImagePickerContainer>
                 <FieldsContainer style={{ width: '47%' }}>
                     <div className="field-row">
                         <TextField
+                            value={fullPriceText}
                             label="Preço"
                             name="priceInput"
                             onTextChange={setFullPriceText}
@@ -217,6 +299,7 @@ const ProductCreation: React.FC = () => {
                     </div>
                     <div className="field-row">
                         <TextField
+                            value={installmentPriceText}
                             label="Preço parcelado"
                             name="installmentPriceInput"
                             onTextChange={setInstallmentPriceText}
@@ -233,6 +316,7 @@ const ProductCreation: React.FC = () => {
                     </div>
                     <div className="field-row">
                         <TextField
+                            value={discountAmountText}
                             label="Desconto em %"
                             name="discountAmountInput"
                             onTextChange={setDiscountAmountText}
@@ -249,9 +333,10 @@ const ProductCreation: React.FC = () => {
                     </div>
                 </FieldsContainer>
             </div>
-            <FieldsContainer style={{ marginTop: -10 }}>
+            <FieldsContainer>
                 <div className="field-row">
                     <TextField
+                        value={nameText}
                         label="Nome"
                         name="nameInput"
                         onTextChange={setNameText}
@@ -264,6 +349,7 @@ const ProductCreation: React.FC = () => {
                 </div>
                 <div className="field-row">
                     <TextField
+                        value={descriptionText}
                         label="Descrição"
                         name="descriptionInput"
                         onTextChange={setDescriptionText}
@@ -276,6 +362,7 @@ const ProductCreation: React.FC = () => {
                 </div>
                 <div className="field-row">
                     <TextField
+                        value={installmentAmountText}
                         label="Quantidade de parcelas"
                         name="installmentAmountInput"
                         onTextChange={setInstallmentAmountText}
@@ -290,6 +377,7 @@ const ProductCreation: React.FC = () => {
                         style={{ width: '47%' }}
                     />
                     <TextField
+                        value={stockAmountText}
                         label="Quantidade em estoque"
                         name="stockAmountInput"
                         onTextChange={setStockAmountText}
@@ -303,24 +391,39 @@ const ProductCreation: React.FC = () => {
                         style={{ width: '47%' }}
                     />
                 </div>
-                <div className="field-row">
-                    <Select
-                        isLoading={isCategoriesLoading}
-                        closeMenuOnSelect={false}
-                        isMulti
-                        name="categories"
-                        options={categories}
-                        placeholder=""
-                        className="category-selector"
-                        menuPlacement="auto"
-                        backspaceRemovesValue
-                        controlShouldRenderValue={false}
-                        components={{
-                            Input
-                        }}
-                        onChange={onCategorySelect}
-                    />
-                </div>
+                {!isCategoriesLoading &&
+                    (product ? categoriesList.length > 0 : true) &&
+                    categories.length > 0 && (
+                        <div className="field-row">
+                            <Select
+                                isLoading={isCategoriesLoading}
+                                closeMenuOnSelect={false}
+                                isMulti
+                                name="categories"
+                                defaultValue={[...getSelectDefaultValue()]}
+                                options={categories}
+                                placeholder=""
+                                className="category-selector"
+                                classNamePrefix="selector"
+                                menuPlacement="top"
+                                backspaceRemovesValue
+                                controlShouldRenderValue={false}
+                                components={{
+                                    ValueContainer
+                                }}
+                                onChange={onCategorySelect}
+                                menuIsOpen={isMenuOpen}
+                            />
+                        </div>
+                    )}
+                {isCategoriesLoading && (
+                    <div
+                        className="field-row"
+                        style={{ justifyContent: 'center' }}
+                    >
+                        <LoadingDots />
+                    </div>
+                )}
             </FieldsContainer>
             {isFormLoading ? (
                 <LoadingDots />
@@ -328,9 +431,9 @@ const ProductCreation: React.FC = () => {
                 <CreateButton
                     disabled={!isFormValid()}
                     className={!isFormValid() ? 'disabled' : ''}
-                    onClick={createProduct}
+                    onClick={handleCreateClick}
                 >
-                    Criar
+                    {product ? 'Atualizar' : 'Criar'}
                 </CreateButton>
             )}
         </Container>

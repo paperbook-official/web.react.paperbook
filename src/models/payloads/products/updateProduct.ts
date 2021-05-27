@@ -7,4 +7,5 @@ export interface UpdateProductPayload {
     installmentAmount?: number;
     discount?: number;
     stockAmount?: number;
+    categoryIds?: number[];
 }
