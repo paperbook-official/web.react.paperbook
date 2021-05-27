@@ -21,6 +21,7 @@ const Button: React.FC<ButtonProps> = ({
 }: ButtonProps): JSX.Element => {
     return (
         <Container
+            disabled={disabled}
             className={isLoading ? 'loading' : disabled ? 'disabled' : ''}
             style={style}
             onClick={handleClick}

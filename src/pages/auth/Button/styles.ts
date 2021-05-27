@@ -35,6 +35,7 @@ export const Container = styled.button`
     }
 
     &.disabled {
+        pointer-events: none;
         border: 3px solid ${(props) => props.theme.colors.defaultGrey};
         background-color: transparent;
         cursor: default;
