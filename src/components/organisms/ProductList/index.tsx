@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { GetMany } from '../../../models/getMany';
 import { ProductProxy } from '../../../models/proxies/product/product';
 
+import { useLoading } from '../../../hooks/useLoading';
+
 import { useTheme } from 'styled-components';
 
 import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-right.svg';
@@ -33,6 +35,7 @@ const ProductList: React.FC<ProductListProps> = ({
     style
 }: ProductListProps) => {
     const theme = useTheme();
+    const { isLoadingContent, setLoadingContent } = useLoading();
 
     const [itemsPerPage, setItemsPerPage] = useState(0);
     const [page, setPage] = useState(1);
@@ -72,13 +75,18 @@ const ProductList: React.FC<ProductListProps> = ({
     };
 
     const nextPage = async (): Promise<void> => {
+        setLoadingContent(true);
+
         const nPage = page + 1;
+        setCurrentProducts(getPageContent(nPage));
+        setPage(nPage);
+
         if (totalProducts && totalProducts > productsList.length) {
             const response = await request(itemsPerPage, nPage + 1);
             setProductsList([...productsList, ...response.data]);
         }
-        setCurrentProducts(getPageContent(nPage));
-        setPage(nPage);
+
+        setLoadingContent(false);
     };
 
     const previousPage = (): void => {
@@ -122,8 +130,11 @@ const ProductList: React.FC<ProductListProps> = ({
                             onClick={previousPage}
                             style={{
                                 marginLeft: 20,
-                                opacity: page > 1 ? 1 : 0,
-                                pointerEvents: page > 1 ? 'visible' : 'none'
+                                opacity: !isLoadingContent && page > 1 ? 1 : 0,
+                                pointerEvents:
+                                    !isLoadingContent && page > 1
+                                        ? 'visible'
+                                        : 'none'
                             }}
                         >
                             <ArrowIcon
@@ -143,10 +154,12 @@ const ProductList: React.FC<ProductListProps> = ({
                             onClick={nextPage}
                             style={{
                                 marginRight: 20,
-                                opacity: hasMorePages() ? 1 : 0,
-                                pointerEvents: hasMorePages()
-                                    ? 'visible'
-                                    : 'none'
+                                opacity:
+                                    !isLoadingContent && hasMorePages() ? 1 : 0,
+                                pointerEvents:
+                                    !isLoadingContent && hasMorePages()
+                                        ? 'visible'
+                                        : 'none'
                             }}
                         >
                             <ArrowIcon
