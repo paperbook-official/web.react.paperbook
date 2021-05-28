@@ -53,8 +53,8 @@ const Home: React.FC = (): JSX.Element => {
         getProductsByPrice,
         getProductsOnSale,
         getInterestFree,
-        getRecentProducts
-        // getMostBought
+        getRecentProducts,
+        getMostBought
     } = useProduct();
     const { getCategories, getCategoryById } = useCategory();
     const { me } = useUser();
@@ -341,7 +341,7 @@ const Home: React.FC = (): JSX.Element => {
                         history.push('/products/' + product.id)
                     }
                 />
-                {/* <ProductList
+                <ProductList
                     topicTitle={`Mais comprados`}
                     request={(i: number, p: number) =>
                         getProductsByTopic(i, p, getMostBought)
@@ -349,7 +349,7 @@ const Home: React.FC = (): JSX.Element => {
                     onProductClick={(product) =>
                         history.push('/products/' + product.id)
                     }
-                /> */}
+                />
             </SecondPageContainer>
             <HeaderContainer
                 style={{ transform: `translateY(${headerPosition}px)` }}

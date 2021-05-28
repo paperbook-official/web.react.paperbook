@@ -461,7 +461,11 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         join = ['user||name', 'ratings'],
         orderBy: string[] = []
     ): Promise<GetMany<ProductProxy>> => {
-        let url: string = concatParam('/products?', 'sort', orderBy);
+        let url: string = concatParam(
+            '/products/most-bought?',
+            'sort',
+            orderBy
+        );
         url = concatParam(url, 'join', join);
 
         url = insertParamInQuery(url, 'limit', limit);
