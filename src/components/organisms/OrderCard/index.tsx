@@ -26,7 +26,6 @@ import {
     Price,
     ProductGroupCard,
     RateIcon,
-    Seller,
     StatusContainer,
     Title,
     TrackingCode
@@ -242,9 +241,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
                                     <InfoContainer>
                                         <div className="title-seller">
                                             <Title>{product.name}</Title>
-                                            <Seller>
-                                                {product.user?.name || 'Seller'}
-                                            </Seller>
                                         </div>
                                         <div className="product-price">
                                             <Price>

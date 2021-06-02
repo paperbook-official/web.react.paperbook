@@ -192,15 +192,6 @@ export const ImageContainer = styled.div`
     }
 `;
 
-export const Seller = styled.span`
-    color: ${(props) => props.theme.colors.defaultHighlightGreyBlue};
-    cursor: pointer;
-
-    &:hover {
-        color: ${(props) => props.theme.colors.defaultBlue};
-    }
-`;
-
 export const RateIcon = styled(RateSVG)`
     height: 24px;
     width: 24px;
