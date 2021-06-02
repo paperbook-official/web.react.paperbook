@@ -58,7 +58,6 @@ interface GenericObject {
 
 interface SearchProductsProps {
     page?: number;
-    offset?: number;
     itemsPerPage?: number;
     join?: string[];
     order?: string[];
@@ -185,21 +184,21 @@ const Search: React.FC = (): JSX.Element => {
         const queryToCommon = search || category || '';
         setTitle(userId ? 'Anúncios do vendedor' : queryToCommon);
 
-        const response = await searchProducts(
-            searchParams?.page || parseInt(queryPage || '1'),
-            searchParams?.offset || 0,
-            searchParams?.itemsPerPage || itemsPerPage,
-            searchParams?.join || ['ratings'],
-            searchParams?.order || [],
-            search.toLowerCase(),
+        const response = await searchProducts({
+            page: searchParams?.page || parseInt(queryPage || '1'),
+            limit: searchParams?.itemsPerPage || itemsPerPage,
+            join: searchParams?.join || ['ratings'],
+            orderBy: searchParams?.order || [],
+            name: search.toLowerCase(),
             categoryId,
             userId,
-            queryMinPrice,
-            queryMaxPrice,
+            minPrice: queryMinPrice,
+            maxPrice: queryMaxPrice,
             state,
-            searchParams?.hasDiscount || hasDiscount === 'true',
-            searchParams?.freeOfInterests || freeOfInterests === 'true'
-        );
+            hasDiscount: searchParams?.hasDiscount || hasDiscount === 'true',
+            freeOfInterests:
+                searchParams?.freeOfInterests || freeOfInterests === 'true'
+        });
 
         setProducts(response.data);
         setTotalMatches(response.total);

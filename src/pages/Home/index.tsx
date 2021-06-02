@@ -10,6 +10,8 @@ import { useCategory } from '../../hooks/useCategory';
 import { useProduct } from '../../hooks/useProduct';
 import { useUser } from '../../hooks/useUser';
 
+import { QueryParams } from '../../contexts/productContext';
+
 import FloatButton from '../../components/atoms/FloatButton';
 import LoadingDots from '../../components/atoms/LoadingDots';
 import Modal from '../../components/atoms/Modal';
@@ -154,7 +156,7 @@ const Home: React.FC = (): JSX.Element => {
 
     const getCustomCardProduct = async (): Promise<void> => {
         setLoadingCustomCard(true);
-        const response = await getRecentProducts(1, 0, 1);
+        const response = await getRecentProducts({ page: 1, limit: 1 });
         setCustomCardProduct(response.data[0]);
         setLoadingCustomCard(false);
     };
@@ -162,16 +164,9 @@ const Home: React.FC = (): JSX.Element => {
     const getProductsByTopic = async (
         itemsPerPage: number,
         page: number,
-        request: (
-            page: number,
-            offset: number,
-            itemsPerPage: number,
-            join?: string[],
-            orderBy?: string[]
-        ) => Promise<GetMany<ProductProxy>>
+        request: (queryParams: QueryParams) => Promise<GetMany<ProductProxy>>
     ): Promise<GetMany<ProductProxy>> => {
-        const offset = 0;
-        const data = await request(page, offset, itemsPerPage);
+        const data = await request({ page, limit: itemsPerPage });
         return data;
     };
 
@@ -179,13 +174,10 @@ const Home: React.FC = (): JSX.Element => {
         itemsPerPage: number,
         page: number
     ): Promise<GetMany<ProductProxy>> => {
-        const offset = 0;
-        const data = await getProductsByPrice(
-            randomPrice,
+        const data = await getProductsByPrice(randomPrice, {
             page,
-            offset,
-            itemsPerPage
-        );
+            limit: itemsPerPage
+        });
         return data;
     };
 
@@ -193,13 +185,10 @@ const Home: React.FC = (): JSX.Element => {
         itemsPerPage: number,
         page: number
     ): Promise<GetMany<ProductProxy>> => {
-        const offset = 0;
-        const data = await getProductsByCategory(
-            randomCategory,
+        const data = await getProductsByCategory(randomCategory, {
             page,
-            offset,
-            itemsPerPage
-        );
+            limit: itemsPerPage
+        });
         return data;
     };
 

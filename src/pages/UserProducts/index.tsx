@@ -51,7 +51,10 @@ const UserProducts: React.FC = () => {
 
         const queryPage = parseInt(query.get('page') || '1');
 
-        const response = await getUserProducts(queryPage, itemsPerPage);
+        const response = await getUserProducts({
+            page: queryPage,
+            limit: itemsPerPage
+        });
 
         if (response) {
             setProducts(response.data);
@@ -85,7 +88,10 @@ const UserProducts: React.FC = () => {
             setPage(pageNumber);
             window.scrollTo(0, 0);
 
-            const response = await getUserProducts(pageNumber, itemsPerPage);
+            const response = await getUserProducts({
+                page: pageNumber,
+                limit: itemsPerPage
+            });
             if (response) setProducts(response.data);
         }
 
