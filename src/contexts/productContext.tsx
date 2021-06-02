@@ -19,6 +19,29 @@ import { insertParamInQuery } from '../utils/formatters';
 
 import { AxiosResponse } from 'axios';
 
+export interface QueryParams {
+    page: number;
+    limit: number;
+    join?: string[];
+    filter?: string[];
+    orderBy?: string[];
+}
+
+export interface SearchParams {
+    page: number;
+    limit: number;
+    join?: string[];
+    orderBy?: string[];
+    name?: string;
+    categoryId?: string;
+    userId?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    state?: string;
+    hasDiscount?: boolean;
+    freeOfInterests?: boolean;
+}
+
 export interface ProductContextData {
     createProduct(product: CreateProductPayload): Promise<ProductProxy>;
     updateProduct(
@@ -32,10 +55,7 @@ export interface ProductContextData {
     uploadImage(image: File): Promise<ImageUploadProxy>;
     createProductRating(rating: CreateRating): Promise<void>;
     getUserProducts(
-        page: number,
-        limit: number,
-        join?: string[],
-        filter?: string[]
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy> | null>;
     getUserProductRating(
         userId: number,
@@ -45,71 +65,20 @@ export interface ProductContextData {
         ratingId: number,
         updateRating: UpdateRating
     ): Promise<void>;
-    searchProducts(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[],
-        name?: string,
-        categoryId?: string,
-        userId?: string,
-        minPrice?: string,
-        maxPrice?: string,
-        state?: string,
-        hasDiscount?: boolean,
-        freeOfInterests?: boolean
-    ): Promise<GetMany<ProductProxy>>;
-    getProducts(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
-    ): Promise<GetMany<ProductProxy>>;
+    searchProducts(searchParams: SearchParams): Promise<GetMany<ProductProxy>>;
+    getProducts(queryParams: QueryParams): Promise<GetMany<ProductProxy>>;
     getProductsByCategory(
         categoryId: number,
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>>;
     getProductsByPrice(
         price: number,
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>>;
-    getProductsOnSale(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
-    ): Promise<GetMany<ProductProxy>>;
-    getInterestFree(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
-    ): Promise<GetMany<ProductProxy>>;
-    getRecentProducts(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[]
-    ): Promise<GetMany<ProductProxy>>;
-    getMostBought(
-        page: number,
-        offset: number,
-        limit: number,
-        join?: string[],
-        orderBy?: string[]
-    ): Promise<GetMany<ProductProxy>>;
+    getProductsOnSale(queryParams: QueryParams): Promise<GetMany<ProductProxy>>;
+    getInterestFree(queryParams: QueryParams): Promise<GetMany<ProductProxy>>;
+    getRecentProducts(queryParams: QueryParams): Promise<GetMany<ProductProxy>>;
+    getMostBought(queryParams: QueryParams): Promise<GetMany<ProductProxy>>;
 }
 
 interface ImageUploadProxy {
@@ -256,22 +225,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const searchProducts = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['ratings'],
-        orderBy: string[] = [],
-        name?: string,
-        categoryId?: string,
-        userId?: string,
-        minPrice?: string,
-        maxPrice?: string,
-        state?: string,
-        hasDiscount?: boolean,
-        freeOfInterests?: boolean
+        searchParams: SearchParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url: string = concatParam('/search?', 'sort', orderBy);
-        url = concatParam(url, 'join', join);
+        const { hasDiscount, userId } = searchParams;
+
+        let url: string = concatParam(
+            '/search?',
+            'sort',
+            searchParams.orderBy || []
+        );
+        url = concatParam(url, 'join', searchParams.join || ['ratings']);
 
         if (userId && hasDiscount)
             url = concatParam(url, 'filter', [
@@ -283,38 +246,44 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
         else if (hasDiscount)
             url = insertParamInQuery(url, 'filter', 'discount||$gt||0');
 
-        url = insertParamInQuery(url, 'name', name || '');
-        url = insertParamInQuery(url, 'categoryId', categoryId || '');
-        url = insertParamInQuery(url, 'minPrice', minPrice || '');
-        url = insertParamInQuery(url, 'maxPrice', maxPrice || '');
-        url = insertParamInQuery(url, 'state', state || '');
+        url = insertParamInQuery(url, 'name', searchParams.name || '');
+        url = insertParamInQuery(
+            url,
+            'categoryId',
+            searchParams.categoryId || ''
+        );
+        url = insertParamInQuery(url, 'minPrice', searchParams.minPrice || '');
+        url = insertParamInQuery(url, 'maxPrice', searchParams.maxPrice || '');
+        url = insertParamInQuery(url, 'state', searchParams.state || '');
         url = insertParamInQuery(
             url,
             'freeOfInterests',
-            freeOfInterests ? 'true' : ''
+            searchParams.freeOfInterests ? 'true' : ''
         );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', searchParams.limit);
+        url = insertParamInQuery(url, 'page', searchParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url);
         return response.data;
     };
 
     const getProducts = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url: string = concatParam('/products?', 'sort', orderBy);
-        url = concatParam(url, 'join', join);
+        let url: string = concatParam(
+            '/products?',
+            'sort',
+            queryParams.orderBy || []
+        );
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -324,18 +293,17 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
     const getProductsByCategory = async (
         categoryId: number,
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['categories', 'user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url = concatParam('/products?', 'sort', orderBy);
-        url = concatParam(url, 'join', join);
+        let url = concatParam('/products?', 'sort', queryParams.orderBy || []);
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['categories', 'user||name', 'ratings']
+        );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
         url = insertParamInQuery(
             url,
             'filter',
@@ -349,21 +317,22 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getUserProducts = async (
-        page: number,
-        limit: number,
-        join = ['user||name', 'ratings', 'categories'],
-        filter: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy> | null> => {
         if (me) {
             let url: string = concatParam(
                 '/users/me/products?',
                 'filter',
-                filter
+                queryParams.filter || []
             );
-            url = concatParam(url, 'join', join);
+            url = concatParam(
+                url,
+                'join',
+                queryParams.join || ['user||name', 'ratings', 'categories']
+            );
 
-            url = insertParamInQuery(url, 'limit', limit);
-            url = insertParamInQuery(url, 'page', page);
+            url = insertParamInQuery(url, 'limit', queryParams.limit);
+            url = insertParamInQuery(url, 'page', queryParams.page);
 
             const response = await api.get<GetMany<ProductProxy>>(url, {
                 headers: { Authorization: 'Bearer ' + token }
@@ -375,19 +344,22 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
 
     const getProductsByPrice = async (
         price: number,
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url: string = concatParam('/products/less-than?', 'sort', orderBy);
-        url = concatParam(url, 'join', join);
+        let url: string = concatParam(
+            '/products/less-than?',
+            'sort',
+            queryParams.orderBy || []
+        );
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
 
         url = insertParamInQuery(url, 'maxPrice', price);
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -396,15 +368,19 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getProductsOnSale = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url: string = concatParam('/products/on-sale?', 'sort', orderBy);
-        url = concatParam(url, 'join', join);
-        url += `limit=${limit}&offset=${offset}&page=${page}`;
+        let url: string = concatParam(
+            '/products/on-sale?',
+            'sort',
+            queryParams.orderBy || []
+        );
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
+        url += `limit=${queryParams.limit}&page=${queryParams.page}`;
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -413,22 +389,21 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getInterestFree = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam(
             '/products/free-of-interests?',
             'sort',
-            orderBy
+            queryParams.orderBy || []
         );
-        url = concatParam(url, 'join', join);
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -437,16 +412,16 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getRecentProducts = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings']
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
-        let url = concatParam('/products/recent?', 'join', join);
+        let url = concatParam(
+            '/products/recent?',
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
@@ -455,22 +430,21 @@ export const ProductProvider: React.FC<ProductProviderProps> = ({
     };
 
     const getMostBought = async (
-        page: number,
-        offset: number,
-        limit: number,
-        join = ['user||name', 'ratings'],
-        orderBy: string[] = []
+        queryParams: QueryParams
     ): Promise<GetMany<ProductProxy>> => {
         let url: string = concatParam(
             '/products/most-bought?',
             'sort',
-            orderBy
+            queryParams.orderBy || []
         );
-        url = concatParam(url, 'join', join);
+        url = concatParam(
+            url,
+            'join',
+            queryParams.join || ['user||name', 'ratings']
+        );
 
-        url = insertParamInQuery(url, 'limit', limit);
-        url = insertParamInQuery(url, 'offset', offset);
-        url = insertParamInQuery(url, 'page', page);
+        url = insertParamInQuery(url, 'limit', queryParams.limit);
+        url = insertParamInQuery(url, 'page', queryParams.page);
 
         const response = await api.get<GetMany<ProductProxy>>(url, {
             headers: { Authorization: 'Bearer ' + token }
