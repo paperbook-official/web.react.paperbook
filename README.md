@@ -1,46 +1,149 @@
-# Getting Started with Create React App
+<div
+    align="center"
+    style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    "
+>
+    <span style="font-size:2.4rem;font-weight:500;">
+        Made with
+    </span>
+    <a href="https://reactjs.org/" target="_blank">
+        <img
+            alt="React Icon"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png"
+            style="max-height: 120px;"
+        >
+    </a>
+</div>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<div align="center" style="margin: 10px 0 30px 0">
+    <img
+        src="./src/assets/icons/paperbook-logo.svg"
+        alt="Paperbook Icon"
+        style="height: 100px;"
+    >
+</div>
 
-## Available Scripts
+## Description
 
-In the project directory, you can run:
+The project simulates an e-commerce for buying and selling books and stationery. Made with Typescript and React, it gets data from the [application backend](https://github.com/AppliedProject05/api.nestjs.paperbook).
 
-### `npm start`
+<hr>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Content Table
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+<!--ts-->
 
-### `npm test`
+-   [Description](#description)
+-   [Content Table](#content-table)
+-   [Getting Started](#getting-started)
+-   [Running and Building the App](#running-and-building-the-app)
+-   [Heroku](#heroku)
+-   [Structure](#structure)
+-   [Technologies](#technologies)
+-   [License](#license)
+<!--te-->
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+<hr>
 
-### `npm run build`
+## Getting Started
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Before continue, be sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org/en/) installed.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To clone the repository, use:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+$ git clone 'https://github.com/AppliedProject05/web.react.paperbook.git'
+```
 
-### `npm run eject`
+Then, install all of it's dependencies:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+$ npm install
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+For VSCode developers, it's also highly recommended to install some extensions:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+-   ESLint
+-   Prettier - Code formatter
+-   vscode-styled-components
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+<hr>
 
-## Learn More
+## Running and Building the App
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To run the app in development mode:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+$ npm start
+```
+
+Building the app for production:
+
+```bash
+$ npm run build
+```
+
+<hr>
+
+## Heroku
+
+The project uses Heroku to host it's development version. It can be accessed by [clicking here](http://appliedproject05-paperbook-web.herokuapp.com/).
+
+To send the app to Heroku, first create a file named **.env.local** and put in it the template bellow:
+
+```js
+PORT = 3000;
+```
+
+> The PORT is not fixed and may be changed
+
+\
+Then, add the Heroku repository:
+
+```bash
+$ git remote add heroku https://git.heroku.com/heroku-app-name-here.git
+
+$ git checkout master
+$ git merge develop
+
+$ git push heroku master
+```
+
+<hr>
+
+## Structure
+
+The project uses the [atomic design pattern](https://medium.com/@janelle.wg/atomic-design-pattern-how-to-structure-your-react-application-2bb4d9ca5f97) to organize it's components, so be sure to select the correct folder according to the pattern's concepts.
+
+Ex.: creating the Button, ListItem and List components:
+
+-   `components`
+    -   `atoms`
+        -   `Button`
+            -   index.tsx
+            -   styles.ts
+    -   `molecules`
+        -   `ListItem`
+            -   index.tsx
+            -   styles.ts
+    -   `organisms`
+        -   `List`
+            -   index.tsx
+            -   styles.ts
+
+<hr>
+
+## Technologies
+
+-   [React](https://reactjs.org/)
+-   [Typescript](https://www.typescriptlang.org/)
+-   [Styled Components](https://styled-components.com/)
+
+<hr>
+
+## License
+
+The PaperBook project is licensed under the [MIT license](https://opensource.org/licenses/MIT).
