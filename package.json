@@ -1,7 +1,14 @@
 {
-    "name": "web.react.paperbook",
-    "version": "0.1.0",
+    "name": "paperbook",
+    "version": "1.0.0",
+    "description": "The project simulates an e-commerce for buying and selling books and stationery. Made with Typescript and React, it gets data from the application backend.",
+    "author": {
+        "name": "Michell Algarra",
+        "email": "michell.algarra@gmail.com",
+        "url": "https://github.com/mchalgarra"
+    },
     "private": true,
+    "license": "MIT",
     "dependencies": {
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^11.2.5",
