@@ -1,29 +1,21 @@
-<div
-    align="center"
-    style="
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    "
->
-    <span style="font-size:2.4rem;font-weight:500;">
-        Made with
-    </span>
+<div align="center">
     <a href="https://reactjs.org/" target="_blank">
         <img
-            alt="React Icon"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1280px-React-icon.svg.png"
-            style="max-height: 120px;"
+            src="./src/assets/icons/made-with-react.svg"
+            alt="Made with React"
+            height="80"
         >
     </a>
 </div>
 
-<div align="center" style="margin: 10px 0 30px 0">
-    <img
-        src="./src/assets/icons/paperbook-logo.svg"
-        alt="Paperbook Icon"
-        style="height: 100px;"
-    >
+<div align="center">
+    <a href="http://appliedproject05-paperbook-web.herokuapp.com/" target="_blank">
+        <img
+            src="./src/assets/icons/paperbook-logo.svg"
+            alt="PaperBook Logo"
+            height="100"
+        >
+    </a>
 </div>
 
 ## Description
