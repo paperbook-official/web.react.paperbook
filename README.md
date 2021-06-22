@@ -20,7 +20,7 @@
 
 ## Description
 
-The project simulates an e-commerce for buying and selling books and stationery. Made with Typescript and React, it gets data from the [application backend](https://github.com/AppliedProject05/api.nestjs.paperbook).
+The project simulates an e-commerce for buying and selling books and stationery. Made with Typescript and React, it gets data from the [application backend](https://github.com/paperbook-official/api.nestjs.paperbook).
 
 <hr>
 
@@ -47,7 +47,7 @@ Before continue, be sure to have [Git](https://git-scm.com/) and [Node.js](https
 To clone the repository, use:
 
 ```bash
-$ git clone 'https://github.com/AppliedProject05/web.react.paperbook.git'
+$ git clone 'https://github.com/paperbook-official/web.react.paperbook.git'
 ```
 
 Then, install all of it's dependencies:
